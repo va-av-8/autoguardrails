@@ -27,6 +27,13 @@ from .data_utils import (
     get_intent_names,
 )
 from .evaluation import Evaluator, EvaluationResult
+from .visualization import (
+    plot_roc_curves,
+    plot_fewshot_scaling,
+    plot_confusion_matrix,
+    plot_threshold_curve,
+    plot_ioc_curve,
+)
 
 __all__ = [
     # Metrics
@@ -48,4 +55,10 @@ __all__ = [
     # Evaluation
     "Evaluator",
     "EvaluationResult",
+    # Visualization
+    "plot_roc_curves",
+    "plot_fewshot_scaling",
+    "plot_confusion_matrix",
+    "plot_threshold_curve",
+    "plot_ioc_curve",
 ]

@@ -70,8 +70,21 @@ def oos_recall(
     Returns:
         recall на OOS-классе, float в [0, 1]
     """
-    # TODO: реализовать
-    raise NotImplementedError
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+
+    oos_mask = y_true == oos_label
+    if oos_mask.sum() == 0:
+        return 0.0
+
+    # TP: correctly predicted as OOS
+    tp = ((y_true == oos_label) & (y_pred == oos_label)).sum()
+    # FN: OOS but predicted as in-scope
+    fn = ((y_true == oos_label) & (y_pred != oos_label)).sum()
+
+    if tp + fn == 0:
+        return 0.0
+    return float(tp / (tp + fn))
 
 
 def in_domain_accuracy(
@@ -94,8 +107,18 @@ def in_domain_accuracy(
     Returns:
         accuracy на in-scope подмножестве, float в [0, 1]
     """
-    # TODO: реализовать
-    raise NotImplementedError
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+
+    # Filter to in-scope examples only
+    inscope_mask = y_true != oos_label
+    if inscope_mask.sum() == 0:
+        return 0.0
+
+    y_true_inscope = y_true[inscope_mask]
+    y_pred_inscope = y_pred[inscope_mask]
+
+    return float(accuracy_score(y_true_inscope, y_pred_inscope))
 
 
 def f1_oos(
@@ -119,8 +142,15 @@ def f1_oos(
     Returns:
         F1-score для OOS-класса, float в [0, 1]
     """
-    # TODO: реализовать
-    raise NotImplementedError
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+
+    # Convert to binary: OOS=1, in-scope=0
+    y_true_binary = (y_true == oos_label).astype(int)
+    y_pred_binary = (y_pred == oos_label).astype(int)
+
+    # F1 for the positive class (OOS)
+    return float(f1_score(y_true_binary, y_pred_binary, pos_label=1, zero_division=0))
 
 
 def auroc(
@@ -143,13 +173,23 @@ def auroc(
     Returns:
         AUROC, float в [0.5, 1.0]
     """
-    # TODO: реализовать
-    raise NotImplementedError
+    y_true = np.asarray(y_true)
+    y_scores = np.asarray(y_scores)
+
+    # Convert to binary: OOS=1, in-scope=0
+    y_true_binary = (y_true == oos_label).astype(int)
+
+    # Check for degenerate cases
+    if len(np.unique(y_true_binary)) < 2:
+        return 0.5  # Random baseline
+
+    return float(roc_auc_score(y_true_binary, y_scores))
 
 
 def au_ioc(
     y_true: np.ndarray,
     y_scores: np.ndarray,
+    y_pred_intent: np.ndarray | None = None,
     oos_label: int = -1,
     n_thresholds: int = 100,
 ) -> float:
@@ -174,14 +214,74 @@ def au_ioc(
     Args:
         y_true: истинные метки (-1 для OOS, 0..N для in-scope intent)
         y_scores: скоры OOS-вероятности (выше = более OOS)
+        y_pred_intent: предсказанные intent-метки (если None, используется
+                       упрощённая версия - просто accuracy на не-OOS)
         oos_label: метка OOS-класса
         n_thresholds: число точек для построения кривой
 
     Returns:
         AU-IOC, float в [0, 1]
     """
-    # TODO: реализовать
-    raise NotImplementedError
+    y_true = np.asarray(y_true)
+    y_scores = np.asarray(y_scores)
+
+    if y_pred_intent is not None:
+        y_pred_intent = np.asarray(y_pred_intent)
+
+    # Generate thresholds from score distribution
+    thresholds = np.linspace(y_scores.min(), y_scores.max(), n_thresholds)
+
+    # Masks
+    oos_mask = y_true == oos_label
+    inscope_mask = ~oos_mask
+
+    n_oos = oos_mask.sum()
+    n_inscope = inscope_mask.sum()
+
+    if n_oos == 0 or n_inscope == 0:
+        return 0.5  # Degenerate case
+
+    x_points = []  # in-domain accuracy
+    y_points = []  # OOS recall
+
+    for thresh in thresholds:
+        # Predict OOS if score >= threshold
+        pred_oos = y_scores >= thresh
+
+        # OOS recall: TP / (TP + FN)
+        oos_tp = (oos_mask & pred_oos).sum()
+        oos_recall_val = oos_tp / n_oos
+
+        # In-domain accuracy: correct in-scope predictions among in-scope samples
+        # An in-scope sample is "correct" if:
+        # 1. It's NOT predicted as OOS (threshold)
+        # 2. AND (if y_pred_intent provided) its intent is correctly predicted
+        inscope_not_oos = inscope_mask & ~pred_oos
+
+        if y_pred_intent is not None:
+            # Check intent correctness for in-scope samples not flagged as OOS
+            inscope_correct = (
+                inscope_not_oos & (y_pred_intent == y_true)
+            ).sum()
+        else:
+            # Simplified: just count in-scope not flagged as OOS
+            inscope_correct = inscope_not_oos.sum()
+
+        in_domain_acc_val = inscope_correct / n_inscope
+
+        x_points.append(in_domain_acc_val)
+        y_points.append(oos_recall_val)
+
+    # Sort by x for proper AUC calculation
+    sorted_indices = np.argsort(x_points)
+    x_sorted = np.array(x_points)[sorted_indices]
+    y_sorted = np.array(y_points)[sorted_indices]
+
+    # Calculate AUC using trapezoidal rule
+    auc = float(np.trapz(y_sorted, x_sorted))
+
+    # Normalize to [0, 1] (max possible area is 1x1)
+    return max(0.0, min(1.0, auc))
 
 
 def measure_latency(
@@ -206,8 +306,21 @@ def measure_latency(
     Returns:
         среднее время на 1 запрос в миллисекундах
     """
-    # TODO: реализовать
-    raise NotImplementedError
+    import time
+
+    # Warmup runs
+    for _ in range(n_warmup):
+        _ = model.predict(texts[:1])
+
+    # Timed runs
+    times = []
+    for _ in range(n_runs):
+        start = time.perf_counter()
+        _ = model.predict(texts[:1])
+        end = time.perf_counter()
+        times.append((end - start) * 1000)  # Convert to ms
+
+    return float(np.mean(times))
 
 
 def compute_all_metrics(
@@ -232,5 +345,12 @@ def compute_all_metrics(
           auroc, au_ioc                        <- вспомогательные
         latency_ms считается отдельно через measure_latency()
     """
-    # TODO: реализовать
-    raise NotImplementedError
+    return {
+        # Primary metrics
+        "oos_recall": oos_recall(y_true, y_pred, oos_label),
+        "in_domain_acc": in_domain_accuracy(y_true, y_pred, oos_label),
+        "f1_oos": f1_oos(y_true, y_pred, oos_label),
+        # Secondary metrics
+        "auroc": auroc(y_true, y_scores, oos_label),
+        "au_ioc": au_ioc(y_true, y_scores, y_pred, oos_label),
+    }
