@@ -1,0 +1,30 @@
+# AutoIntent на полном train-сплите
+# Воспроизведение результата из статьи: OOS F1 = 76.79 на CLINC150
+# Служит верхней границей качества AutoIntent и проверкой воспроизводимости
+
+model: autointent
+mode: full
+
+autointent:
+  preset: classic-light         # тот же preset, что и в few-shot
+  # для fair comparison используем одинаковые гиперпараметры
+
+oos_detection:
+  decision_module: tunable      # автоматический подбор порога
+
+# Ожидаемые результаты из статьи AutoIntent (Table 3):
+# - in-domain accuracy: 96.13
+# - OOS F1: 76.79
+# - OOS recall: не указан
+# - OOS precision: не указан
+# Примечание: сплит OOS (easy/medium/hard) в статье не уточнён
+
+evaluation:
+  primary_metric: recall_at_fpr
+  fpr_targets: [0.05, 0.10]
+  secondary_metrics: [auroc, f1_oos, latency_ms]
+
+reproducibility:
+  # параметры для точного воспроизведения результата из статьи
+  seed: 42
+  log_config: true              # сохранить финальный конфиг в results/
