@@ -1,40 +1,21 @@
 """
-Запуск бейзлайн-моделей для OOS-детекции.
-
-Бейзлайны:
-- TF-IDF + Logistic Regression (OOS как доп. класс)
-- Cosine Similarity Threshold (embedding-based)
+Запуск бейзлайнов: TF-IDF + LogReg и Cosine Similarity.
 
 Использование:
-    python run_baseline.py --model tfidf --config configs/baseline_tfidf.yaml
-    python run_baseline.py --model cosine --config configs/baseline_cosine.yaml
+    # Бейзлайн A
+    python scripts/run_baseline.py --model tfidf
 
-TODO:
-    - [ ] Загрузка данных
-    - [ ] Обучение TF-IDF + LogReg
-    - [ ] Реализация cosine threshold
-    - [ ] Оценка на тест-сплите
-    - [ ] Сохранение результатов
+    # Бейзлайн B — оба варианта модели одной командой
+    python scripts/run_baseline.py --model cosine
+
+    # Бейзлайн B — конкретная модель
+    python scripts/run_baseline.py --model cosine --model_name bert-base-uncased
+    python scripts/run_baseline.py --model cosine --model_name sentence-transformers/all-MiniLM-L6-v2
+
+    # Все бейзлайны подряд
+    python scripts/run_baseline.py --model all
 """
 
-from __future__ import annotations
-
-import argparse
-from pathlib import Path
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Run baseline models")
-    parser.add_argument("--model", choices=["tfidf", "cosine"], required=True)
-    parser.add_argument("--config", type=Path, required=True)
-    parser.add_argument("--data_dir", type=Path, default=Path("data/processed"))
-    parser.add_argument("--results_dir", type=Path, default=Path("results"))
-
-    args = parser.parse_args()
-
-    # TODO: реализовать
-    raise NotImplementedError("run_baseline.py not implemented yet")
-
-
-if __name__ == "__main__":
-    main()
+# TODO: реализовать
+# Аргументы: --model (tfidf | cosine | all), --model_name, --split (easy|plus)
+# Выход: results/metrics.json (дописать), results/error_analysis.csv

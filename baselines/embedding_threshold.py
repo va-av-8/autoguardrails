@@ -1,112 +1,149 @@
 """
-Embedding-based OOS detection with cosine similarity threshold.
+Бейзлайн B: Cosine Similarity + Threshold для OOS-детекции.
 
-Simple approach: compute cosine similarity to training examples,
-if max similarity is below threshold — classify as OOS.
+Логика: если максимальная косинусная близость запроса к любому
+обучающему примеру ниже порога — запрос считается OOS.
+
+Поддерживает два варианта модели через параметр model_name:
+- "bert-base-uncased": замороженный BERT без дообучения.
+  Используется в литературе как нижняя граница embedding-методов
+  (ADB AAAI 2021, DCLOOS ACL 2021). Слабее, но сравним с опубл. числами.
+- "sentence-transformers/all-MiniLM-L6-v2": дообучен на semantic
+  similarity, даёт лучше zero-shot качество.
+
+Оба варианта — заморожены, дообучения нет.
 """
 
 from __future__ import annotations
 import numpy as np
+import torch
+from transformers import AutoTokenizer, AutoModel
+from sklearn.metrics.pairwise import cosine_similarity
+
+
+SUPPORTED_MODELS = [
+    "bert-base-uncased",
+    "sentence-transformers/all-MiniLM-L6-v2",
+]
+
+
+def mean_pool(token_embeddings: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
+    """
+    Mean pooling — усредняем токены с учётом attention mask.
+    Стандартный способ получить sentence embedding из токен-эмбеддингов.
+    """
+    mask_expanded = attention_mask.unsqueeze(-1).float()
+    return (token_embeddings * mask_expanded).sum(1) / mask_expanded.sum(1).clamp(min=1e-9)
+
+
+def get_embeddings(
+    texts: list[str],
+    model: AutoModel,
+    tokenizer: AutoTokenizer,
+    batch_size: int = 32,
+    device: str = "cpu",
+) -> np.ndarray:
+    """
+    Вычисляет эмбеддинги для списка текстов батчами.
+
+    Args:
+        texts: список входных текстов
+        model: замороженная HuggingFace модель
+        tokenizer: соответствующий токенизатор
+        batch_size: размер батча
+        device: "cpu" или "cuda"
+
+    Returns:
+        np.ndarray shape (len(texts), hidden_dim)
+    """
+    # TODO: реализовать
+    raise NotImplementedError
 
 
 class EmbeddingThreshold:
     """
-    OOS detection via cosine similarity threshold.
+    Cosine similarity baseline для OOS-детекции.
 
-    For each test sample:
-    1. Compute embedding
-    2. Find max cosine similarity to any training sample
-    3. If max_sim < threshold -> OOS
+    Параметр model_name позволяет запускать два варианта
+    одной командой без дублирования кода:
 
-    Attributes:
-        model_name: sentence-transformers model name
-        threshold: similarity threshold for OOS detection
-        train_embeddings: cached training embeddings
-        train_labels: training labels
+        # вариант 1 — для связи с литературой
+        model = EmbeddingThreshold(model_name="bert-base-uncased")
+
+        # вариант 2 — сильнее zero-shot
+        model = EmbeddingThreshold(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+        model.fit(train_texts, train_labels)
+        oos_scores = model.predict_proba(test_texts)
+
+    OOS-скор = 1 - max_cosine_similarity к обучающим примерам.
+    Чем выше скор — тем более OOS запрос.
     """
 
     def __init__(
         self,
-        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
-        threshold: float | None = None,
-        threshold_percentile: float = 95,
+        model_name: str = "bert-base-uncased",
+        threshold: float = 0.85,
+        batch_size: int = 32,
+        device: str = "cpu",
     ):
         """
-        Initialize embedding threshold model.
-
         Args:
-            model_name: sentence-transformers model to use
-            threshold: fixed similarity threshold (if None, use percentile)
-            threshold_percentile: percentile of train similarities for threshold
+            model_name: название модели из SUPPORTED_MODELS
+            threshold: порог cosine similarity (ниже = OOS)
+            batch_size: батч для инференса
+            device: "cpu" или "cuda"
         """
+        if model_name not in SUPPORTED_MODELS:
+            raise ValueError(f"model_name должен быть одним из {SUPPORTED_MODELS}")
         self.model_name = model_name
         self.threshold = threshold
-        self.threshold_percentile = threshold_percentile
-        self.encoder = None
-        self.train_embeddings = None
-        self.train_labels = None
+        self.batch_size = batch_size
+        self.device = device
+        self.tokenizer = None
+        self.model = None
+        self.train_embeddings = None  # np.ndarray (n_train, hidden_dim)
+        self.train_labels = None      # np.ndarray (n_train,)
 
-    def fit(self, texts: list[str], labels: list[int]) -> "EmbeddingThreshold":
+    def load_model(self) -> None:
         """
-        Fit the model (compute and cache training embeddings).
-
-        Args:
-            texts: list of text samples (in-scope only for fitting)
-            labels: list of integer labels
-
-        Returns:
-            self
+        Загружает токенизатор и модель с HuggingFace.
+        Вызывается лениво при первом fit() или predict_proba().
         """
         # TODO: реализовать
         raise NotImplementedError
 
-    def predict(self, texts: list[str]) -> np.ndarray:
+    def fit(self, texts: list[str], labels: list[int]) -> None:
         """
-        Predict class labels (including OOS = -1).
+        Запоминает эмбеддинги обучающих примеров.
+        Дообучения нет — модель заморожена.
 
         Args:
-            texts: list of text samples
-
-        Returns:
-            predicted labels (-1 for OOS)
+            texts: обучающие тексты (in-scope)
+            labels: intent-метки (OOS-примеры не передаются)
         """
         # TODO: реализовать
         raise NotImplementedError
 
     def predict_proba(self, texts: list[str]) -> np.ndarray:
         """
-        Get OOS probability (1 - max_similarity).
-
-        Args:
-            texts: list of text samples
-
-        Returns:
-            OOS probability for each sample
-        """
-        # TODO: реализовать
-        raise NotImplementedError
-
-    def get_oos_scores(self, texts: list[str]) -> np.ndarray:
-        """
-        Get OOS scores (1 - max_similarity).
-
-        Higher score = more likely OOS.
-
-        Args:
-            texts: list of text samples
+        OOS-скор для каждого текста.
+        OOS-скор = 1 - max_cosine_similarity к train.
+        Чем выше — тем более OOS.
 
         Returns:
-            OOS score for each sample
+            np.ndarray shape (len(texts),), значения в [0, 1]
         """
         # TODO: реализовать
         raise NotImplementedError
 
-    def _compute_embeddings(self, texts: list[str]) -> np.ndarray:
-        """Compute embeddings for texts."""
-        # TODO: реализовать
-        raise NotImplementedError
+    def predict(self, texts: list[str]) -> np.ndarray:
+        """
+        Бинарное предсказание: 1 = OOS, 0 = in-scope.
+        Порог применяется к OOS-скору.
 
-    def _compute_similarities(self, query_embeddings: np.ndarray) -> np.ndarray:
-        """Compute max similarity to training set for each query."""
+        Returns:
+            np.ndarray shape (len(texts),), значения в {0, 1}
+        """
         # TODO: реализовать
         raise NotImplementedError

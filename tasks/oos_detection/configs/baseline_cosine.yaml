@@ -1,26 +1,23 @@
-# Бейзлайн B: Cosine Similarity Threshold
-# OOS детектируется через порог косинусного расстояния до ближайшего кластера
-# Простой embedding-based подход без обучения классификатора
+# Бейзлайн B: Cosine Similarity + Threshold
+# Два варианта модели, запускаются одним скриптом через --model_name
 
 model: embedding_threshold
-oos_handling: threshold   # OOS = запрос далеко от всех известных интентов
 
-embedding:
-  model_name: sentence-transformers/all-mpnet-base-v2
-  # та же модель, что используется в AutoIntent по умолчанию
-  # для fair comparison бейзлайна с AutoIntent
+variants:
+  - model_name: bert-base-uncased
+    # Связь с литературой: используется в ADB (AAAI 2021), DCLOOS (ACL 2021)
+    # Нижняя граница среди embedding-методов — модель не оптимизирована
+    # под semantic similarity
 
-threshold:
-  method: percentile      # порог как перцентиль расстояний на train
-  percentile: 95          # 95% train-примеров ближе порога
-  # альтернатива: method: fixed, value: 0.7
+  - model_name: sentence-transformers/all-MiniLM-L6-v2
+    # Дообучена на semantic similarity — даёт лучше zero-shot качество
+    # Используется для сравнения внутри бейзлайна
 
-similarity:
-  metric: cosine
-  aggregation: max        # max sim до любого примера из train
-  # альтернатива: aggregation: centroid — sim до центроида кластера
+threshold: 0.85                      # начальное значение, подбирается по val
+batch_size: 32
+device: cpu
 
 evaluation:
   primary_metric: recall_at_fpr
   fpr_targets: [0.05, 0.10]
-  secondary_metrics: [accuracy, auroc, f1_oos, latency_ms]
+  secondary_metrics: [auroc, f1_oos, in_domain_accuracy, latency_ms]

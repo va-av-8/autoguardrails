@@ -1,16 +1,12 @@
-"""
-Baseline models for OOS detection.
-
-Simple models without specialized OOS support:
-- TfidfLogreg: TF-IDF + Logistic Regression (OOS as extra class)
-- EmbeddingThreshold: Cosine similarity threshold
-- ZeroShotLLM: LLM-based zero-shot classification
-"""
-
 from .tfidf_logreg import TfidfLogreg
-from .embedding_threshold import EmbeddingThreshold
+from .embedding_threshold import EmbeddingThreshold, SUPPORTED_MODELS
+from .deter import DETERWrapper
+from .guardrail_reference import GuardrailReference
 
 __all__ = [
     "TfidfLogreg",
     "EmbeddingThreshold",
+    "SUPPORTED_MODELS",
+    "DETERWrapper",
+    "GuardrailReference",
 ]

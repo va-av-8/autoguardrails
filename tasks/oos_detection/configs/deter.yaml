@@ -1,0 +1,17 @@
+# SOTA: DETER — Dual Encoder for Threshold-Based Re-Classification
+# arxiv.org/abs/2405.19967 (2024)
+# GitHub: github.com/Hossam-Mohammed-tech/Intent_Classification_OOS
+#
+# Роль: SOTA (верхняя граница качества)
+# Метрики на CLINC150 vs ADB: +13% F1 known, +5% F1 unknown
+
+model: deter
+
+deter:
+  repo_path: external/deter          # git clone сюда
+  device: cpu                        # или cuda
+
+evaluation:
+  primary_metric: recall_at_fpr
+  fpr_targets: [0.05, 0.10]
+  secondary_metrics: [auroc, f1_oos, in_domain_accuracy, latency_ms]
