@@ -8,7 +8,28 @@ guardrail: пропустить нарушение дороже, чем ложн
 
 from __future__ import annotations
 import numpy as np
-from sklearn.metrics import roc_auc_score, roc_curve, f1_score
+from sklearn.metrics import roc_auc_score, roc_curve, f1_score, accuracy_score
+
+
+def accuracy(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+) -> float:
+    """
+    Accuracy на всех классах (включая OOS).
+
+    Стандартная метрика для сравнения с литературой.
+    В статье AutoIntent: in-domain accuracy = 96.13 на CLINC150.
+
+    Args:
+        y_true: истинные метки
+        y_pred: предсказанные метки
+
+    Returns:
+        accuracy score
+    """
+    # TODO: реализовать
+    raise NotImplementedError
 
 
 def recall_at_fpr(
@@ -90,7 +111,7 @@ def compute_all_metrics(
     Используется в evaluate.py для единообразного репортинга.
 
     Returns:
-        dict с ключами: recall_at_fpr_05, recall_at_fpr_10,
+        dict с ключами: accuracy, recall_at_fpr_05, recall_at_fpr_10,
                         auroc, f1_oos
     """
     # TODO: реализовать

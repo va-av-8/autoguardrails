@@ -24,4 +24,4 @@ oos_detection:
 evaluation:
   primary_metric: recall_at_fpr
   fpr_targets: [0.05, 0.10]
-  secondary_metrics: [auroc, f1_oos, latency_ms]
+  secondary_metrics: [accuracy, auroc, f1_oos, latency_ms]

@@ -1,9 +1,15 @@
 # DA-ADB: Distance-Aware Adaptive Decision Boundary
-# SOTA метод для OOS-детекции (Zhang et al., 2021)
+# SOTA метод для OOS-детекции (Zhang et al., AAAI 2021 + IEEE TASLP 2023)
 # Верхняя граница качества для сравнения с AutoIntent
+#
+# Статьи:
+# - ADB (AAAI 2021): Deep Open Intent Classification with Adaptive Decision Boundary
+# - DA-ADB (IEEE TASLP 2023): Learning Discriminative Representations and Decision
+#   Boundaries for Open Intent Detection (arXiv:2203.05823)
+#
+# Репозиторий: https://github.com/thuiar/Adaptive-Decision-Boundary
 
 model: dadb
-# Репозиторий: https://github.com/zhang-yu-wei/ADB
 
 encoder:
   # DA-ADB использует BERT + дообучение на in-scope данных
@@ -37,4 +43,4 @@ oos_detection:
 evaluation:
   primary_metric: recall_at_fpr
   fpr_targets: [0.05, 0.10]
-  secondary_metrics: [auroc, f1_oos, latency_ms]
+  secondary_metrics: [accuracy, auroc, f1_oos, latency_ms]

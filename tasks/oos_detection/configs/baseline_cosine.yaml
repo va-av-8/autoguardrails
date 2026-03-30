@@ -6,9 +6,9 @@ model: embedding_threshold
 oos_handling: threshold   # OOS = запрос далеко от всех известных интентов
 
 embedding:
-  model_name: sentence-transformers/all-MiniLM-L6-v2
-  # быстрая модель, достаточная для бейзлайна
-  # в AutoIntent используются более мощные модели
+  model_name: sentence-transformers/all-mpnet-base-v2
+  # та же модель, что используется в AutoIntent по умолчанию
+  # для fair comparison бейзлайна с AutoIntent
 
 threshold:
   method: percentile      # порог как перцентиль расстояний на train
@@ -23,4 +23,4 @@ similarity:
 evaluation:
   primary_metric: recall_at_fpr
   fpr_targets: [0.05, 0.10]
-  secondary_metrics: [auroc, f1_oos, latency_ms]
+  secondary_metrics: [accuracy, auroc, f1_oos, latency_ms]
