@@ -48,17 +48,27 @@ def get_intent_names(dataset) -> dict[int, str]:
     return intent_names
 
 
-def deduplicate_split(split_data) -> list[dict]:
+def deduplicate_split(split_data, exclude_texts: set | None = None) -> list[dict]:
     """
     Deduplicate examples by text, keeping first occurrence.
     HuggingFace clinc_oos "plus" config now contains duplicates
     from multiple configurations.
+
+    Args:
+        split_data: HuggingFace dataset split
+        exclude_texts: set of texts to exclude (e.g., from train when processing test)
+
+    Returns:
+        list of unique examples not in exclude_texts
     """
+    if exclude_texts is None:
+        exclude_texts = set()
+
     seen_texts = set()
     unique_examples = []
     for example in split_data:
         text = example["text"]
-        if text not in seen_texts:
+        if text not in seen_texts and text not in exclude_texts:
             seen_texts.add(text)
             unique_examples.append({"text": text, "intent": example["intent"]})
     return unique_examples
@@ -196,6 +206,7 @@ def main():
 
     # Convert all splits to standard and autointent formats
     # Note: deduplicate because HuggingFace now returns combined configs
+    # Also remove train-test overlap by excluding train texts from val/test
     full_data = {
         "standard": {},
         "autointent": {},
@@ -203,9 +214,18 @@ def main():
     }
 
     split_stats = {}
-    for split_name in ["train", "validation", "test"]:
-        # Deduplicate
-        unique_examples = deduplicate_split(dataset[split_name])
+
+    # Process train first (no exclusions)
+    train_examples = deduplicate_split(dataset["train"])
+    train_texts = {ex["text"] for ex in train_examples}
+    train_standard = convert_to_standard_format(train_examples)
+    full_data["standard"]["train"] = train_standard
+    full_data["autointent"]["train"] = convert_to_autointent_format(train_standard)
+    split_stats["train"] = count_split_stats(train_standard)
+
+    # Process validation and test, excluding any texts from train
+    for split_name in ["validation", "test"]:
+        unique_examples = deduplicate_split(dataset[split_name], exclude_texts=train_texts)
 
         # Convert to standard format
         standard = convert_to_standard_format(unique_examples)
