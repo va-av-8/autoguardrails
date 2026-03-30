@@ -18,13 +18,13 @@
 
 **Задача:** OOS Detection
 **Гипотеза:** Калибровка порога OOS-детекции отдельно для каждого
-intent-кластера улучшает Recall@FPR на hard OOS без потери precision.
+intent-кластера улучшает OOS Recall на hard OOS без потери In-domain Accuracy.
 **Мотивация:** Разные intent-кластеры имеют разную плотность в
 embedding-пространстве. Глобальный порог (как в AutoIntent по умолчанию)
 неоптимален: для плотных кластеров нужен более жёсткий порог, для
 разреженных — более мягкий.
 **Реализация:** scripts/run_autointent.py --hypothesis per_intent_threshold
-**Метрика:** Recall@FPR=0.05 и Recall@FPR=0.10 на CLINC150 hard OOS
+**Метрика:** OOS Recall и In-domain Accuracy на CLINC150 hard OOS
 **Результат:** —
 **Вывод:** —
 **Дата:** —

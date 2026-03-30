@@ -18,6 +18,13 @@ batch_size: 32
 device: cpu
 
 evaluation:
-  primary_metric: recall_at_fpr
-  fpr_targets: [0.05, 0.10]
-  secondary_metrics: [auroc, f1_oos, in_domain_accuracy, latency_ms]
+  # Основные метрики — прямое сравнение с OOS-литературой
+  primary_metrics:
+    - oos_recall      # TPR на OOS; ADB, DETER, AutoIntent
+    - in_domain_acc   # accuracy на in-scope; AutoIntent Table 3: 96.13
+    - f1_oos          # F1 на OOS; AutoIntent Table 3: 76.79
+  # Вспомогательные
+  secondary_metrics:
+    - auroc           # EMNLP Industry 2024
+    - au_ioc          # Springer Applied Intelligence 2024; guardrail trade-off
+    - latency_ms      # guardrail-аргументация

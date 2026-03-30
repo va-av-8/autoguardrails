@@ -13,15 +13,30 @@ import time
 
 @dataclass
 class EvaluationResult:
+    """
+    Результат оценки одной модели на тест-сплите.
+
+    Метрики соответствуют стандарту OOS NLP-литературы.
+    Основные три (oos_recall, in_domain_acc, f1_oos) позволяют
+    напрямую сравниться с AutoIntent Table 3, ADB, DETER.
+    """
     model_name: str
-    mode: str                    # "full" | "10shot" | "20shot" | "50shot"
-    recall_at_fpr_05: float = 0.0
-    recall_at_fpr_10: float = 0.0
-    auroc: float = 0.0
-    f1_oos: float = 0.0
-    latency_ms: float = 0.0
-    n_shots: int | None = None
+    mode: str                      # "full" | "10shot" | "20shot" | "50shot"
+
+    # Основные метрики — прямое сравнение с литературой
+    oos_recall: float = 0.0        # TPR на OOS; стандарт в ADB, DETER, AutoIntent
+    in_domain_acc: float = 0.0     # accuracy на in-scope; AutoIntent Table 3: 96.13
+    f1_oos: float = 0.0            # F1 на OOS; AutoIntent Table 3: 76.79
+
+    # Вспомогательные метрики
+    auroc: float = 0.0             # EMNLP Industry 2024
+    au_ioc: float = 0.0            # Springer Applied Intelligence 2024
+    latency_ms: float = 0.0        # для guardrail-аргументации
+
+    # Мета-информация
+    n_shots: int | None = None     # None = full train
     seed: int | None = None
+    is_reference: bool = False     # True для guardrail reference (Chua 2024)
     extra: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:
