@@ -17,10 +17,19 @@ from .metrics import (
     measure_latency,
     compute_all_metrics,
 )
-from .data_utils import load_clinc150, sample_fewshot, convert_to_autointent_format
+from .data_utils import (
+    load_clinc150,
+    load_clinc150_autointent,
+    load_fewshot,
+    load_fewshot_autointent,
+    load_intents,
+    load_meta,
+    get_intent_names,
+)
 from .evaluation import Evaluator, EvaluationResult
 
 __all__ = [
+    # Metrics
     "oos_recall",
     "in_domain_accuracy",
     "f1_oos",
@@ -28,9 +37,15 @@ __all__ = [
     "au_ioc",
     "measure_latency",
     "compute_all_metrics",
+    # Data loading
     "load_clinc150",
-    "sample_fewshot",
-    "convert_to_autointent_format",
+    "load_clinc150_autointent",
+    "load_fewshot",
+    "load_fewshot_autointent",
+    "load_intents",
+    "load_meta",
+    "get_intent_names",
+    # Evaluation
     "Evaluator",
     "EvaluationResult",
 ]

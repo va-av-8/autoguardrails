@@ -215,6 +215,10 @@ tasks/*/data/raw/*
 tasks/*/data/processed/*
 !tasks/*/data/processed/.gitkeep
 
+# Processed JSON data files
+data/processed/*.json
+!data/processed/.gitkeep
+
 # Results (large files)
 results/*.pkl
 results/*.pt
