@@ -214,6 +214,9 @@ tasks/*/data/raw/*
 !tasks/*/data/raw/.gitkeep
 tasks/*/data/processed/*
 !tasks/*/data/processed/.gitkeep
+!tasks/*/data/processed/embeddings_cache/
+tasks/*/data/processed/embeddings_cache/**
+!tasks/*/data/processed/embeddings_cache/.gitkeep
 
 # Processed JSON data files
 data/processed/*.json

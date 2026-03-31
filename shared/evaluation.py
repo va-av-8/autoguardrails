@@ -24,7 +24,7 @@ class OOSModel(Protocol):
         """Return predicted labels (-1 for OOS, 0..N for intents)."""
         ...
 
-    def predict_proba_oos(self, texts: list[str]) -> np.ndarray:
+    def predict_proba(self, texts: list[str]) -> np.ndarray:
         """Return OOS probability scores (higher = more likely OOS)."""
         ...
 
@@ -115,7 +115,7 @@ class Evaluator:
         """
         # Get predictions
         y_pred = model.predict(self.texts)
-        y_scores = model.predict_proba_oos(self.texts)
+        y_scores = model.predict_proba(self.texts)
 
         # Compute metrics
         metrics = compute_all_metrics(
@@ -125,10 +125,10 @@ class Evaluator:
             oos_label=self.oos_label,
         )
 
-        # Measure latency
+        # Measure latency (first 100 texts for speed)
         latency = 0.0
         if measure_latency_flag:
-            latency = measure_latency(model, self.texts)
+            latency = measure_latency(model, self.texts[:100])
 
         return EvaluationResult(
             model_name=model_name,
@@ -184,14 +184,14 @@ class Evaluator:
         )
         print("-" * 100)
 
-        # Sort by mode, then by model name
-        sorted_results = sorted(results, key=lambda x: (x["mode"], x["model_name"]))
+        # Sort by f1_oos descending
+        sorted_results = sorted(results, key=lambda x: -x["f1_oos"])
 
         for r in sorted_results:
             # Mark reference models
             name = r["model_name"]
             if r.get("is_reference"):
-                name += " *"
+                name += " [ref]"
 
             print(
                 f"{name:<25} {r['mode']:<10} "
