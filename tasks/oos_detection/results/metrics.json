@@ -1,1 +1,86 @@
-[]
+[
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.001,
+    "in_domain_acc": 0.7434415295686972,
+    "f1_oos": 0.001998001998001998,
+    "auroc": 0.7683105824811027,
+    "au_ioc": 0.5858747220987105,
+    "latency_ms": 1.3678833404264878,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {}
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.133,
+    "in_domain_acc": 0.7369942196531792,
+    "f1_oos": 0.22542372881355932,
+    "auroc": 0.7683105824811027,
+    "au_ioc": 0.5851755224544242,
+    "latency_ms": 2.5637057996937074,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {}
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.95,
+    "in_domain_acc": 0.365051133837261,
+    "f1_oos": 0.4302536231884058,
+    "auroc": 0.8276665184526456,
+    "au_ioc": 0.3530978212538906,
+    "latency_ms": 50.326944100525,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {}
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.325,
+    "in_domain_acc": 0.6514006224988884,
+    "f1_oos": 0.4077791718946048,
+    "auroc": 0.8276665184526456,
+    "au_ioc": 0.5828871720764784,
+    "latency_ms": 1.741592499165563,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {}
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.999,
+    "in_domain_acc": 0.19986660738105824,
+    "f1_oos": 0.3572961373390558,
+    "auroc": 0.9446616273899512,
+    "au_ioc": 0.1966257225433526,
+    "latency_ms": 9.247511699941242,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {}
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.594,
+    "in_domain_acc": 0.8105824811027124,
+    "f1_oos": 0.6967741935483871,
+    "auroc": 0.9446616273899512,
+    "au_ioc": 0.7843516007114273,
+    "latency_ms": 0.9260933002224192,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {}
+  }
+]
