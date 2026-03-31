@@ -74,20 +74,20 @@ def deduplicate_split(split_data, exclude_texts: set | None = None) -> list[dict
     return unique_examples
 
 
-def convert_to_standard_format(examples: list[dict]) -> dict:
+def convert_to_standard_format(examples: list[dict], label_mapping: dict[int, int]) -> dict:
     """
     Convert examples to standard format.
-    OOS (intent 42) -> -1, in-scope labels unchanged.
+    OOS (intent 42) -> -1, in-scope labels remapped to sequential 0-149.
     """
     texts = []
     labels = []
     for example in examples:
         texts.append(example["text"])
-        label = example["intent"]
-        if label == OOS_LABEL_HF:
+        hf_label = example["intent"]
+        if hf_label == OOS_LABEL_HF:
             labels.append(OOS_LABEL_STANDARD)
         else:
-            labels.append(label)
+            labels.append(label_mapping[hf_label])
     return {"texts": texts, "labels": labels}
 
 
@@ -106,12 +106,31 @@ def convert_to_autointent_format(standard_data: dict) -> list[dict]:
     return result
 
 
-def get_intents_list(intent_names: dict[int, str]) -> list[dict]:
-    """Get list of in-scope intents (excluding OOS)."""
+def build_label_mapping(intent_names: dict[int, str]) -> dict[int, int]:
+    """
+    Build mapping from HF label IDs to sequential 0-149 IDs.
+
+    HuggingFace clinc_oos uses label 42 for OOS, so in-scope labels are:
+    0-41, 43-150 (150 total). We remap these to sequential 0-149.
+
+    Returns:
+        {hf_label: new_label} for in-scope intents only
+    """
+    mapping = {}
+    new_id = 0
+    for hf_id in sorted(intent_names.keys()):
+        if hf_id != OOS_LABEL_HF:  # Skip OOS
+            mapping[hf_id] = new_id
+            new_id += 1
+    assert new_id == N_INTENTS, f"Expected {N_INTENTS} intents, got {new_id}"
+    return mapping
+
+
+def get_intents_list(intent_names: dict[int, str], label_mapping: dict[int, int]) -> list[dict]:
+    """Get list of in-scope intents with sequential IDs 0-149."""
     intents = []
-    for label_id, name in sorted(intent_names.items()):
-        if label_id != OOS_LABEL_HF:  # Exclude OOS
-            intents.append({"id": label_id, "name": name})
+    for hf_id, new_id in sorted(label_mapping.items(), key=lambda x: x[1]):
+        intents.append({"id": new_id, "name": intent_names[hf_id]})
     return intents
 
 
@@ -201,8 +220,10 @@ def main():
     verify_oos_label(dataset)
     print(f'OOS label: {OOS_LABEL_HF} ("oos") — verified')
 
-    # Get intent names
+    # Get intent names and build label mapping (HF IDs -> sequential 0-149)
     intent_names = get_intent_names(dataset)
+    label_mapping = build_label_mapping(intent_names)
+    print(f"Label mapping: {N_INTENTS} in-scope intents remapped to 0-{N_INTENTS-1}")
 
     # Convert all splits to standard and autointent formats
     # Note: deduplicate because HuggingFace now returns combined configs
@@ -210,7 +231,7 @@ def main():
     full_data = {
         "standard": {},
         "autointent": {},
-        "intents": get_intents_list(intent_names)
+        "intents": get_intents_list(intent_names, label_mapping)
     }
 
     split_stats = {}
@@ -218,7 +239,7 @@ def main():
     # Process train first (no exclusions)
     train_examples = deduplicate_split(dataset["train"])
     train_texts = {ex["text"] for ex in train_examples}
-    train_standard = convert_to_standard_format(train_examples)
+    train_standard = convert_to_standard_format(train_examples, label_mapping)
     full_data["standard"]["train"] = train_standard
     full_data["autointent"]["train"] = convert_to_autointent_format(train_standard)
     split_stats["train"] = count_split_stats(train_standard)
@@ -228,7 +249,7 @@ def main():
         unique_examples = deduplicate_split(dataset[split_name], exclude_texts=train_texts)
 
         # Convert to standard format
-        standard = convert_to_standard_format(unique_examples)
+        standard = convert_to_standard_format(unique_examples, label_mapping)
         autointent = convert_to_autointent_format(standard)
         full_data["standard"][split_name] = standard
         full_data["autointent"][split_name] = autointent
@@ -301,8 +322,9 @@ def main():
             }
         },
         "intent_names": {
-            str(k): v for k, v in intent_names.items()
-            if k != OOS_LABEL_HF  # Exclude OOS from intent names
+            str(label_mapping[hf_id]): name
+            for hf_id, name in intent_names.items()
+            if hf_id != OOS_LABEL_HF  # Exclude OOS from intent names
         }
     }
 

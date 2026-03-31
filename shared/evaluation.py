@@ -145,15 +145,33 @@ class Evaluator:
         )
 
     def save(self, result: EvaluationResult) -> None:
-        """Дописывает результат в results/metrics.json."""
+        """
+        Сохраняет результат в results/metrics.json.
+
+        Если результат с таким же (model_name, mode, seed) уже существует,
+        он будет обновлён. Иначе — добавлен.
+        """
         # Load existing results
         results = []
         if self.metrics_file.exists():
             with open(self.metrics_file, "r", encoding="utf-8") as f:
                 results = json.load(f)
 
-        # Append new result
-        results.append(result.to_dict())
+        # Create key for deduplication
+        result_dict = result.to_dict()
+        key = (result.model_name, result.mode, result.seed)
+
+        # Find and update existing, or append new
+        found = False
+        for i, r in enumerate(results):
+            existing_key = (r["model_name"], r["mode"], r.get("seed"))
+            if existing_key == key:
+                results[i] = result_dict
+                found = True
+                break
+
+        if not found:
+            results.append(result_dict)
 
         # Save
         with open(self.metrics_file, "w", encoding="utf-8") as f:

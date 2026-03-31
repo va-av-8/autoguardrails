@@ -82,5 +82,43 @@
     "seed": 42,
     "is_reference": false,
     "extra": {}
+  },
+  {
+    "model_name": "autointent_classic-light_pilot",
+    "mode": "10shot",
+    "oos_recall": 0.623,
+    "in_domain_acc": 0.8617163183637172,
+    "f1_oos": 0.6827397260273973,
+    "auroc": 0.7890455758114717,
+    "au_ioc": 0.6992827923521565,
+    "latency_ms": 0.1454558399382222,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-small",
+      "pilot": true
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "10shot",
+    "oos_recall": 0.633,
+    "in_domain_acc": 0.918852823477101,
+    "f1_oos": 0.7326388888888888,
+    "auroc": 0.8059397510004447,
+    "au_ioc": 0.7502433303690529,
+    "latency_ms": 50.52931428001102,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_10shot_seed42"
+    }
   }
 ]
