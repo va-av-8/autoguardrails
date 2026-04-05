@@ -8,6 +8,7 @@ Cosine Similarity + Threshold baseline для OOS-детекции.
 Поддерживает:
 - bert-base-uncased: замороженный BERT (нижняя граница)
 - sentence-transformers/all-MiniLM-L6-v2: дообучен на semantic similarity
+- intfloat/multilingual-e5-large-instruct: сильный multilingual embedder (сравнимо с AutoIntent)
 """
 
 from __future__ import annotations
@@ -15,14 +16,14 @@ import hashlib
 from pathlib import Path
 
 import numpy as np
-import torch
-from transformers import AutoTokenizer, AutoModel
+from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
 SUPPORTED_MODELS = [
     "bert-base-uncased",
     "sentence-transformers/all-MiniLM-L6-v2",
+    "intfloat/multilingual-e5-large-instruct",
 ]
 
 
@@ -57,20 +58,16 @@ class EmbeddingThreshold:
         self.batch_size = batch_size
         self.device = device
         self.cache_dir = Path(cache_dir) if cache_dir is not None else None
-        self.tokenizer = None
-        self.model = None
+        self.st_model: SentenceTransformer | None = None
         self.train_embeddings = None
         self.train_labels = None
         self.threshold_: float | None = None
 
     def _load_model(self) -> None:
-        """Загружает токенизатор и модель с HuggingFace."""
-        if self.model is not None:
+        """Загружает SentenceTransformer модель."""
+        if self.st_model is not None:
             return
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        self.model = AutoModel.from_pretrained(self.model_name)
-        self.model.to(self.device)
-        self.model.eval()
+        self.st_model = SentenceTransformer(self.model_name, device=self.device)
 
     def _cache_key(self, texts: list[str]) -> str:
         """
@@ -84,7 +81,7 @@ class EmbeddingThreshold:
 
     def _get_embeddings(self, texts: list[str]) -> np.ndarray:
         """
-        Mean pooling поверх last_hidden_state.
+        Получает эмбеддинги через SentenceTransformer.encode().
         Если cache_dir задан — читает/пишет кеш на диск.
         """
         # Проверить кеш
@@ -94,32 +91,14 @@ class EmbeddingThreshold:
             if cache_file.exists():
                 return np.load(cache_file)
 
-        # Считать эмбеддинги
+        # Считать эмбеддинги через sentence-transformers
         self._load_model()
-        all_embeddings = []
-
-        for i in range(0, len(texts), self.batch_size):
-            batch_texts = texts[i:i + self.batch_size]
-            encoded = self.tokenizer(
-                batch_texts,
-                padding=True,
-                truncation=True,
-                max_length=64,
-                return_tensors="pt",
-            )
-            encoded = {k: v.to(self.device) for k, v in encoded.items()}
-
-            with torch.no_grad():
-                outputs = self.model(**encoded)
-                token_embeddings = outputs.last_hidden_state
-                attention_mask = encoded["attention_mask"]
-                mask_expanded = attention_mask.unsqueeze(-1).float()
-                sum_embeddings = (token_embeddings * mask_expanded).sum(1)
-                sum_mask = mask_expanded.sum(1).clamp(min=1e-9)
-                embeddings = sum_embeddings / sum_mask
-                all_embeddings.append(embeddings.cpu().numpy())
-
-        result = np.vstack(all_embeddings)
+        result = self.st_model.encode(
+            texts,
+            batch_size=self.batch_size,
+            normalize_embeddings=True,
+            show_progress_bar=False,
+        )
 
         # Сохранить в кеш
         if self.cache_dir is not None:

@@ -116,6 +116,29 @@ def au_ioc(
     return max(0.0, min(1.0, auc_value))
 
 
+def get_oos_scores_from_pipeline(pipeline, texts: list[str]) -> np.ndarray:
+    """
+    Get continuous OOS scores from AutoIntent pipeline.
+    Uses predict_with_metadata to get class probability scores,
+    then computes OOS score as 1 - max(class_scores).
+    Falls back to binary scores if continuous unavailable.
+    Returns array of shape (n_samples,).
+    """
+    if hasattr(pipeline, 'predict_with_metadata'):
+        try:
+            results = pipeline.predict_with_metadata(texts)
+            if hasattr(results, 'utterances') and results.utterances:
+                all_scores = [utt.score for utt in results.utterances
+                              if hasattr(utt, 'score') and utt.score is not None]
+                if all_scores:
+                    return 1 - np.array(all_scores).max(axis=1)
+        except Exception:
+            pass
+    # fallback
+    preds = pipeline.predict(texts)
+    return np.array([1.0 if p is None else 0.0 for p in preds])
+
+
 def measure_latency(
     model,
     texts: list[str],

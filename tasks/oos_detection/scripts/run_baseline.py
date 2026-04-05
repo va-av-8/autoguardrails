@@ -104,7 +104,12 @@ def run_cosine(
     cache_dir = get_cache_dir()
 
     for emb_model in models_to_run:
-        short_name = "bert" if "bert-base" in emb_model else "minilm"
+        if "bert-base" in emb_model:
+            short_name = "bert"
+        elif "e5-large" in emb_model:
+            short_name = "e5large"
+        else:
+            short_name = "minilm"
 
         # Argmax variant (default threshold)
         print(f"Running cosine_{short_name}_argmax ({mode_str})...")

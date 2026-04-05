@@ -29,7 +29,7 @@ sys.path.insert(0, str(project_root))
 from autointent import Pipeline
 
 from shared.data_utils import load_clinc150
-from shared.metrics import compute_all_metrics, measure_latency
+from shared.metrics import compute_all_metrics, measure_latency, get_oos_scores_from_pipeline
 from shared.evaluation import Evaluator, EvaluationResult
 
 
@@ -140,10 +140,10 @@ def main():
     print(f"Predictions: {len(y_pred)}")
     print(f"OOS predictions: {(y_pred == -1).sum()}")
 
-    # OOS scores for AUROC
-    # AutoIntent doesn't provide continuous scores, use binary predictions
-    y_scores = (y_pred == -1).astype(float)
-    print("Note: AutoIntent provides only discrete predictions, using binary scores for AUROC")
+    # OOS scores for AUROC - extract continuous scores from pipeline
+    y_scores = get_oos_scores_from_pipeline(pipeline, test_texts)
+    n_unique = len(np.unique(y_scores))
+    print(f"OOS scores: {n_unique} unique values ({'continuous' if n_unique > 2 else 'binary fallback'})")
 
     # Compute metrics
     print()

@@ -102,7 +102,7 @@ def main():
     model_dir = get_model_dir(
         args.pilot, args.mode,
         args.n_shots if args.mode == "fewshot" else None,
-        args.seed if args.mode == "fewshot" else None,
+        args.seed,  # always pass seed for consistent model_dir
     )
 
     eval_args = [
