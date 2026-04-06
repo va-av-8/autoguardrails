@@ -119,30 +119,31 @@ def load_eval_binary(data_dir: Path) -> list[dict]:
 def convert_to_autointent_test(test_data: dict) -> list[dict]:
     """
     Convert test data to AutoIntent format for inference.
-    In-scope (safe, label=0): {"utterance": str, "label": 0}
-    OOS (jailbreak, label=1): {"utterance": str} (no label field)
+    Binary classification (no OOS):
+    - safe (label=0): {"utterance": str, "label": 0}
+    - jailbreak (label=1): {"utterance": str, "label": 1}
     """
     result = []
     for utt, label in zip(test_data["utterances"], test_data["labels"]):
-        if label == 0:  # safe = in-scope
-            result.append({"utterance": utt, "label": 0})
-        else:  # jailbreak = OOS
-            result.append({"utterance": utt})
+        result.append({"utterance": utt, "label": label})
     return result
 
 
 def convert_to_autointent_train(train_data: dict) -> list[dict]:
     """
     Convert few-shot train data to AutoIntent list format.
+    Binary classification:
+    - safe (from intents[0]) -> label 0
+    - jailbreak (from oos_utterances) -> label 1
     """
     result = []
-    # In-scope intents
+    # Safe examples (label=0)
     for intent in train_data["intents"]:
         for utt in intent["utterances"]:
-            result.append({"utterance": utt, "label": intent["id"]})
-    # OOS utterances (no label)
+            result.append({"utterance": utt, "label": 0})
+    # Jailbreak examples (label=1) - NOT OOS, but second intent
     for utt in train_data["oos_utterances"]:
-        result.append({"utterance": utt})
+        result.append({"utterance": utt, "label": 1})
     return result
 
 
@@ -199,12 +200,17 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
     train_ai = convert_to_autointent_train(train_raw)
     test_ai = convert_to_autointent_test(test_raw)
 
-    # Intents for jailbreak: only "safe" (id=0)
-    intents = [{"id": 0, "name": "safe"}]
+    # Binary classification: 2 intents (no OOS)
+    intents = [
+        {"id": 0, "name": "safe"},
+        {"id": 1, "name": "jailbreak"},
+    ]
 
+    n_safe = len(train_raw['intents'][0]['utterances'])
+    n_jailbreak = len(train_raw['oos_utterances'])
     print(f"Train: {len(train_ai)} samples")
-    print(f"  - safe: {len(train_raw['intents'][0]['utterances'])}")
-    print(f"  - jailbreak (OOS): {len(train_raw['oos_utterances'])}")
+    print(f"  - safe (label=0): {n_safe}")
+    print(f"  - jailbreak (label=1): {n_jailbreak}")
     print(f"Test: {len(test_ai)} samples")
     print()
 
@@ -216,6 +222,7 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
     })
 
     # Create pipeline
+    # Binary classification: safe (0) vs jailbreak (1)
     pipeline = Pipeline.from_preset("classic-light")
     pipeline.set_config(EmbedderConfig(model_name=embedder_name))
 
@@ -252,6 +259,7 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
         "pilot": args.pilot,
         "preset": "classic-light",
         "task": "jailbreak_detection",
+        "approach": "binary_classification",  # Not OOS detection
     }
     (model_dir / "train_metadata.json").write_text(json.dumps(metadata, indent=2))
 
@@ -309,12 +317,13 @@ def evaluate(args, data_dir: Path, model_dir: Path, results_dir: Path) -> None:
     print("Running predictions...")
     raw_preds = pipeline.predict(test_texts)
 
-    # Convert: None (OOS) -> 1 (jailbreak), 0 (safe) -> 0
-    y_pred = np.array([1 if p is None else 0 for p in raw_preds])
+    # Binary classification: predictions are 0 (safe) or 1 (jailbreak) directly
+    # None means model couldn't decide - treat as jailbreak (safer for guardrail)
+    y_pred = np.array([1 if p is None else p for p in raw_preds])
 
     print(f"Predictions: {len(y_pred)}")
     print(f"  predicted safe: {sum(y_pred == 0)}")
-    print(f"  predicted jailbreak (OOS): {sum(y_pred == 1)}")
+    print(f"  predicted jailbreak: {sum(y_pred == 1)}")
     print()
 
     # Compute metrics
