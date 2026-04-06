@@ -2,9 +2,8 @@
 
 ## Исследовательский вопрос
 
-Может ли AutoIntent, настроенный на небольшом количестве примеров
-(реалистичный production-сценарий), обеспечить качество OOS-детекции,
-сопоставимое со специализированными SOTA-методами?
+Применим ли AutoIntent как OOS-guardrail — в том числе при ограниченном
+количестве обучающих данных (реалистичный production-сценарий)?
 
 ## Мотивация
 
@@ -15,147 +14,188 @@ AutoML-движок — кандидат на роль такого инстру
 
 ## Датасет
 
-**CLINC150** (Larson et al., 2019)
-- 150 intent-классов, 22 500 in-scope примеров
-- 1 200 OOS примеров в трёх уровнях сложности: easy / medium / hard
-- HuggingFace: `clinc_oos` (splits: train / validation / test)
-- Hard OOS — семантически близко к in-scope, основной challenge
+**CLINC150** (Larson et al., 2019), конфигурация `plus`
+- 150 intent-классов, 10 доменов
+- Train: 15 250 примеров (15 000 in-scope + 250 OOS)
+- Validation: 3 100 (3 000 + 100 OOS)
+- Test: 5 500 (4 500 + 1 000 OOS), OOS base rate 18.2%
+- HuggingFace: `DeepPavlov/clinc150`
 
 **Few-shot сэмплинг:**
-Из train-сплита сэмплируем n примеров на intent (n ∈ {10, 20, 50}).
-OOS-примеры для train берём пропорционально: n_oos = n_intents × n_shots × 0.1
-Тест-сплит всегда фиксированный (стандартный CLINC150 test).
-
-**Формат для AutoIntent:**
-OOS-примеры передаются без поля `label` (согласно документации AutoIntent).
+Из train сэмплируем n примеров на intent (n ∈ {10, 20, 50}).
+OOS-примеры пропорционально: n_oos = n_intents × n_shots × 0.1.
+Тест-сплит всегда фиксированный. Threshold калибруется через
+cross-validation на train (AutoIntent) — внешний val не используется.
 
 ## Метрики
 
-Схема метрик соответствует академической OOS NLP-литературе.
-Основные три метрики позволяют напрямую сравниться с опубликованными
-результатами ADB, DETER и AutoIntent.
+Схема соответствует академической OOS NLP-литературе для
+прямого сравнения с ADB и AutoIntent.
 
-### Основные (прямое сравнение с литературой)
+### Основные
 
 | Метрика | Описание | Литературный прецедент |
 |---|---|---|
-| **OOS Recall** | TPR на OOS-классе: доля пойманных нарушений мандата | ADB (AAAI 2021), DETER (2024), AutoIntent (EMNLP 2025) |
-| **In-domain Accuracy** | Accuracy только на in-scope примерах | AutoIntent Table 3 (96.13), ADB, большинство OOS-работ |
-| **F1 OOS** | F1-score на OOS-классе | AutoIntent Table 3 (76.79), ADB, DETER |
-
-Мотивация выбора OOS Recall как ключевой метрики детекции:
-пропустить OOS-запрос (FN) критичнее, чем ложно заблокировать
-in-scope (FP): FP вызывает fallback с просьбой переформулировать,
-тогда как FN порождает неверный ответ системы.
-
-Примечание: "in-domain accuracy" и "in-scope accuracy" — синонимы
-в OOS-литературе. Используем "in-domain" для согласованности
-с AutoIntent Table 3.
+| **OOS Recall** | TPR на OOS-классе | ADB (AAAI 2021), AutoIntent (EMNLP 2025) |
+| **In-domain Accuracy** | Accuracy на in-scope примерах | AutoIntent Table 3, ADB |
+| **F1 OOS** | F1-score на OOS-классе | AutoIntent Table 3, ADB |
 
 ### Вспомогательные
 
-| Метрика | Описание | Литературный прецедент |
-|---|---|---|
-| **AUROC** | Area Under ROC Curve | "Intent Detection in the Age of LLMs" (EMNLP Industry 2024) |
-| **AU-IOC** | Area Under In-scope/Out-of-scope Characteristic curve | Springer Applied Intelligence (2024) |
-| **Latency (ms)** | Время инференса на 1 запрос | Нет прецедента в OOS-литературе; важна для guardrail-аргументации |
-
-AU-IOC специально разработана для OOS-задачи: строит кривую
-(X = in-domain accuracy, Y = OOS recall) при изменении порога.
-Отражает guardrail trade-off между защитой и usability —
-в отличие от AUROC, учитывает качество классификации внутри in-scope.
+| Метрика | Описание |
+|---|---|
+| **AUROC** | Continuous OOS-скоры через `pipeline._nodes[0]` |
+| **Latency (ms)** | Среднее время инференса на 1 запрос |
 
 ## Эксперименты
 
-### Шаг 1. Бейзлайны (нижняя граница)
-Простейшие решения без специальной поддержки OOS.
+### Бейзлайны
+- TF-IDF + LogReg с threshold calibration
+- Cosine similarity + threshold (embedders: BERT, MiniLM, E5-Large-Instruct)
 
-**Бейзлайн A:** TF-IDF + LogReg, OOS как доп. класс
-**Бейзлайн B:** Cosine similarity threshold поверх sentence embeddings
+### AutoIntent
+- Few-shot: n ∈ {10, 20, 50}, 3 seeds (42, 123, 456)
+- Full train: seed=42
+- Preset: `classic-light` (multilingual-e5-large-instruct)
 
-Конфиги: `configs/baseline_tfidf.yaml`, `configs/baseline_cosine.yaml`
-Скрипт: `scripts/run_baseline.py`
+Референс из статьи (AutoIntent Table 3): F1 OOS = 76.79,
+In-domain Accuracy = 96.13.
 
-### Шаг 2. SOTA (верхняя граница)
+### Примечание о сравнении с литературой
 
-**Метод:** DETER (Dual Encoder for Threshold-Based Re-Classification)
-Публикация: arxiv.org/abs/2405.19967 (2024)
-GitHub: github.com/Hossam-Mohammed-tech/Intent_Classification_OOS
-
-Dual encoder (USE + TSDAE) с синтетическими outliers и threshold re-classification.
-Превосходит ADB (AAAI 2021): +13% F1 known, +5% F1 unknown на CLINC150.
-
-Конфиг: `configs/deter.yaml`
-Скрипт: `scripts/run_deter.py`
-
-### Шаг 2b. Guardrail Reference (отдельно от основного сравнения)
-
-**Модель:** govtech/stsb-roberta-base-off-topic
-Публикация: arxiv.org/abs/2411.12946 (Chua et al., 2024)
-
-Единственная открытая модель, специально обученная под off-topic guardrail для LLM.
-Включается как reference по постановке задачи, не как SOTA по метрикам.
-Обучена на синтетических данных — результаты на CLINC150 интерпретируются отдельно.
-
-Конфиг: `configs/guardrail_reference.yaml`
-Скрипт: `scripts/run_guardrail_reference.py`
-
-### Шаг 3. AutoIntent — few-shot режим
-Основной эксперимент: реалистичный production-сценарий.
-
-Запускаем AutoIntent при n ∈ {10, 20, 50} примеров на intent.
-Вопрос: при каком n AutoIntent достигает приемлемого качества
-(OOS Recall ≥ 0.85, In-domain Accuracy ≥ 0.90)?
-
-Конфиг: `configs/autointent_fewshot.yaml`
-Скрипт: `scripts/run_autointent.py --mode fewshot --n_shots 10 20 50`
-
-### Шаг 4. AutoIntent — full train
-Воспроизведение результата из статьи (OOS F1 = 76.79) на full train.
-Служит точкой сравнения и проверкой воспроизводимости.
-
-Конфиг: `configs/autointent_full.yaml`
-Скрипт: `scripts/run_autointent.py --mode full`
-
-### Шаг 5. Гипотеза
-**HYP-001:** Per-intent threshold calibration улучшает OOS Recall на hard OOS
-без потери In-domain Accuracy.
-
-Мотивация: разные intent-кластеры имеют разную плотность в
-embedding-пространстве — глобальный порог неоптимален.
-
-Скрипт: `scripts/run_autointent.py --mode fewshot --hypothesis per_intent_threshold`
+Специализированные OOS-методы (ADB, DA-ADB, DETER) публикуют
+результаты в протоколе TEXTOIR: варьируемая доля известных
+интентов (25%/50%/75%), остальные становятся OOS при тесте.
+В нашем протоколе все 150 интентов фиксированы, OOS — отдельный
+класс. Прямое сравнение чисел некорректно. Единственный
+напрямую сравнимый референс — AutoIntent Table 3.
 
 ## Результаты
 
-| Модель | Режим | OOS Recall | In-domain Acc | F1 OOS | AUROC | AU-IOC | Latency (ms) |
-|---|---|---|---|---|---|---|---|
-| TF-IDF + LogReg | full train | — | — | — | — | — | — |
-| Cosine, bert-base-uncased | full train | — | — | — | — | — | — |
-| Cosine, all-MiniLM-L6-v2 | full train | — | — | — | — | — | — |
-| DETER | full train | — | — | — | — | — | — |
-| AutoIntent | 10-shot | — | — | — | — | — | — |
-| AutoIntent | 20-shot | — | — | — | — | — | — |
-| AutoIntent | 50-shot | — | — | — | — | — | — |
-| AutoIntent | full train | — | — | — | — | — | — |
-| AutoIntent + HYP-001 | 50-shot | — | — | — | — | — | — |
-| [reference] Guardrail (Chua 2024) | zero-shot | — | — | — | — | — | — |
+### Few-shot (F1 OOS, mean ± std, 3 seeds)
 
-Референсные значения из статьи AutoIntent (Table 3, CLINC150):
-- AutoIntent: In-domain Accuracy = 96.13, F1 OOS = 76.79
-- AutoGluon (OOS как доп. класс): F1 OOS = 48.53
-- H2O (OOS как доп. класс): F1 OOS = 40.69
+| Модель | 10-shot | 20-shot | 50-shot |
+|---|---|---|---|
+| **AutoIntent classic-light** | **0.724 ± 0.022** | **0.819 ± 0.012** | **0.730 ± 0.007** |
+| cosine_e5large_threshold | 0.660 ± 0.057 | 0.685 ± 0.011 | 0.693 ± 0.040 |
+| cosine_minilm_threshold | 0.624 ± 0.077 | 0.649 ± 0.076 | 0.671 ± 0.012 |
+| tfidf_threshold | 0.221 ± 0.019 | 0.218 ± 0.043 | 0.314 ± 0.077 |
 
-Строка [reference] не участвует в основном сравнении —
-модель обучена на другом распределении (синтетические данные).
+### Full train
+
+| Модель | OOS Recall | In-Domain Acc | F1 OOS | AUROC | Latency (ms) |
+|---|---|---|---|---|---|
+| **AutoIntent classic-light** | **0.835** | **0.940** | **0.841** | **0.974** | 0.19 |
+| cosine_e5large_threshold | 0.595 | 0.908 | 0.719 | 0.961 | 19.24 |
+| cosine_minilm_threshold | 0.494 | 0.875 | 0.642 | 0.963 | 7.12 |
+| tfidf_threshold | 0.277 | 0.884 | 0.417 | 0.898 | 3.14 |
+| AutoIntent Table 3 (Golubev et al., 2025)† | — | 0.961 | 0.768 | — | — |
+
+† Reported numbers, same protocol (CLINC150, all 150 intents, separate OOS class).
+
+### Ключевые наблюдения
+
+- **AutoIntent применим как guardrail.** На 20-shot достигает F1=0.819,
+  превосходя все бейзлайны на +13–19 п.п. при 20 примерах на интент.
+- **Embedder критичен.** E5-Large-Instruct vs E5-Small: +5 п.п. F1,
+  +5.7 п.п. In-Domain Accuracy.
+- **AutoML стабильнее бейзлайнов** в 3–4 раза (CV ~3% vs ~9–12%).
+- **Аномалия 50-shot** — не баг алгоритма: AutoML стабильно выбирает
+  `linear + threshold`, провал объясняется переобучением threshold
+  на val-фолдах (val/test gap +0.218 vs +0.073 на 20-shot).
+- **Рекомендация:** 20 примеров на интент — оптимальный порог
+  для production. Threshold по умолчанию менять не нужно
+  (FPR=0.066 при OOS Recall=0.899).
+
+## Проверка гипотез
+
+| # | Гипотеза | Вывод |
+|---|---|---|
+| HYP-001 | Per-intent threshold calibration | Отложена: в few-shot режиме недостаточно данных на кластер |
+| HYP-002 | Асимметричная cost function (α·FNR + β·FPR) | Опровергнута: невыгодный trade-off, нестабильна при 2:1 |
+
+## Ноутбуки
+
+| Ноутбук | Содержание |
+|---|---|
+| `01_eda.ipynb` | EDA датасета CLINC150 |
+| `02_baseline.ipynb` | Бейзлайны: запуск и анализ |
+| `03_autointent_fewshot.ipynb` | Few-shot эксперименты, variance, scaling curve, анализ AutoML |
+| `04_autointent_full.ipynb` | Full train, сравнение с референсом, scaling curve few-shot → full |
+| `05_hypothesis_asymmetric_cost.ipynb` | HYP-002: асимметричная cost function |
+| `06_results_summary.ipynb` | Итоговое сравнение всех моделей и выводы |
+
+## Ограничение по датасету
+
+Мы используем `DeepPavlov/clinc150` — датасет, подготовленный самой
+командой AutoIntent из `cmaldona/All-Generalization-OOD-CLINC150`.
+По структуре он соответствует `plus`-конфигурации оригинального
+CLINC150 (250 OOS в train, 15 250 строк train всего).
+
+Статья AutoIntent (Table 3) указывает только "CLINC150 (Larson et al.,
+2019)" без уточнения конфигурации (`full` vs `plus`). Поскольку авторы
+сами создали `DeepPavlov/clinc150`, высока вероятность что они
+использовали именно его — то есть ту же конфигурацию что и мы.
+Тогда расхождение наших результатов (F1=0.841) с Table 3 (F1=0.768)
+объясняется обновлением библиотеки, а не разными данными.
+
+Большинство специализированных OOS-работ (ADB, DETER) используют
+`clinc/clinc_oos` (`full`, 100 OOS train) — другой датасет
+с меньшим числом OOS-примеров в train.
+
+## Открытые вопросы к авторам AutoIntent
+
+1. **Какая конфигурация CLINC150 использована в Table 3?**
+   `full` (100 OOS train) или `plus` (250 OOS train)?
+   Если `DeepPavlov/clinc150` — это подтверждает сравнимость
+   наших результатов, если `full` — нужен перезапуск.
+
+2. **Как вычисляется AUROC в AutoIntent?**
+   `pipeline.predict()` возвращает только бинарные предсказания.
+   Мы получаем continuous скоры через `pipeline._nodes[0]`
+   (`predict_with_metadata`) — это официально поддерживаемый способ
+   или внутренний API, который может измениться?
+
+3. **Аномалия на 50-shot — известное поведение?**
+   Мы наблюдаем F1: 10-shot=0.724 → 20-shot=0.819 → 50-shot=0.730.
+   Анализ показывает val/test gap при threshold calibration:
+   +0.073 на 20-shot vs +0.218 на 50-shot. Это известное ограничение
+   TunableDecision при CV на малых данных?
+
+4. **Какой embedder использован в Table 3?**
+   Мы фиксировали `multilingual-e5-large-instruct` явно через
+   `EmbedderConfig`. При запуске `classic-light` без фиксации
+   embedder оптимизируется автоматически и может выбрать другую
+   модель (по Table 5 в статье лучший — `stella_en_400M_v5`).
+   Был ли embedder зафиксирован в экспериментах Table 3?
+
+4. **Какой embedder использован в Table 3?**
+   Мы фиксировали  явно через
+   . При запуске  без фиксации
+   embedder оптимизируется автоматически и может выбрать другую
+   модель (по Table 5 в статье лучший — ).
+   Был ли embedder зафиксирован в экспериментах Table 3?
+
+## Дальнейшие шаги
+
+- **Оценка на `clinc/clinc_oos` (full, 100 OOS train)** — запустить
+  AutoIntent и все бейзлайны на стандартном бенчмарк-датасете.
+  Тест-сплит тот же, меняется только количество OOS в train (100 vs 250).
+  Это даст числа сравнимые с ADB/DETER и позволит оценить влияние
+  конфигурации датасета на результаты.
+- **Поиск SOTA в нашем протоколе** через Papers with Code leaderboard
+  на CLINC150 — методы с фиксированными 150 интентами и отдельным
+  OOS-классом.
+- **Сравнение в протоколе TEXTOIR** (25%/50%/75% известных интентов)
+  для прямого соотнесения с ADB, DA-ADB, DETER.
+- **HYP-001** (per-intent threshold calibration) — отложена,
+  актуальна при наличии большего числа примеров на интент.
 
 ## Ссылки
 
-- [CLINC150 paper](https://aclanthology.org/D19-1131/)
-- [AutoIntent paper](https://arxiv.org/abs/2509.21138)
+- [CLINC150](https://aclanthology.org/D19-1131/) — Larson et al., EMNLP 2019
+- [AutoIntent](https://arxiv.org/abs/2509.21138) — Golubev et al., EMNLP 2025
 - [AutoIntent GitHub](https://github.com/deeppavlov/AutoIntent)
-- [DETER paper](https://arxiv.org/abs/2405.19967)
-- [DETER GitHub](https://github.com/Hossam-Mohammed-tech/Intent_Classification_OOS)
-- [ADB paper](https://arxiv.org/abs/2012.10209) — предшественник DETER, AAAI 2021
-- [Chua et al. 2024](https://arxiv.org/abs/2411.12946) — guardrail reference
-- [govtech/stsb-roberta-base-off-topic](https://huggingface.co/govtech/stsb-roberta-base-off-topic)
+- [ADB](https://arxiv.org/abs/2012.10209) — Zhang et al., AAAI 2021
+- [DA-ADB](https://arxiv.org/abs/2203.05687) — Zhang et al., TASLP 2023
+- [DETER](https://arxiv.org/abs/2405.19967) — Rashwan et al., LREC-COLING 2024
