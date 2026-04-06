@@ -1,0 +1,28 @@
+# Бейзлайн A: TF-IDF + Logistic Regression
+# OOS обрабатывается как дополнительный класс (label = n_intents)
+# Это намеренно слабый бейзлайн — нижняя граница качества
+
+model: tfidf_logreg
+oos_handling: extra_class   # OOS добавляется как класс, без спец. поддержки
+
+tfidf:
+  max_features: 10000
+  ngram_range: [1, 2]
+  sublinear_tf: true
+
+logreg:
+  C: 1.0
+  max_iter: 1000
+  class_weight: balanced   # важно из-за дисбаланса OOS vs in-scope
+
+evaluation:
+  # Основные метрики — прямое сравнение с OOS-литературой
+  primary_metrics:
+    - oos_recall      # TPR на OOS; ADB, DETER, AutoIntent
+    - in_domain_acc   # accuracy на in-scope; AutoIntent Table 3: 96.13
+    - f1_oos          # F1 на OOS; AutoIntent Table 3: 76.79
+  # Вспомогательные
+  secondary_metrics:
+    - auroc           # EMNLP Industry 2024
+    - au_ioc          # Springer Applied Intelligence 2024; guardrail trade-off
+    - latency_ms      # guardrail-аргументация

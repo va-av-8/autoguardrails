@@ -1,0 +1,34 @@
+# AutoIntent в few-shot режиме
+# Основной эксперимент: реалистичный production-сценарий
+# Разработчик имеет только n примеров на intent
+
+model: autointent
+mode: fewshot
+
+fewshot:
+  n_shots: [10, 20, 50]         # количество примеров на intent
+  n_seeds: 3                    # усреднение по трём random seeds
+  oos_ratio: 0.1                # n_oos = n_intents * n_shots * oos_ratio
+
+autointent:
+  preset: classic-light         # быстрый preset, хорошо работает в few-shot
+  # согласно статье AutoIntent, classic-light лучший по соотношению
+  # качество/скорость; few-shot эксперименты показывают его превосходство
+  # над H2O и AutoGluon при малых данных (Figure 3 в статье)
+
+oos_detection:
+  # AutoIntent имеет нативную поддержку OOS через JinoosDecision и
+  # TunableDecision — в отличие от бейзлайнов, которые добавляют OOS как класс
+  decision_module: tunable      # автоматический подбор порога через Optuna
+
+evaluation:
+  # Основные метрики — прямое сравнение с OOS-литературой
+  primary_metrics:
+    - oos_recall      # TPR на OOS; ADB, DETER, AutoIntent
+    - in_domain_acc   # accuracy на in-scope; AutoIntent Table 3: 96.13
+    - f1_oos          # F1 на OOS; AutoIntent Table 3: 76.79
+  # Вспомогательные
+  secondary_metrics:
+    - auroc           # EMNLP Industry 2024
+    - au_ioc          # Springer Applied Intelligence 2024; guardrail trade-off
+    - latency_ms      # guardrail-аргументация
