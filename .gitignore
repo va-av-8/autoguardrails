@@ -209,6 +209,10 @@ __marimo__/
 
 # Project-specific
 
+# OS generated files
+.DS_Store
+Thumbs.db
+
 # Data (raw and processed)
 tasks/*/data/raw/*
 !tasks/*/data/raw/.gitkeep
