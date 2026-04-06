@@ -71,6 +71,25 @@ Vanilla-примеров в eval нет.
 
 Агрегатор: `evaluate_jailbreak(y_true, y_pred, data_types, oos_label=1)`.
 
+## SOTA-модели
+
+| Модель | Параметры | Тип | Источник |
+|--------|-----------|-----|----------|
+| PromptGuard 2 | 86M | BERT-style classifier | LlamaFirewall, arxiv:2505.03574 |
+| Qwen3Guard-Gen | 4B / 8B | Generative LLM | arxiv:2510.14276 |
+
+**Примечания по выбору:**
+- WildGuard (NeurIPS 2024) исключён: обучен на WildGuardMix,
+  включающем данные из WildJailbreak — data leakage на нашем тесте.
+- Бейзлайны из OOS-спринта (TF-IDF, cosine) не запускаются:
+  adversarial промпты специально маскируют вредоносный intent,
+  bag-of-words методы предсказуемо деградируют.
+- SOTA запускается в zero-shot режиме только на тестовом сплите.
+- PromptGuard 2: SOTA-статус заявлен авторами (Meta),
+  независимых рецензируемых оценок нет.
+- Qwen3Guard: независимо оценён в arxiv:2511.22047,
+  показывает generalization gap −57 п.п. на novel prompts.
+
 ## Гипотезы
 
 | # | Гипотеза | Статус |
@@ -83,6 +102,7 @@ Vanilla-примеров в eval нет.
 | Ноутбук | Содержание |
 |---------|------------|
 | `01_eda.ipynb` | EDA датасета WildJailbreak |
+| `02_sota_eval.ipynb` | Запуск SOTA-моделей (Colab/Kaggle) |
 
 ## Ограничения
 
@@ -97,3 +117,5 @@ Vanilla-примеров в eval нет.
 - [WildGuard](https://arxiv.org/abs/2406.18495) — Han et al., NeurIPS 2024
 - [XSTest](https://arxiv.org/abs/2308.01263) — Röttger et al., NAACL 2024
 - [AutoIntent](https://arxiv.org/abs/2509.21138) — Golubev et al., EMNLP 2025
+- [LlamaFirewall / PromptGuard 2](https://arxiv.org/abs/2505.03574) — Meta, 2025
+- [Qwen3Guard](https://arxiv.org/abs/2510.14276) — Alibaba, 2025
