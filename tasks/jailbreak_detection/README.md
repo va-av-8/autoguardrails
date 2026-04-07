@@ -103,6 +103,7 @@ Vanilla-примеров в eval нет.
 |---------|------------|
 | `01_eda.ipynb` | EDA датасета WildJailbreak |
 | `02_sota_eval.ipynb` | Запуск SOTA-моделей (Colab/Kaggle) |
+| `03_autointent_fewshot.ipynb` | AutoIntent few-shot (10/20/50-shot, 3 seeds) |
 
 ## Ограничения
 
@@ -119,3 +120,17 @@ Vanilla-примеров в eval нет.
 - [AutoIntent](https://arxiv.org/abs/2509.21138) — Golubev et al., EMNLP 2025
 - [LlamaFirewall / PromptGuard 2](https://arxiv.org/abs/2505.03574) — Meta, 2025
 - [Qwen3Guard](https://arxiv.org/abs/2510.14276) — Alibaba, 2025
+
+## Результаты AutoIntent few-shot
+
+**Модель:** AutoIntent classic-light
+**Embedder:** intfloat/multilingual-e5-large-instruct
+
+| n_shots | F1 | Recall | CV(F1) |
+|---------|----|--------|--------|
+| 10-shot | 0.757 ± 0.026 | 0.642 ± 0.039 | 3.4% |
+| 20-shot | 0.796 ± 0.062 | 0.701 ± 0.108 | 7.8% |
+| 50-shot | 0.731 ± 0.148 | 0.623 ± 0.196 | 20.2% |
+
+Вердикт: **UNSTABLE** (overall CV = 10.3%). Оптимальная точка —
+20-shot. Высокий Over-refusal Rate (до 74%) — открытая проблема.
