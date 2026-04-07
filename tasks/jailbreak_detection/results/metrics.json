@@ -1,1 +1,164 @@
-{}
+[
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "10shot",
+    "n_shots": 10,
+    "seed": 42,
+    "f1": 0.757155001416832,
+    "precision": 0.8737737083060824,
+    "recall": 0.668,
+    "over_refusal_rate": 0.919047619047619,
+    "recall_adversarial_harmful": 0.668,
+    "timestamp": "2026-04-06T23:53:25.879574+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_10shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "10shot",
+    "n_shots": 10,
+    "seed": 123,
+    "f1": 0.7306634056863345,
+    "precision": 0.9402045633359559,
+    "recall": 0.5975,
+    "over_refusal_rate": 0.3619047619047619,
+    "recall_adversarial_harmful": 0.5975,
+    "timestamp": "2026-04-06T23:54:12.092076+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_10shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "10shot",
+    "n_shots": 10,
+    "seed": 456,
+    "f1": 0.7828402366863906,
+    "precision": 0.9586956521739131,
+    "recall": 0.6615,
+    "over_refusal_rate": 0.2714285714285714,
+    "recall_adversarial_harmful": 0.6615,
+    "timestamp": "2026-04-06T23:58:44.772719+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_10shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "20shot",
+    "n_shots": 20,
+    "seed": 42,
+    "f1": 0.8670520231213873,
+    "precision": 0.9136212624584718,
+    "recall": 0.825,
+    "over_refusal_rate": 0.7428571428571429,
+    "recall_adversarial_harmful": 0.825,
+    "timestamp": "2026-04-06T23:59:36.330376+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_20shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "20shot",
+    "n_shots": 20,
+    "seed": 123,
+    "f1": 0.7497005988023953,
+    "precision": 0.9343283582089552,
+    "recall": 0.626,
+    "over_refusal_rate": 0.41904761904761906,
+    "recall_adversarial_harmful": 0.626,
+    "timestamp": "2026-04-07T00:00:27.571805+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_20shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "20shot",
+    "n_shots": 20,
+    "seed": 456,
+    "f1": 0.7713270142180095,
+    "precision": 0.9462209302325582,
+    "recall": 0.651,
+    "over_refusal_rate": 0.3523809523809524,
+    "recall_adversarial_harmful": 0.651,
+    "timestamp": "2026-04-07T00:01:15.915043+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_20shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "50shot",
+    "n_shots": 50,
+    "seed": 42,
+    "f1": 0.8188888888888889,
+    "precision": 0.92125,
+    "recall": 0.737,
+    "over_refusal_rate": 0.6,
+    "recall_adversarial_harmful": 0.737,
+    "timestamp": "2026-04-07T00:02:22.276810+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_50shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "50shot",
+    "n_shots": 50,
+    "seed": 123,
+    "f1": 0.8132963988919668,
+    "precision": 0.9118012422360249,
+    "recall": 0.734,
+    "over_refusal_rate": 0.6761904761904762,
+    "recall_adversarial_harmful": 0.734,
+    "timestamp": "2026-04-07T00:03:29.255493+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_50shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "50shot",
+    "n_shots": 50,
+    "seed": 456,
+    "f1": 0.5602260685270223,
+    "precision": 0.9542719614921781,
+    "recall": 0.3965,
+    "over_refusal_rate": 0.18095238095238095,
+    "recall_adversarial_harmful": 0.3965,
+    "timestamp": "2026-04-07T00:04:34.362904+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_50shot_seed456"
+    }
+  }
+]

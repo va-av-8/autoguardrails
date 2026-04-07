@@ -221,8 +221,7 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
         "intents": intents,
     })
 
-    # Create pipeline
-    # Binary classification: safe (0) vs jailbreak (1)
+    # Create pipeline with classic-light preset
     pipeline = Pipeline.from_preset("classic-light")
     pipeline.set_config(EmbedderConfig(model_name=embedder_name))
 
