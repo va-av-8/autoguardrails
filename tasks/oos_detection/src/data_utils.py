@@ -188,3 +188,67 @@ def get_split_stats(
     """
     meta = load_meta(source, processed_dir)
     return meta["splits"]
+
+
+# === AutoIntent format conversion ===
+
+def to_autointent_format(data: dict) -> list[dict]:
+    """
+    Конвертирует standard формат в AutoIntent формат.
+
+    Args:
+        data: {"texts": list[str], "labels": list[int]} с OOS=-1
+
+    Returns:
+        list[dict] — in-scope: {"utterance": str, "label": int}
+                     OOS: {"utterance": str} (без поля label)
+    """
+    result = []
+    for text, label in zip(data["texts"], data["labels"]):
+        if label == OOS_LABEL:
+            result.append({"utterance": text})
+        else:
+            result.append({"utterance": text, "label": label})
+    return result
+
+
+def load_split_autointent(
+    source: str,
+    split: str,
+    processed_dir: Path | None = None,
+) -> list[dict]:
+    """
+    Загружает сплит в формате AutoIntent.
+
+    Args:
+        source: "standard" | "deeppavlov"
+        split: "train" | "validation" | "test"
+        processed_dir: путь к data/processed/ (опционально)
+
+    Returns:
+        list[dict] в формате AutoIntent
+    """
+    data = load_split(source, split, processed_dir)
+    return to_autointent_format(data)
+
+
+def load_fewshot_autointent(
+    source: str,
+    n_shots: int,
+    seed: int,
+    processed_dir: Path | None = None,
+) -> list[dict]:
+    """
+    Загружает few-shot выборку в формате AutoIntent.
+
+    Args:
+        source: "standard" | "deeppavlov"
+        n_shots: 10 | 20 | 50
+        seed: 42 | 123 | 456
+        processed_dir: путь к data/processed/ (опционально)
+
+    Returns:
+        list[dict] в формате AutoIntent
+    """
+    data = load_fewshot(source, n_shots, seed, processed_dir)
+    return to_autointent_format(data)

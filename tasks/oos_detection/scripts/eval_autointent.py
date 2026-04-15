@@ -28,9 +28,10 @@ sys.path.insert(0, str(project_root))
 
 from autointent import Pipeline
 
-from shared.data_utils import load_clinc150
-from shared.metrics import compute_all_metrics, measure_latency, get_oos_scores_from_pipeline
-from shared.evaluation import Evaluator, EvaluationResult
+sys.path.insert(0, str(task_dir / "src"))
+from data_utils import load_split
+from metrics import compute_all_metrics, measure_latency, get_oos_scores_from_pipeline
+from evaluation import Evaluator, EvaluationResult
 
 
 def get_data_dir() -> Path:
@@ -61,6 +62,12 @@ def main():
         type=Path,
         required=True,
         help="Path to trained model directory",
+    )
+    parser.add_argument(
+        "--source",
+        choices=["standard", "deeppavlov"],
+        default="deeppavlov",
+        help="Data source: standard (100 OOS) or deeppavlov (200 OOS)",
     )
     parser.add_argument(
         "--mode",
@@ -126,7 +133,7 @@ def main():
     print()
 
     # Load test data
-    test_std = load_clinc150("test", data_dir)
+    test_std = load_split(args.source, "test")
     test_texts = test_std["texts"]
     test_labels = np.array(test_std["labels"])
 

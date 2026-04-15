@@ -34,10 +34,11 @@ sys.path.insert(0, str(project_root))
 from autointent import Pipeline, Dataset as AIDataset
 from autointent.configs import LoggingConfig, EmbedderConfig, DataConfig
 
-from shared.data_utils import (
-    load_clinc150_autointent,
+sys.path.insert(0, str(task_dir / "src"))
+from data_utils import (
+    load_split_autointent,
     load_fewshot_autointent,
-    load_intents,
+    get_intents,
 )
 
 
@@ -65,6 +66,12 @@ def get_embedder_name(pilot: bool) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Train AutoIntent on CLINC150")
+    parser.add_argument(
+        "--source",
+        choices=["standard", "deeppavlov"],
+        default="deeppavlov",
+        help="Data source: standard (100 OOS) or deeppavlov (200 OOS)",
+    )
     parser.add_argument(
         "--mode",
         choices=["full", "fewshot"],
@@ -119,12 +126,12 @@ def main():
 
     # Load data (AutoIntent format)
     if args.mode == "fewshot":
-        train_ai = load_fewshot_autointent(args.n_shots, args.seed, data_dir)
+        train_ai = load_fewshot_autointent(args.source, args.n_shots, args.seed)
     else:
-        train_ai = load_clinc150_autointent("train", data_dir)
+        train_ai = load_split_autointent(args.source, "train")
 
-    test_ai = load_clinc150_autointent("test", data_dir)
-    intents = load_intents(data_dir)
+    test_ai = load_split_autointent(args.source, "test")
+    intents = get_intents(args.source)
 
     print(f"Train: {len(train_ai)} samples")
     print(f"Test: {len(test_ai)} samples")

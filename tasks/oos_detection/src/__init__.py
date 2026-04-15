@@ -11,6 +11,9 @@ Modules:
 from .data_utils import (
     load_split,
     load_fewshot,
+    load_split_autointent,
+    load_fewshot_autointent,
+    to_autointent_format,
     get_intents,
     get_intent_names,
     load_meta,
@@ -41,6 +44,9 @@ __all__ = [
     # Data loading
     "load_split",
     "load_fewshot",
+    "load_split_autointent",
+    "load_fewshot_autointent",
+    "to_autointent_format",
     "get_intents",
     "get_intent_names",
     "load_meta",

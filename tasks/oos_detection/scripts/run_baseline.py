@@ -32,8 +32,10 @@ sys.path.insert(0, str(project_root))
 
 from baselines.tfidf_logreg import TfidfLogreg
 from baselines.embedding_threshold import EmbeddingThreshold, SUPPORTED_MODELS
-from shared.data_utils import load_clinc150, load_fewshot
-from shared.evaluation import Evaluator
+
+sys.path.insert(0, str(task_dir / "src"))
+from data_utils import load_split, load_fewshot
+from evaluation import Evaluator
 
 
 def get_data_dir() -> Path:
@@ -143,6 +145,12 @@ def run_cosine(
 def main():
     parser = argparse.ArgumentParser(description="Run OOS detection baselines")
     parser.add_argument(
+        "--source",
+        choices=["standard", "deeppavlov"],
+        default="deeppavlov",
+        help="Data source: standard (100 OOS) or deeppavlov (200 OOS)",
+    )
+    parser.add_argument(
         "--model",
         choices=["tfidf", "cosine", "all"],
         default="all",
@@ -181,19 +189,19 @@ def main():
 
     # Load train data (depends on mode)
     if args.mode == "fewshot":
-        train_data = load_fewshot(args.n_shots, args.seed, data_dir)
+        train_data = load_fewshot(args.source, args.n_shots, args.seed)
         mode_str = f"{args.n_shots}shot"
         n_shots = args.n_shots
         seed = args.seed
     else:
-        train_data = load_clinc150("train", data_dir)
+        train_data = load_split(args.source, "train")
         mode_str = "full"
         n_shots = None
         seed = None
 
     # Val and test are ALWAYS full
-    val_data = load_clinc150("validation", data_dir)
-    test_data = load_clinc150("test", data_dir)
+    val_data = load_split(args.source, "validation")
+    test_data = load_split(args.source, "test")
 
     print(f"Train: {len(train_data['texts'])} samples")
     print(f"Val: {len(val_data['texts'])} samples")
