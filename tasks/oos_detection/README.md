@@ -74,6 +74,58 @@ python scripts/prepare_data.py --source standard    # github.com/clinc/oos-eval 
 python scripts/prepare_data.py --source deeppavlov  # HuggingFace DeepPavlov/clinc150 (200 OOS train)
 ```
 
+**Структура данных после подготовки:**
+
+```
+data/processed/
+├── standard/
+│   ├── full.json      # полные сплиты
+│   ├── fewshot.json   # few-shot выборки
+│   └── meta.json      # метаданные
+└── deeppavlov/
+    ├── full.json
+    ├── fewshot.json
+    └── meta.json
+```
+
+**Формат файлов:**
+
+`full.json` — полные сплиты:
+```json
+{
+  "train": {"texts": ["...", ...], "labels": [0, 5, -1, ...]},
+  "validation": {"texts": [...], "labels": [...]},
+  "test": {"texts": [...], "labels": [...]}
+}
+```
+
+`fewshot.json` — few-shot выборки (n_shots × seeds):
+```json
+{
+  "n10": {
+    "seed42": {"texts": [...], "labels": [...]},
+    "seed123": {...},
+    "seed456": {...}
+  },
+  "n20": {...},
+  "n50": {...}
+}
+```
+
+`meta.json` — метаданные:
+```json
+{
+  "source": "deeppavlov",
+  "n_intents": 150,
+  "oos_label": -1,
+  "splits": {"train": {"total": 15100, "n_inscope": 14900, "n_oos": 200}, ...},
+  "fewshot": {"n_shots": [10, 20, 50], "seeds": [42, 123, 456], "oos_ratio": 0.1},
+  "intents": [{"id": 0, "name": "intent_0"}, ...]
+}
+```
+
+**Метки:** OOS = `-1`, in-scope = `0..149`
+
 ### Baselines
 
 ```bash
