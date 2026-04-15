@@ -124,7 +124,13 @@ data/processed/
 }
 ```
 
-**Метки:** OOS = `-1`, in-scope = `0..149`
+**Метки (стандартный формат):** OOS = `-1`, in-scope = `0..149`
+
+**Формат AutoIntent** (используется при обучении):
+- in-scope: `{"utterance": "текст", "label": 0..149}`
+- OOS: `{"utterance": "текст"}` (без поля `label`)
+
+Конвертация: `load_split_autointent()`, `load_fewshot_autointent()`
 
 ### Baselines
 
