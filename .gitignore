@@ -226,7 +226,8 @@ tasks/*/data/processed/embeddings_cache/**
 data/processed/*.json
 !data/processed/.gitkeep
 
-# Results (large files)
+# Results (generated)
+**/results/metrics.json
 results/*.pkl
 results/*.pt
 
