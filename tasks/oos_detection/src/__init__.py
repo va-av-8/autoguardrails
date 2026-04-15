@@ -2,12 +2,21 @@
 OOS Detection utilities.
 
 Modules:
-- metrics: OOS detection metrics aligned with academic literature
-- data_utils: data loading (standard + HuggingFace)
+- data_utils: data loading (standard + deeppavlov)
+- metrics: OOS detection metrics
 - evaluation: unified evaluation interface
 - visualization: plotting utilities
 """
 
+from .data_utils import (
+    load_split,
+    load_fewshot,
+    get_intents,
+    get_intent_names,
+    load_meta,
+    get_split_stats,
+    OOS_LABEL,
+)
 from .metrics import (
     oos_recall,
     in_domain_accuracy,
@@ -16,12 +25,6 @@ from .metrics import (
     au_ioc,
     measure_latency,
     compute_all_metrics,
-)
-from .data_utils import (
-    load_standard,
-    load_autointent,
-    get_standard_intents,
-    get_autointent_intents,
 )
 from .evaluation import Evaluator, EvaluationResult
 from .visualization import (
@@ -33,6 +36,15 @@ from .visualization import (
 )
 
 __all__ = [
+    # Constants
+    "OOS_LABEL",
+    # Data loading
+    "load_split",
+    "load_fewshot",
+    "get_intents",
+    "get_intent_names",
+    "load_meta",
+    "get_split_stats",
     # Metrics
     "oos_recall",
     "in_domain_accuracy",
@@ -41,11 +53,6 @@ __all__ = [
     "au_ioc",
     "measure_latency",
     "compute_all_metrics",
-    # Data loading
-    "load_standard",
-    "load_autointent",
-    "get_standard_intents",
-    "get_autointent_intents",
     # Evaluation
     "Evaluator",
     "EvaluationResult",

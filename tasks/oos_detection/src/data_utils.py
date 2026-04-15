@@ -1,9 +1,13 @@
 """
-Утилиты для загрузки данных CLINC150.
+Утилиты для загрузки подготовленных данных CLINC150.
 
-Два источника данных:
-    - standard: локальный файл data_full.json (формат testing_models_auto_intent)
-    - autointent: HuggingFace DeepPavlov/clinc150
+Данные должны быть предварительно созданы через:
+    python scripts/prepare_data.py --source standard
+    python scripts/prepare_data.py --source deeppavlov
+
+Источники:
+    - standard: github.com/clinc/oos-eval (100 OOS train)
+    - deeppavlov: HuggingFace DeepPavlov/clinc150 (200 OOS train)
 """
 
 from __future__ import annotations
@@ -12,147 +16,175 @@ import json
 from pathlib import Path
 
 
-# === Константы ===
+# === Constants ===
 
-OOS_LABEL_STANDARD = -1
-OOS_LABEL_STRING = "oos"
+OOS_LABEL = -1
+VALID_SOURCES = ("standard", "deeppavlov")
+VALID_SPLITS = ("train", "validation", "test")
+
+# Default path to processed data
+_DEFAULT_PROCESSED_DIR = Path(__file__).parent.parent / "data" / "processed"
 
 
-# === Загрузка из standard формата (data_full.json) ===
+def _get_processed_dir(source: str, processed_dir: Path | None = None) -> Path:
+    """Get path to processed data directory for a source."""
+    if source not in VALID_SOURCES:
+        raise ValueError(f"source must be one of {VALID_SOURCES}, got '{source}'")
 
-def load_standard(
-    json_path: Path,
-    split: str = "train",
+    base_dir = processed_dir or _DEFAULT_PROCESSED_DIR
+    source_dir = base_dir / source
+
+    if not source_dir.exists():
+        raise FileNotFoundError(
+            f"Processed data not found: {source_dir}\n"
+            f"Run: python scripts/prepare_data.py --source {source}"
+        )
+
+    return source_dir
+
+
+# === Loading functions ===
+
+def load_split(
+    source: str,
+    split: str,
+    processed_dir: Path | None = None,
 ) -> dict:
     """
-    Загружает данные из standard формата (data_full.json).
-
-    Формат входного файла:
-        {
-            "train": [["text", "label"], ...],
-            "val": [["text", "label"], ...],
-            "test": [["text", "label"], ...],
-            "oos_train": [["text", "oos"], ...],
-            "oos_val": [["text", "oos"], ...],
-            "oos_test": [["text", "oos"], ...]
-        }
+    Загружает сплит данных.
 
     Args:
-        json_path: путь к data_full.json
-        split: "train" | "val" | "test"
+        source: "standard" | "deeppavlov"
+        split: "train" | "validation" | "test"
+        processed_dir: путь к data/processed/ (опционально)
 
     Returns:
         {"texts": list[str], "labels": list[int]}
         OOS имеет label = -1
     """
-    valid_splits = ("train", "val", "test")
-    if split not in valid_splits:
-        raise ValueError(f"split must be one of {valid_splits}, got '{split}'")
+    if split not in VALID_SPLITS:
+        raise ValueError(f"split must be one of {VALID_SPLITS}, got '{split}'")
 
-    with open(json_path, "r", encoding="utf-8") as f:
-        raw = json.load(f)
+    source_dir = _get_processed_dir(source, processed_dir)
+    full_path = source_dir / "full.json"
 
-    # Собираем уникальные метки для создания маппинга
-    all_labels = set()
-    for item in raw[split]:
-        if item[1] != OOS_LABEL_STRING:
-            all_labels.add(item[1])
+    with open(full_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
 
-    # Создаём маппинг: label_name -> label_id (сортируем для воспроизводимости)
-    label_to_id = {name: idx for idx, name in enumerate(sorted(all_labels))}
-
-    texts = []
-    labels = []
-
-    # In-domain примеры
-    for text, label in raw[split]:
-        texts.append(text)
-        labels.append(label_to_id[label])
-
-    # OOS примеры
-    oos_key = f"oos_{split}"
-    if oos_key in raw:
-        for text, _ in raw[oos_key]:
-            texts.append(text)
-            labels.append(OOS_LABEL_STANDARD)
-
-    return {"texts": texts, "labels": labels}
+    return data[split]
 
 
-def get_standard_intents(json_path: Path) -> list[dict]:
+def load_fewshot(
+    source: str,
+    n_shots: int,
+    seed: int,
+    processed_dir: Path | None = None,
+) -> dict:
     """
-    Извлекает список интентов из data_full.json.
+    Загружает few-shot train выборку.
 
     Args:
-        json_path: путь к data_full.json
+        source: "standard" | "deeppavlov"
+        n_shots: 10 | 20 | 50
+        seed: 42 | 123 | 456
+        processed_dir: путь к data/processed/ (опционально)
+
+    Returns:
+        {"texts": list[str], "labels": list[int]}
+    """
+    source_dir = _get_processed_dir(source, processed_dir)
+    fewshot_path = source_dir / "fewshot.json"
+
+    with open(fewshot_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    n_key = f"n{n_shots}"
+    seed_key = f"seed{seed}"
+
+    if n_key not in data:
+        raise ValueError(f"n_shots={n_shots} not found. Available: {list(data.keys())}")
+    if seed_key not in data[n_key]:
+        raise ValueError(f"seed={seed} not found. Available: {list(data[n_key].keys())}")
+
+    return data[n_key][seed_key]
+
+
+def get_intents(
+    source: str,
+    processed_dir: Path | None = None,
+) -> list[dict]:
+    """
+    Возвращает список интентов.
+
+    Args:
+        source: "standard" | "deeppavlov"
+        processed_dir: путь к data/processed/ (опционально)
 
     Returns:
         [{"id": int, "name": str}, ...] отсортировано по id
     """
-    with open(json_path, "r", encoding="utf-8") as f:
-        raw = json.load(f)
+    source_dir = _get_processed_dir(source, processed_dir)
+    meta_path = source_dir / "meta.json"
 
-    all_labels = set()
-    for split in ("train", "val", "test"):
-        for item in raw[split]:
-            if item[1] != OOS_LABEL_STRING:
-                all_labels.add(item[1])
+    with open(meta_path, "r", encoding="utf-8") as f:
+        meta = json.load(f)
 
-    sorted_labels = sorted(all_labels)
-    return [{"id": idx, "name": name} for idx, name in enumerate(sorted_labels)]
+    return meta["intents"]
 
 
-# === Загрузка из HuggingFace DeepPavlov/clinc150 (autointent) ===
-
-def load_autointent(
-    split: str = "train",
-) -> dict:
+def get_intent_names(
+    source: str,
+    processed_dir: Path | None = None,
+) -> dict[int, str]:
     """
-    Загружает данные из HuggingFace DeepPavlov/clinc150.
-
-    OOS примеры в этом датасете имеют label=None.
+    Возвращает mapping label_id -> intent_name.
 
     Args:
-        split: "train" | "validation" | "test"
+        source: "standard" | "deeppavlov"
+        processed_dir: путь к data/processed/ (опционально)
 
     Returns:
-        {"texts": list[str], "labels": list[int]}
-        OOS имеет label = -1
+        {label_id: intent_name}
+        Не включает OOS (label -1)
     """
-    from datasets import load_dataset
-
-    valid_splits = ("train", "validation", "test")
-    if split not in valid_splits:
-        raise ValueError(f"split must be one of {valid_splits}, got '{split}'")
-
-    ds = load_dataset("DeepPavlov/clinc150", split=split)
-
-    texts = []
-    labels = []
-
-    for item in ds:
-        texts.append(item["utterance"])
-        if item["label"] is None:
-            labels.append(OOS_LABEL_STANDARD)
-        else:
-            labels.append(item["label"])
-
-    return {"texts": texts, "labels": labels}
+    intents = get_intents(source, processed_dir)
+    return {intent["id"]: intent["name"] for intent in intents}
 
 
-def get_autointent_intents() -> list[dict]:
+def load_meta(
+    source: str,
+    processed_dir: Path | None = None,
+) -> dict:
     """
-    Загружает список интентов из DeepPavlov/clinc150 (конфигурация intents).
+    Загружает метаданные датасета.
+
+    Args:
+        source: "standard" | "deeppavlov"
+        processed_dir: путь к data/processed/ (опционально)
 
     Returns:
-        [{"id": int, "name": str}, ...]
+        dict с метаданными
     """
-    from datasets import load_dataset
+    source_dir = _get_processed_dir(source, processed_dir)
+    meta_path = source_dir / "meta.json"
 
-    ds = load_dataset("DeepPavlov/clinc150", "intents", split="intents")
+    with open(meta_path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-    intents = []
-    for item in ds:
-        intents.append({"id": item["id"], "name": item["name"]})
 
-    return sorted(intents, key=lambda x: x["id"])
+def get_split_stats(
+    source: str,
+    processed_dir: Path | None = None,
+) -> dict:
+    """
+    Возвращает статистику по сплитам.
+
+    Args:
+        source: "standard" | "deeppavlov"
+        processed_dir: путь к data/processed/ (опционально)
+
+    Returns:
+        {split_name: {"total": int, "n_inscope": int, "n_oos": int}}
+    """
+    meta = load_meta(source, processed_dir)
+    return meta["splits"]

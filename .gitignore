@@ -213,10 +213,9 @@ __marimo__/
 .DS_Store
 Thumbs.db
 
-# Data (raw and processed)
+# Data (raw and processed) - downloaded/generated automatically
 tasks/*/data/raw/*
 !tasks/*/data/raw/.gitkeep
-!tasks/*/data/raw/data_full.json
 tasks/*/data/processed/*
 !tasks/*/data/processed/.gitkeep
 !tasks/*/data/processed/embeddings_cache/
