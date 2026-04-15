@@ -1,9 +1,9 @@
 """
-Shared utilities for AutoGuardrails experiments.
+OOS Detection utilities.
 
 Modules:
 - metrics: OOS detection metrics aligned with academic literature
-- data_utils: data loading and preprocessing
+- data_utils: data loading (standard + HuggingFace)
 - evaluation: unified evaluation interface
 - visualization: plotting utilities
 """
@@ -18,13 +18,10 @@ from .metrics import (
     compute_all_metrics,
 )
 from .data_utils import (
-    load_clinc150,
-    load_clinc150_autointent,
-    load_fewshot,
-    load_fewshot_autointent,
-    load_intents,
-    load_meta,
-    get_intent_names,
+    load_standard,
+    load_autointent,
+    get_standard_intents,
+    get_autointent_intents,
 )
 from .evaluation import Evaluator, EvaluationResult
 from .visualization import (
@@ -45,13 +42,10 @@ __all__ = [
     "measure_latency",
     "compute_all_metrics",
     # Data loading
-    "load_clinc150",
-    "load_clinc150_autointent",
-    "load_fewshot",
-    "load_fewshot_autointent",
-    "load_intents",
-    "load_meta",
-    "get_intent_names",
+    "load_standard",
+    "load_autointent",
+    "get_standard_intents",
+    "get_autointent_intents",
     # Evaluation
     "Evaluator",
     "EvaluationResult",

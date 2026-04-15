@@ -8,17 +8,17 @@ CLI для загрузки данных CLINC150.
 
 Примеры использования:
     # Загрузка из standard (data_full.json)
-    python load_data_cli.py --source standard --split train
-    python load_data_cli.py --source standard --split val --stats
-    python load_data_cli.py --source standard --split test --output data.json
+    python load_data.py --source standard --split train
+    python load_data.py --source standard --split val --stats
+    python load_data.py --source standard --split test --output data.json
 
     # Загрузка из autointent (HuggingFace)
-    python load_data_cli.py --source autointent --split train
-    python load_data_cli.py --source autointent --split validation --stats
+    python load_data.py --source autointent --split train
+    python load_data.py --source autointent --split validation --stats
 
     # Показать интенты
-    python load_data_cli.py --source standard --intents
-    python load_data_cli.py --source autointent --intents
+    python load_data.py --source standard --intents
+    python load_data.py --source autointent --intents
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from data_utils import (
     load_standard,
@@ -39,7 +39,7 @@ from data_utils import (
 
 
 # Путь по умолчанию к data_full.json
-DEFAULT_STANDARD_PATH = Path(__file__).parent.parent / "tasks/oos_detection/data/raw/data_full.json"
+DEFAULT_STANDARD_PATH = Path(__file__).parent.parent / "data/raw/data_full.json"
 
 
 def main():
