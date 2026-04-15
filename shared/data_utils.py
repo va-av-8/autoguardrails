@@ -1,13 +1,9 @@
 """
-Утилиты для загрузки подготовленных данных CLINC150.
+Утилиты для загрузки данных CLINC150.
 
-Данные должны быть предварительно созданы через:
-    python scripts/prepare_data.py
-
-Файлы в data/processed/:
-    clinc150_full.json     — полные сплиты train/validation/test
-    clinc150_fewshot.json  — few-shot выборки для разных n и seed
-    clinc150_meta.json     — метаданные датасета
+Два источника данных:
+    - standard: локальный файл data_full.json (формат testing_models_auto_intent)
+    - autointent: HuggingFace DeepPavlov/clinc150
 """
 
 from __future__ import annotations
@@ -16,154 +12,147 @@ import json
 from pathlib import Path
 
 
-def load_clinc150(split: str, processed_dir: Path) -> dict:
+# === Константы ===
+
+OOS_LABEL_STANDARD = -1
+OOS_LABEL_STRING = "oos"
+
+
+# === Загрузка из standard формата (data_full.json) ===
+
+def load_standard(
+    json_path: Path,
+    split: str = "train",
+) -> dict:
     """
-    Загружает сплит CLINC150 в standard формате.
+    Загружает данные из standard формата (data_full.json).
+
+    Формат входного файла:
+        {
+            "train": [["text", "label"], ...],
+            "val": [["text", "label"], ...],
+            "test": [["text", "label"], ...],
+            "oos_train": [["text", "oos"], ...],
+            "oos_val": [["text", "oos"], ...],
+            "oos_test": [["text", "oos"], ...]
+        }
 
     Args:
-        split: "train" | "validation" | "test"
-        processed_dir: путь к data/processed/
+        json_path: путь к data_full.json
+        split: "train" | "val" | "test"
 
     Returns:
         {"texts": list[str], "labels": list[int]}
         OOS имеет label = -1
     """
-    full_path = processed_dir / "clinc150_full.json"
-    with open(full_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return data["standard"][split]
+    valid_splits = ("train", "val", "test")
+    if split not in valid_splits:
+        raise ValueError(f"split must be one of {valid_splits}, got '{split}'")
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        raw = json.load(f)
+
+    # Собираем уникальные метки для создания маппинга
+    all_labels = set()
+    for item in raw[split]:
+        if item[1] != OOS_LABEL_STRING:
+            all_labels.add(item[1])
+
+    # Создаём маппинг: label_name -> label_id (сортируем для воспроизводимости)
+    label_to_id = {name: idx for idx, name in enumerate(sorted(all_labels))}
+
+    texts = []
+    labels = []
+
+    # In-domain примеры
+    for text, label in raw[split]:
+        texts.append(text)
+        labels.append(label_to_id[label])
+
+    # OOS примеры
+    oos_key = f"oos_{split}"
+    if oos_key in raw:
+        for text, _ in raw[oos_key]:
+            texts.append(text)
+            labels.append(OOS_LABEL_STANDARD)
+
+    return {"texts": texts, "labels": labels}
 
 
-def load_clinc150_autointent(split: str, processed_dir: Path) -> list[dict]:
+def get_standard_intents(json_path: Path) -> list[dict]:
     """
-    Загружает сплит CLINC150 в формате AutoIntent.
+    Извлекает список интентов из data_full.json.
 
     Args:
-        split: "train" | "validation" | "test"
-        processed_dir: путь к data/processed/
-
-    Returns:
-        list[dict] — in-scope: {"utterance": str, "label": int}
-                     OOS: {"utterance": str} (без поля label)
-    """
-    full_path = processed_dir / "clinc150_full.json"
-    with open(full_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return data["autointent"][split]
-
-
-def load_fewshot(n_shots: int, seed: int, processed_dir: Path) -> dict:
-    """
-    Загружает few-shot train выборку в standard формате.
-
-    Args:
-        n_shots: 10 | 20 | 50
-        seed: 42 | 123 | 456
-        processed_dir: путь к data/processed/
-
-    Returns:
-        {"texts": list[str], "labels": list[int]}
-    """
-    fewshot_path = processed_dir / "clinc150_fewshot.json"
-    with open(fewshot_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    n_key = f"n{n_shots}"
-    seed_key = f"seed{seed}"
-    return data[n_key][seed_key]["standard"]
-
-
-def load_fewshot_autointent(n_shots: int, seed: int, processed_dir: Path) -> list[dict]:
-    """
-    Загружает few-shot train выборку в формате AutoIntent.
-
-    Args:
-        n_shots: 10 | 20 | 50
-        seed: 42 | 123 | 456
-        processed_dir: путь к data/processed/
-
-    Returns:
-        list[dict] — формат AutoIntent
-    """
-    fewshot_path = processed_dir / "clinc150_fewshot.json"
-    with open(fewshot_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    n_key = f"n{n_shots}"
-    seed_key = f"seed{seed}"
-    return data[n_key][seed_key]["autointent"]
-
-
-def load_intents(processed_dir: Path) -> list[dict]:
-    """
-    Загружает список in-scope интентов.
-
-    Args:
-        processed_dir: путь к data/processed/
+        json_path: путь к data_full.json
 
     Returns:
         [{"id": int, "name": str}, ...] отсортировано по id
     """
-    full_path = processed_dir / "clinc150_full.json"
-    with open(full_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return data["intents"]
+    with open(json_path, "r", encoding="utf-8") as f:
+        raw = json.load(f)
+
+    all_labels = set()
+    for split in ("train", "val", "test"):
+        for item in raw[split]:
+            if item[1] != OOS_LABEL_STRING:
+                all_labels.add(item[1])
+
+    sorted_labels = sorted(all_labels)
+    return [{"id": idx, "name": name} for idx, name in enumerate(sorted_labels)]
 
 
-def load_meta(processed_dir: Path) -> dict:
-    """
-    Загружает метаданные датасета.
+# === Загрузка из HuggingFace DeepPavlov/clinc150 (autointent) ===
 
-    Args:
-        processed_dir: путь к data/processed/
-
-    Returns:
-        dict с метаданными (см. clinc150_meta.json)
-    """
-    meta_path = processed_dir / "clinc150_meta.json"
-    with open(meta_path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def get_intent_names(processed_dir: Path) -> dict[int, str]:
-    """
-    Возвращает mapping label_id -> intent_name для in-scope интентов.
-
-    Args:
-        processed_dir: путь к data/processed/
-
-    Returns:
-        {label_id (int): intent_name (str)}
-        Не включает OOS (label -1)
-    """
-    meta = load_meta(processed_dir)
-    return {int(k): v for k, v in meta["intent_names"].items()}
-
-
-# Legacy functions for compatibility (deprecated)
-
-def sample_fewshot(
-    data: dict,
-    n_shots: int,
-    oos_ratio: float = 0.1,
-    seed: int = 42,
+def load_autointent(
+    split: str = "train",
 ) -> dict:
     """
-    DEPRECATED: Use load_fewshot() instead.
-    Few-shot sampling is now done in prepare_data.py.
+    Загружает данные из HuggingFace DeepPavlov/clinc150.
+
+    OOS примеры в этом датасете имеют label=None.
+
+    Args:
+        split: "train" | "validation" | "test"
+
+    Returns:
+        {"texts": list[str], "labels": list[int]}
+        OOS имеет label = -1
     """
-    raise NotImplementedError(
-        "sample_fewshot is deprecated. "
-        "Run `python scripts/prepare_data.py` first, "
-        "then use `load_fewshot(n_shots, seed, processed_dir)`."
-    )
+    from datasets import load_dataset
+
+    valid_splits = ("train", "validation", "test")
+    if split not in valid_splits:
+        raise ValueError(f"split must be one of {valid_splits}, got '{split}'")
+
+    ds = load_dataset("DeepPavlov/clinc150", split=split)
+
+    texts = []
+    labels = []
+
+    for item in ds:
+        texts.append(item["utterance"])
+        if item["label"] is None:
+            labels.append(OOS_LABEL_STANDARD)
+        else:
+            labels.append(item["label"])
+
+    return {"texts": texts, "labels": labels}
 
 
-def convert_to_autointent_format(data: dict) -> list[dict]:
+def get_autointent_intents() -> list[dict]:
     """
-    DEPRECATED: Use load_clinc150_autointent() or load_fewshot_autointent().
-    Conversion is now done in prepare_data.py.
+    Загружает список интентов из DeepPavlov/clinc150 (конфигурация intents).
+
+    Returns:
+        [{"id": int, "name": str}, ...]
     """
-    raise NotImplementedError(
-        "convert_to_autointent_format is deprecated. "
-        "Run `python scripts/prepare_data.py` first, "
-        "then use load_clinc150_autointent() or load_fewshot_autointent()."
-    )
+    from datasets import load_dataset
+
+    ds = load_dataset("DeepPavlov/clinc150", "intents", split="intents")
+
+    intents = []
+    for item in ds:
+        intents.append({"id": item["id"], "name": item["name"]})
+
+    return sorted(intents, key=lambda x: x["id"])
