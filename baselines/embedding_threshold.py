@@ -129,7 +129,7 @@ class EmbeddingThreshold:
         Подбирает оптимальный порог на validation set по F1 OOS.
         Эмбеддинги для val считаются ровно один раз.
         """
-        from shared.metrics import f1_oos as _f1_oos
+        from tasks.oos_detection.src.metrics import f1_oos as _f1_oos
 
         # Считаем эмбеддинги ОДИН раз
         query_embeddings = self._get_embeddings(val_texts)

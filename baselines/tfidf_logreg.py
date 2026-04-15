@@ -69,7 +69,7 @@ class TfidfLogreg:
         Подбирает оптимальный порог на validation set по F1 OOS.
         Сохраняет в self.threshold_.
         """
-        from shared.metrics import f1_oos as _f1_oos
+        from tasks.oos_detection.src.metrics import f1_oos as _f1_oos
 
         oos_scores = self.predict_proba(val_texts)
         proba = self.pipeline.predict_proba(val_texts)
