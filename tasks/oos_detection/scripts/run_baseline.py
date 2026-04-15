@@ -33,9 +33,9 @@ sys.path.insert(0, str(project_root))
 from baselines.tfidf_logreg import TfidfLogreg
 from baselines.embedding_threshold import EmbeddingThreshold, SUPPORTED_MODELS
 
-sys.path.insert(0, str(task_dir / "src"))
-from data_utils import load_split, load_fewshot
-from evaluation import Evaluator
+sys.path.insert(0, str(task_dir))
+from src.data_utils import load_split, load_fewshot
+from src.evaluation import Evaluator
 
 
 def get_data_dir() -> Path:

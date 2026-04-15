@@ -34,8 +34,8 @@ sys.path.insert(0, str(project_root))
 from autointent import Pipeline, Dataset as AIDataset
 from autointent.configs import LoggingConfig, EmbedderConfig, DataConfig
 
-sys.path.insert(0, str(task_dir / "src"))
-from data_utils import (
+sys.path.insert(0, str(task_dir))
+from src.data_utils import (
     load_split_autointent,
     load_fewshot_autointent,
     get_intents,

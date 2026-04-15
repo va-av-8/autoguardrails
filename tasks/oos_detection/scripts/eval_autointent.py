@@ -28,10 +28,10 @@ sys.path.insert(0, str(project_root))
 
 from autointent import Pipeline
 
-sys.path.insert(0, str(task_dir / "src"))
-from data_utils import load_split
-from metrics import compute_all_metrics, measure_latency, get_oos_scores_from_pipeline
-from evaluation import Evaluator, EvaluationResult
+sys.path.insert(0, str(task_dir))
+from src.data_utils import load_split
+from src.metrics import compute_all_metrics, measure_latency, get_oos_scores_from_pipeline
+from src.evaluation import Evaluator, EvaluationResult
 
 
 def get_data_dir() -> Path:
