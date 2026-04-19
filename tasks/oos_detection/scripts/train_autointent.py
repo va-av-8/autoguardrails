@@ -11,6 +11,9 @@
     # Full train
     python scripts/train_autointent.py --mode full
 
+    # AutoML оптимизация embedder (без фиксации)
+    python scripts/train_autointent.py --mode fewshot --n_shots 10 --seed 42 --no-fix-embedder
+
 После обучения модель сохраняется в runs/<model_name>/.
 Для оценки используйте eval_autointent.py.
 """
@@ -97,14 +100,25 @@ def main():
         action="store_true",
         help="Use small embedder for fast validation (not comparable to Table 3)",
     )
+    parser.add_argument(
+        "--no-fix-embedder",
+        action="store_true",
+        help="Let AutoML optimize embedder (slower, potentially better)",
+    )
     args = parser.parse_args()
 
     data_dir = get_data_dir()
     runs_dir = get_runs_dir()
 
     # Model naming
-    model_name = get_model_name(args.pilot)
-    embedder_name = get_embedder_name(args.pilot)
+    no_fix_embedder = getattr(args, 'no_fix_embedder', False)
+
+    if no_fix_embedder:
+        model_name = "autointent_classic-light_autoembedder"
+        embedder_name = "auto (optimized by AutoML)"
+    else:
+        model_name = get_model_name(args.pilot)
+        embedder_name = get_embedder_name(args.pilot)
 
     if args.mode == "fewshot":
         mode_str = f"{args.n_shots}shot"
@@ -117,7 +131,7 @@ def main():
     print("=" * 60)
     print("AutoIntent Training")
     print("=" * 60)
-    print(f"Mode: {'PILOT' if args.pilot else 'FINAL'}")
+    print(f"Mode: {'PILOT' if args.pilot else ('AUTO-EMBEDDER' if no_fix_embedder else 'FINAL')}")
     print(f"Embedder: {embedder_name}")
     print(f"Training: {mode_str}")
     print(f"Output: {model_dir}")
@@ -147,7 +161,10 @@ def main():
 
     # Create pipeline
     pipeline = Pipeline.from_preset("classic-light")
-    pipeline.set_config(EmbedderConfig(model_name=embedder_name))
+
+    # Set embedder (unless --no-fix-embedder)
+    if not no_fix_embedder:
+        pipeline.set_config(EmbedderConfig(model_name=embedder_name))
 
     # Cross-validation for few-shot
     if args.mode == "fewshot":
@@ -180,6 +197,7 @@ def main():
         "n_shots": args.n_shots if args.mode == "fewshot" else None,
         "seed": args.seed if args.mode == "fewshot" else None,
         "embedder": embedder_name,
+        "embedder_fixed": not no_fix_embedder,
         "pilot": args.pilot,
         "preset": "classic-light",
     }
