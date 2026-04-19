@@ -156,6 +156,10 @@ python scripts/run_autointent.py --source <source> --mode fewshot --n_shots <n> 
 python scripts/run_autointent.py --source <source> --mode full
 python scripts/run_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed>
 
+# AutoML оптимизация embedder (без фиксации, медленнее)
+python scripts/train_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed> --no-fix-embedder
+python scripts/eval_autointent.py --source <source> --model_dir runs/autointent_classic-light_autoembedder_<n>shot_seed<seed>
+
 # Раздельный запуск train/eval
 python scripts/train_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed>
 python scripts/eval_autointent.py --source <source> --model_dir runs/<model_dir>
@@ -188,7 +192,8 @@ uv run python tasks/oos_detection/scripts/summarize_results.py
 | `--n_shots` | `10`, `20`, `50` | Примеров на интент (few-shot) |
 | `--seed` | `42`, `123`, `456` | Random seed (few-shot) |
 | `--model` | `tfidf`, `cosine`, `all` | Бейзлайн (run_baseline.py) |
-| `--pilot` | flag | Быстрый embedder (run_autointent.py) |
+| `--pilot` | flag | Быстрый embedder e5-small (train_autointent.py) |
+| `--no-fix-embedder` | flag | AutoML оптимизирует embedder (train_autointent.py) |
 
 ### Датасеты
 
