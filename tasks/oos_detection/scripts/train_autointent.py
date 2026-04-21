@@ -125,8 +125,8 @@ def main():
     else:
         mode_str = "full"
 
-    # Output directory for this run
-    model_dir = runs_dir / f"{model_name}_{mode_str}_seed{args.seed if args.seed else 0}"
+    # Output directory for this run (include source to avoid conflicts)
+    model_dir = runs_dir / f"{model_name}_{args.source}_{mode_str}_seed{args.seed if args.seed else 0}"
 
     print("=" * 60)
     print("AutoIntent Training")
@@ -193,6 +193,7 @@ def main():
     # Save metadata
     metadata = {
         "model_name": model_name,
+        "source": args.source,
         "mode": mode_str,
         "n_shots": args.n_shots if args.mode == "fewshot" else None,
         "seed": args.seed if args.mode == "fewshot" else None,

@@ -67,11 +67,11 @@ In-domain Accuracy = 96.13.
 
 ```bash
 # Скачать и подготовить оба датасета
-python scripts/prepare_data.py --source all
+uv run python scripts/prepare_data.py --source all
 
 # Или по отдельности
-python scripts/prepare_data.py --source standard    # github.com/clinc/oos-eval (100 OOS train)
-python scripts/prepare_data.py --source deeppavlov  # HuggingFace DeepPavlov/clinc150 (200 OOS train)
+uv run python scripts/prepare_data.py --source standard    # github.com/clinc/oos-eval (100 OOS train)
+uv run python scripts/prepare_data.py --source deeppavlov  # HuggingFace DeepPavlov/clinc150 (200 OOS train)
 ```
 
 **Структура данных после подготовки:**
@@ -136,33 +136,77 @@ data/processed/
 
 ```bash
 # Full train
-python scripts/run_baseline.py --source <source> --model all --mode full
+uv run python scripts/run_baseline.py --source <source> --model all --mode full
 
 # Few-shot
-python scripts/run_baseline.py --source <source> --model all --mode fewshot --n_shots <n> --seed <seed>
+uv run python scripts/run_baseline.py --source <source> --model all --mode fewshot --n_shots <n> --seed <seed>
 
 # Только TF-IDF или Cosine
-python scripts/run_baseline.py --source <source> --model tfidf --mode fewshot --n_shots <n> --seed <seed>
-python scripts/run_baseline.py --source <source> --model cosine --mode fewshot --n_shots <n> --seed <seed>
+uv run python scripts/run_baseline.py --source <source> --model tfidf --mode fewshot --n_shots <n> --seed <seed>
+uv run python scripts/run_baseline.py --source <source> --model cosine --mode fewshot --n_shots <n> --seed <seed>
+```
+
+**Batch-запуск всех бейзлайнов:**
+
+```bash
+for source in standard deeppavlov; do
+  # Full train
+  uv run python scripts/run_baseline.py --source $source --model all --mode full
+  # Few-shot
+  for n in 10 20 50; do
+    for seed in 42 123 456; do
+      uv run python scripts/run_baseline.py --source $source --model all --mode fewshot --n_shots $n --seed $seed
+    done
+  done
+done
 ```
 
 ### AutoIntent
 
 ```bash
 # Pilot (e5-small, быстрая валидация)
-python scripts/run_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed> --pilot
+uv run python scripts/run_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed> --pilot
 
-# Final (e5-large-instruct, сравнимо с Table 3)
-python scripts/run_autointent.py --source <source> --mode full
-python scripts/run_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed>
+# С фиксацией embedder (e5-large-instruct, сравнимо с Table 3)
+uv run python scripts/run_autointent.py --source <source> --mode full
+uv run python scripts/run_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed>
 
-# AutoML оптимизация embedder (без фиксации, медленнее)
-python scripts/train_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed> --no-fix-embedder
-python scripts/eval_autointent.py --source <source> --model_dir runs/autointent_classic-light_autoembedder_<n>shot_seed<seed>
+# Без фиксации embedder (AutoML оптимизирует embedder)
+uv run python scripts/run_autointent.py --source <source> --mode full --no-fix-embedder
+uv run python scripts/run_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed> --no-fix-embedder
 
 # Раздельный запуск train/eval
-python scripts/train_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed>
-python scripts/eval_autointent.py --source <source> --model_dir runs/<model_dir>
+uv run python scripts/train_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed>
+uv run python scripts/eval_autointent.py --model_dir runs/autointent_classic-light_<source>_<n>shot_seed<seed>
+```
+
+**Структура директорий моделей:**
+- С фиксацией: `runs/autointent_classic-light_<source>_<mode>_seed<seed>`
+- Без фиксации: `runs/autointent_classic-light_autoembedder_<source>_<mode>_seed<seed>`
+- Pilot: `runs/autointent_classic-light_pilot_<source>_<mode>_seed<seed>`
+
+**Batch-запуск всех экспериментов:**
+
+```bash
+# С фиксацией embedder
+for source in standard deeppavlov; do
+  uv run python scripts/run_autointent.py --source $source --mode full
+  for n in 10 20 50; do
+    for seed in 42 123 456; do
+      uv run python scripts/run_autointent.py --source $source --mode fewshot --n_shots $n --seed $seed
+    done
+  done
+done
+
+# Без фиксации embedder (AutoML)
+for source in standard deeppavlov; do
+  uv run python scripts/run_autointent.py --source $source --mode full --no-fix-embedder
+  for n in 10 20 50; do
+    for seed in 42 123 456; do
+      uv run python scripts/run_autointent.py --source $source --mode fewshot --n_shots $n --seed $seed --no-fix-embedder
+    done
+  done
+done
 ```
 
 ### Framework Benchmarks (CLI, без ноутбука)
@@ -192,8 +236,8 @@ uv run python tasks/oos_detection/scripts/summarize_results.py
 | `--n_shots` | `10`, `20`, `50` | Примеров на интент (few-shot) |
 | `--seed` | `42`, `123`, `456` | Random seed (few-shot) |
 | `--model` | `tfidf`, `cosine`, `all` | Бейзлайн (run_baseline.py) |
-| `--pilot` | flag | Быстрый embedder e5-small (train_autointent.py) |
-| `--no-fix-embedder` | flag | AutoML оптимизирует embedder (train_autointent.py) |
+| `--pilot` | flag | Быстрый embedder e5-small |
+| `--no-fix-embedder` | flag | AutoML оптимизирует embedder |
 
 ### Датасеты
 
@@ -201,6 +245,13 @@ uv run python tasks/oos_detection/scripts/summarize_results.py
 |--------|-------------|----------|
 | `standard` | 100 | github.com/clinc/oos-eval |
 | `deeppavlov` | 200 | HuggingFace DeepPavlov/clinc150 |
+
+**Известные проблемы качества данных:**
+- **Оба источника:** 2 текста пересекаются между train и test с РАЗНЫМИ метками
+- **deeppavlov:** Train OOS содержит аномально длинные тексты (restaurant reviews, mean ~69 слов vs ~7 в standard)
+
+**Рекомендация:** используйте `--source standard` для более чистых экспериментов (нет аномальных OOS),
+`--source deeppavlov` для сравнения с Table 3.
 
 ### Примечание о сравнении с литературой
 
@@ -212,6 +263,9 @@ uv run python tasks/oos_detection/scripts/summarize_results.py
 напрямую сравнимый референс — AutoIntent Table 3.
 
 ## Результаты
+
+> **TODO:** Результаты ниже устарели (были получены на неверном датасете).
+> После перезапуска экспериментов на standard/deeppavlov обновить через `06_results_summary.ipynb`.
 
 ### Few-shot (F1 OOS, mean ± std, 3 seeds)
 
@@ -259,12 +313,11 @@ uv run python tasks/oos_detection/scripts/summarize_results.py
 
 | Ноутбук | Содержание |
 |---|---|
-| `01_eda.ipynb` | EDA датасета CLINC150 |
-| `02_baseline.ipynb` | Бейзлайны: запуск и анализ |
-| `03_autointent_fewshot.ipynb` | Few-shot эксперименты, variance, scaling curve, анализ AutoML |
-| `04_autointent_full.ipynb` | Full train, сравнение с референсом, scaling curve few-shot → full |
+| `01_eda.ipynb` | EDA датасета CLINC150, сравнение standard vs deeppavlov |
 | `05_hypothesis_asymmetric_cost.ipynb` | HYP-002: асимметричная cost function |
 | `06_results_summary.ipynb` | Итоговое сравнение всех моделей и выводы |
+
+Эксперименты (бейзлайны, AutoIntent) запускаются скриптами, результаты в `results/metrics.json`.
 
 ## Ограничение по датасету
 
@@ -308,13 +361,6 @@ CLINC150 (250 OOS в train, 15 250 строк train всего).
    `EmbedderConfig`. При запуске `classic-light` без фиксации
    embedder оптимизируется автоматически и может выбрать другую
    модель (по Table 5 в статье лучший — `stella_en_400M_v5`).
-   Был ли embedder зафиксирован в экспериментах Table 3?
-
-4. **Какой embedder использован в Table 3?**
-   Мы фиксировали  явно через
-   . При запуске  без фиксации
-   embedder оптимизируется автоматически и может выбрать другую
-   модель (по Table 5 в статье лучший — ).
    Был ли embedder зафиксирован в экспериментах Table 3?
 
 ## Дальнейшие шаги

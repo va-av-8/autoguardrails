@@ -59,11 +59,14 @@ def run_tfidf(
     mode_str: str,
     n_shots: int | None,
     seed: int | None,
+    source: str,
 ) -> None:
     """Run TF-IDF baselines: argmax and threshold variants."""
 
+    extra = {"source": source}
+
     # Argmax variant (no threshold calibration)
-    print(f"Running tfidf_argmax ({mode_str})...")
+    print(f"Running tfidf_argmax ({mode_str}, {source})...")
     model_argmax = TfidfLogreg()
     model_argmax.fit(train_data["texts"], train_data["labels"])
     result_argmax = evaluator.evaluate(
@@ -72,11 +75,12 @@ def run_tfidf(
         mode=mode_str,
         n_shots=n_shots,
         seed=seed,
+        extra=extra,
     )
     evaluator.save(result_argmax)
 
     # Threshold variant (calibrated on validation)
-    print(f"Running tfidf_threshold ({mode_str})...")
+    print(f"Running tfidf_threshold ({mode_str}, {source})...")
     model_thresh = TfidfLogreg()
     model_thresh.fit(train_data["texts"], train_data["labels"])
     t_star = model_thresh.calibrate_threshold(val_data["texts"], val_data["labels"])
@@ -87,6 +91,7 @@ def run_tfidf(
         mode=mode_str,
         n_shots=n_shots,
         seed=seed,
+        extra=extra,
     )
     evaluator.save(result_thresh)
 
@@ -98,12 +103,14 @@ def run_cosine(
     mode_str: str,
     n_shots: int | None,
     seed: int | None,
+    source: str,
     embedding_model: str | None = None,
 ) -> None:
     """Run cosine similarity baselines: argmax and threshold variants."""
 
     models_to_run = [embedding_model] if embedding_model else SUPPORTED_MODELS
     cache_dir = get_cache_dir()
+    extra = {"source": source}
 
     for emb_model in models_to_run:
         if "bert-base" in emb_model:
@@ -114,7 +121,7 @@ def run_cosine(
             short_name = "minilm"
 
         # Argmax variant (default threshold)
-        print(f"Running cosine_{short_name}_argmax ({mode_str})...")
+        print(f"Running cosine_{short_name}_argmax ({mode_str}, {source})...")
         model_argmax = EmbeddingThreshold(model_name=emb_model, cache_dir=cache_dir)
         model_argmax.fit(train_data["texts"], train_data["labels"])
         result_argmax = evaluator.evaluate(
@@ -123,11 +130,12 @@ def run_cosine(
             mode=mode_str,
             n_shots=n_shots,
             seed=seed,
+            extra=extra,
         )
         evaluator.save(result_argmax)
 
         # Threshold variant (calibrated on validation)
-        print(f"Running cosine_{short_name}_threshold ({mode_str})...")
+        print(f"Running cosine_{short_name}_threshold ({mode_str}, {source})...")
         model_thresh = EmbeddingThreshold(model_name=emb_model, cache_dir=cache_dir)
         model_thresh.fit(train_data["texts"], train_data["labels"])
         t_star = model_thresh.calibrate_threshold(val_data["texts"], val_data["labels"])
@@ -138,6 +146,7 @@ def run_cosine(
             mode=mode_str,
             n_shots=n_shots,
             seed=seed,
+            extra=extra,
         )
         evaluator.save(result_thresh)
 
@@ -213,12 +222,12 @@ def main():
 
     # Run baselines
     if args.model in ["tfidf", "all"]:
-        run_tfidf(train_data, val_data, evaluator, mode_str, n_shots, seed)
+        run_tfidf(train_data, val_data, evaluator, mode_str, n_shots, seed, args.source)
 
     if args.model in ["cosine", "all"]:
         run_cosine(
             train_data, val_data, evaluator, mode_str,
-            n_shots, seed, args.embedding_model
+            n_shots, seed, args.source, args.embedding_model
         )
 
     # Print report

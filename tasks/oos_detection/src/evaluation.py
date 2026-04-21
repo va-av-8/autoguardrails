@@ -96,6 +96,7 @@ class Evaluator:
         seed: int | None = None,
         is_reference: bool = False,
         measure_latency_flag: bool = True,
+        extra: dict | None = None,
     ) -> EvaluationResult:
         """
         Прогоняет модель на тест-сплите, вычисляет все метрики,
@@ -142,6 +143,7 @@ class Evaluator:
             n_shots=n_shots,
             seed=seed,
             is_reference=is_reference,
+            extra=extra or {},
         )
 
     def save(self, result: EvaluationResult) -> None:
@@ -157,14 +159,16 @@ class Evaluator:
             with open(self.metrics_file, "r", encoding="utf-8") as f:
                 results = json.load(f)
 
-        # Create key for deduplication
+        # Create key for deduplication (include source to separate datasets)
         result_dict = result.to_dict()
-        key = (result.model_name, result.mode, result.seed)
+        source = result.extra.get("source") if result.extra else None
+        key = (result.model_name, result.mode, result.seed, source)
 
         # Find and update existing, or append new
         found = False
         for i, r in enumerate(results):
-            existing_key = (r["model_name"], r["mode"], r.get("seed"))
+            existing_source = r.get("extra", {}).get("source")
+            existing_key = (r["model_name"], r["mode"], r.get("seed"), existing_source)
             if existing_key == key:
                 results[i] = result_dict
                 found = True
@@ -192,15 +196,15 @@ class Evaluator:
             return
 
         # Header
-        print("\n" + "=" * 100)
+        print("\n" + "=" * 115)
         print("OOS Detection Evaluation Report")
-        print("=" * 100)
+        print("=" * 115)
         print(
-            f"{'Model':<25} {'Mode':<10} "
+            f"{'Model':<25} {'Source':<10} {'Mode':<10} "
             f"{'OOS Rec':>8} {'InD Acc':>8} {'F1 OOS':>8} "
             f"{'AUROC':>8} {'AU-IOC':>8} {'Lat(ms)':>8}"
         )
-        print("-" * 100)
+        print("-" * 115)
 
         # Sort by f1_oos descending
         sorted_results = sorted(results, key=lambda x: -x["f1_oos"])
@@ -211,16 +215,18 @@ class Evaluator:
             if r.get("is_reference"):
                 name += " [ref]"
 
+            # Get source from extra
+            source = r.get("extra", {}).get("source", "—")
+
             print(
-                f"{name:<25} {r['mode']:<10} "
+                f"{name:<25} {source:<10} {r['mode']:<10} "
                 f"{r['oos_recall']:>8.4f} {r['in_domain_acc']:>8.4f} {r['f1_oos']:>8.4f} "
                 f"{r['auroc']:>8.4f} {r['au_ioc']:>8.4f} {r['latency_ms']:>8.2f}"
             )
 
-        print("-" * 100)
-        print("* = Reference model (Chua et al. 2024)")
+        print("-" * 115)
         print(
             "Primary metrics: OOS Recall, In-Domain Acc, F1 OOS | "
             "Secondary: AUROC, AU-IOC, Latency"
         )
-        print("=" * 100 + "\n")
+        print("=" * 115 + "\n")

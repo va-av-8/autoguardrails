@@ -109,10 +109,12 @@ def main():
 
     # Determine parameters
     model_name = metadata.get("model_name", model_dir.name)
+    source = metadata.get("source", args.source)  # Prefer metadata, fallback to args
     mode_str = args.mode or metadata.get("mode", "unknown")
     n_shots = metadata.get("n_shots")
     seed = metadata.get("seed")
     embedder_name = metadata.get("embedder", "unknown")
+    embedder_fixed = metadata.get("embedder_fixed", True)  # Default True for backward compat
     pilot = args.pilot if args.pilot is not None else metadata.get("pilot", False)
 
     print()
@@ -120,9 +122,11 @@ def main():
     print("AutoIntent Evaluation")
     print("=" * 60)
     print(f"Model: {model_name}")
+    print(f"Source: {source}")
     print(f"Mode: {mode_str}")
-    print(f"Pilot: {pilot}")
     print(f"Embedder: {embedder_name}")
+    print(f"Embedder fixed: {embedder_fixed}")
+    print(f"Pilot: {pilot}")
     print("=" * 60)
     print()
 
@@ -132,8 +136,8 @@ def main():
     print("Model loaded!")
     print()
 
-    # Load test data
-    test_std = load_split(args.source, "test")
+    # Load test data (use source from metadata or args)
+    test_std = load_split(source, "test")
     test_texts = test_std["texts"]
     test_labels = np.array(test_std["labels"])
 
@@ -178,10 +182,12 @@ def main():
         n_shots=n_shots,
         seed=seed,
         extra={
+            "source": source,
             "preset": metadata.get("preset", "classic-light"),
             "embedder": embedder_name,
+            "embedder_fixed": embedder_fixed,
             "pilot": pilot,
-            "comparable_to_table3": not pilot,
+            "comparable_to_table3": not pilot and embedder_fixed and source == "deeppavlov",
             "model_dir": str(model_dir),
         },
     )
@@ -192,7 +198,7 @@ def main():
     # Print results
     print()
     print("=" * 60)
-    print(f"AutoIntent Results ({mode_str})")
+    print(f"AutoIntent Results ({source}, {mode_str})")
     print("=" * 60)
     print(f"  OOS Recall:    {metrics['oos_recall']:.4f}")
     print(f"  In-Domain Acc: {metrics['in_domain_acc']:.4f}")

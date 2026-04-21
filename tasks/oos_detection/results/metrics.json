@@ -1,513 +1,19 @@
 [
   {
     "model_name": "tfidf_argmax",
-    "mode": "10shot",
-    "oos_recall": 0.001,
-    "in_domain_acc": 0.7434415295686972,
-    "f1_oos": 0.001998001998001998,
-    "auroc": 0.7683105824811027,
-    "au_ioc": 0.5858747220987105,
-    "latency_ms": 1.281960779815563,
-    "n_shots": 10,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "tfidf_threshold",
-    "mode": "10shot",
-    "oos_recall": 0.133,
-    "in_domain_acc": 0.7369942196531792,
-    "f1_oos": 0.22542372881355932,
-    "auroc": 0.7683105824811027,
-    "au_ioc": 0.5851755224544242,
-    "latency_ms": 2.544708339992212,
-    "n_shots": 10,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_bert_argmax",
-    "mode": "10shot",
-    "oos_recall": 0.941,
-    "in_domain_acc": 0.3655555555555556,
-    "f1_oos": 0.4242560865644725,
-    "auroc": 0.8247384444444444,
-    "au_ioc": 0.35931966666666665,
-    "latency_ms": 1.6602875397074968,
-    "n_shots": 10,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_bert_threshold",
-    "mode": "10shot",
-    "oos_recall": 0.29,
-    "in_domain_acc": 0.6575555555555556,
-    "f1_oos": 0.3853820598006645,
-    "auroc": 0.8247384444444444,
-    "au_ioc": 0.5833855555555556,
-    "latency_ms": 1.4468516560737044,
-    "n_shots": 10,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_minilm_argmax",
-    "mode": "10shot",
-    "oos_recall": 0.998,
-    "in_domain_acc": 0.1971111111111111,
-    "f1_oos": 0.3566833452466047,
-    "auroc": 0.9446043333333333,
-    "au_ioc": 0.19554288888888888,
-    "latency_ms": 0.9052549826446921,
-    "n_shots": 10,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_minilm_threshold",
-    "mode": "10shot",
-    "oos_recall": 0.51,
-    "in_domain_acc": 0.8026666666666666,
-    "f1_oos": 0.637101811367895,
-    "auroc": 0.9446043333333333,
-    "au_ioc": 0.7779446666666667,
-    "latency_ms": 0.7491649396251887,
-    "n_shots": 10,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_e5large_argmax",
-    "mode": "10shot",
-    "oos_recall": 0.281,
-    "in_domain_acc": 0.8666073810582481,
-    "f1_oos": 0.433307632999229,
-    "auroc": 0.9410842596709649,
-    "au_ioc": 0.8257736771898622,
-    "latency_ms": 100.41663003976282,
-    "n_shots": 10,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_e5large_threshold",
-    "mode": "10shot",
-    "oos_recall": 0.534,
-    "in_domain_acc": 0.858603823921743,
-    "f1_oos": 0.6662507797878977,
-    "auroc": 0.9410842596709649,
-    "au_ioc": 0.8221632947976879,
-    "latency_ms": 1.5840008601662703,
-    "n_shots": 10,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "autointent_classic-light",
-    "mode": "10shot",
-    "oos_recall": 0.65,
-    "in_domain_acc": 0.921520675855936,
-    "f1_oos": 0.7488479262672811,
-    "auroc": 0.9596629613161405,
-    "au_ioc": 0.7602545575811471,
-    "latency_ms": 0.21246593911200762,
-    "n_shots": 10,
-    "seed": 123,
-    "is_reference": false,
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "intfloat/multilingual-e5-large-instruct",
-      "pilot": false,
-      "comparable_to_table3": true,
-      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_10shot_seed123"
-    }
-  },
-  {
-    "model_name": "autointent_classic-light",
-    "mode": "10shot",
-    "oos_recall": 0.597,
-    "in_domain_acc": 0.9172965762561138,
-    "f1_oos": 0.7060910703725606,
-    "auroc": 0.9602787905735882,
-    "au_ioc": 0.7324613161405069,
-    "latency_ms": 0.21494161861483008,
-    "n_shots": 10,
-    "seed": 456,
-    "is_reference": false,
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "intfloat/multilingual-e5-large-instruct",
-      "pilot": false,
-      "comparable_to_table3": true,
-      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_10shot_seed456"
-    }
-  },
-  {
-    "model_name": "tfidf_argmax",
-    "mode": "20shot",
-    "oos_recall": 0.005,
-    "in_domain_acc": 0.8019119608714984,
-    "f1_oos": 0.009940357852882704,
-    "auroc": 0.8198453757225433,
-    "au_ioc": 0.6740504668741664,
-    "latency_ms": 1.5511108614737168,
-    "n_shots": 20,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "tfidf_threshold",
-    "mode": "20shot",
-    "oos_recall": 0.099,
-    "in_domain_acc": 0.8010226767452201,
-    "f1_oos": 0.17757847533632287,
-    "auroc": 0.8198453757225433,
-    "au_ioc": 0.6739580924855492,
-    "latency_ms": 3.13101664010901,
-    "n_shots": 20,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_bert_argmax",
-    "mode": "20shot",
-    "oos_recall": 0.92,
-    "in_domain_acc": 0.48577145397954646,
-    "f1_oos": 0.4824331410592554,
-    "auroc": 0.8552570031124943,
-    "au_ioc": 0.46828301467318806,
-    "latency_ms": 3.2381375203840435,
-    "n_shots": 20,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_bert_threshold",
-    "mode": "20shot",
-    "oos_recall": 0.322,
-    "in_domain_acc": 0.7194308581591818,
-    "f1_oos": 0.42677269715043076,
-    "auroc": 0.8552570031124943,
-    "au_ioc": 0.6528740551356158,
-    "latency_ms": 3.1691499787848443,
-    "n_shots": 20,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_minilm_argmax",
-    "mode": "20shot",
-    "oos_recall": 0.999,
-    "in_domain_acc": 0.2723432636727434,
-    "f1_oos": 0.38086160884483417,
-    "auroc": 0.955271676300578,
-    "au_ioc": 0.26895142285460205,
-    "latency_ms": 1.5828341979067773,
-    "n_shots": 20,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_minilm_threshold",
-    "mode": "20shot",
-    "oos_recall": 0.568,
-    "in_domain_acc": 0.8472654513116941,
-    "f1_oos": 0.6918392204628502,
-    "auroc": 0.955271676300578,
-    "au_ioc": 0.823224655402401,
-    "latency_ms": 1.4702350395964459,
-    "n_shots": 20,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_e5large_argmax",
-    "mode": "20shot",
-    "oos_recall": 0.226,
-    "in_domain_acc": 0.8861716318363717,
-    "f1_oos": 0.3651050080775444,
-    "auroc": 0.9499953312583371,
-    "au_ioc": 0.850489662072032,
-    "latency_ms": 4.333098282222636,
-    "n_shots": 20,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_e5large_threshold",
-    "mode": "20shot",
-    "oos_recall": 0.568,
-    "in_domain_acc": 0.879057358826145,
-    "f1_oos": 0.6956521739130435,
-    "auroc": 0.9499953312583371,
-    "au_ioc": 0.8471791907514451,
-    "latency_ms": 3.971724138245918,
-    "n_shots": 20,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "tfidf_argmax",
-    "mode": "50shot",
-    "oos_recall": 0.029,
-    "in_domain_acc": 0.8606047132058693,
-    "f1_oos": 0.05625606207565471,
-    "auroc": 0.8706169408626055,
-    "au_ioc": 0.7627635615829257,
-    "latency_ms": 1.5148700209101662,
-    "n_shots": 50,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "tfidf_threshold",
-    "mode": "50shot",
-    "oos_recall": 0.239,
-    "in_domain_acc": 0.8523788350377945,
-    "f1_oos": 0.3671274961597542,
-    "auroc": 0.8706169408626055,
-    "au_ioc": 0.761254112939084,
-    "latency_ms": 3.145384158124216,
-    "n_shots": 50,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_bert_argmax",
-    "mode": "50shot",
-    "oos_recall": 0.882,
-    "in_domain_acc": 0.619386393952868,
-    "f1_oos": 0.5547169811320755,
-    "auroc": 0.8811067140951534,
-    "au_ioc": 0.6019877723432637,
-    "latency_ms": 7.2075358586153015,
-    "n_shots": 50,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_bert_threshold",
-    "mode": "50shot",
-    "oos_recall": 0.357,
-    "in_domain_acc": 0.7856825255669186,
-    "f1_oos": 0.46727748691099474,
-    "auroc": 0.8811067140951534,
-    "au_ioc": 0.7263018008003558,
-    "latency_ms": 7.121651581255719,
-    "n_shots": 50,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_minilm_argmax",
-    "mode": "50shot",
-    "oos_recall": 0.998,
-    "in_domain_acc": 0.3763895064473099,
-    "f1_oos": 0.4194158436646354,
-    "auroc": 0.9617459982214317,
-    "au_ioc": 0.3754186305024455,
-    "latency_ms": 3.571629181969911,
-    "n_shots": 50,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_minilm_threshold",
-    "mode": "50shot",
-    "oos_recall": 0.555,
-    "in_domain_acc": 0.8568252556691863,
-    "f1_oos": 0.6826568265682657,
-    "auroc": 0.9617459982214317,
-    "au_ioc": 0.8374748777234327,
-    "latency_ms": 3.397738299681805,
-    "n_shots": 50,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_e5large_argmax",
-    "mode": "50shot",
-    "oos_recall": 0.158,
-    "in_domain_acc": 0.904846598488217,
-    "f1_oos": 0.2719449225473322,
-    "auroc": 0.9574202979101825,
-    "au_ioc": 0.8723441529568697,
-    "latency_ms": 9.692156700766645,
-    "n_shots": 50,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_e5large_threshold",
-    "mode": "50shot",
-    "oos_recall": 0.538,
-    "in_domain_acc": 0.8986216096042685,
-    "f1_oos": 0.6792929292929293,
-    "auroc": 0.9574202979101825,
-    "au_ioc": 0.8696326144953312,
-    "latency_ms": 9.719349078368396,
-    "n_shots": 50,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "autointent_classic-light",
-    "mode": "20shot",
-    "oos_recall": 0.805,
-    "in_domain_acc": 0.9257447754557581,
-    "f1_oos": 0.8193384223918575,
-    "auroc": 0.9692745664739885,
-    "au_ioc": 0.8354846598488217,
-    "latency_ms": 0.1939066400518641,
-    "n_shots": 20,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "intfloat/multilingual-e5-large-instruct",
-      "pilot": false,
-      "comparable_to_table3": true,
-      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_20shot_seed42"
-    }
-  },
-  {
-    "model_name": "autointent_classic-light",
-    "mode": "20shot",
-    "oos_recall": 0.817,
-    "in_domain_acc": 0.9333036905291241,
-    "f1_oos": 0.8315521628498728,
-    "auroc": 0.9713617163183638,
-    "au_ioc": 0.8479064028457092,
-    "latency_ms": 0.18108915886841714,
-    "n_shots": 20,
-    "seed": 123,
-    "is_reference": false,
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "intfloat/multilingual-e5-large-instruct",
-      "pilot": false,
-      "comparable_to_table3": true,
-      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_20shot_seed123"
-    }
-  },
-  {
-    "model_name": "autointent_classic-light",
-    "mode": "20shot",
-    "oos_recall": 0.78,
-    "in_domain_acc": 0.9257447754557581,
-    "f1_oos": 0.8074534161490683,
-    "auroc": 0.9697727879057358,
-    "au_ioc": 0.8239128501556247,
-    "latency_ms": 0.1991908805212006,
-    "n_shots": 20,
-    "seed": 456,
-    "is_reference": false,
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "intfloat/multilingual-e5-large-instruct",
-      "pilot": false,
-      "comparable_to_table3": true,
-      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_20shot_seed456"
-    }
-  },
-  {
-    "model_name": "autointent_classic-light",
-    "mode": "50shot",
-    "oos_recall": 0.595,
-    "in_domain_acc": 0.9559804357492219,
-    "f1_oos": 0.7282741738066095,
-    "auroc": 0.9733448199199644,
-    "au_ioc": 0.7623943975100044,
-    "latency_ms": 0.20294157729949802,
-    "n_shots": 50,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "intfloat/multilingual-e5-large-instruct",
-      "pilot": false,
-      "comparable_to_table3": true,
-      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_50shot_seed42"
-    }
-  },
-  {
-    "model_name": "autointent_classic-light",
-    "mode": "50shot",
-    "oos_recall": 0.59,
-    "in_domain_acc": 0.9608714984437527,
-    "f1_oos": 0.7234825260576333,
-    "auroc": 0.974327478879502,
-    "au_ioc": 0.7638928412627833,
-    "latency_ms": 0.19576334161683917,
-    "n_shots": 50,
-    "seed": 123,
-    "is_reference": false,
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "intfloat/multilingual-e5-large-instruct",
-      "pilot": false,
-      "comparable_to_table3": true,
-      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_50shot_seed123"
-    }
-  },
-  {
-    "model_name": "autointent_classic-light",
-    "mode": "50shot",
-    "oos_recall": 0.608,
-    "in_domain_acc": 0.960204535349044,
-    "f1_oos": 0.7369696969696969,
-    "auroc": 0.9745793686082703,
-    "au_ioc": 0.7720044464206315,
-    "latency_ms": 0.2079583192244172,
-    "n_shots": 50,
-    "seed": 456,
-    "is_reference": false,
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "intfloat/multilingual-e5-large-instruct",
-      "pilot": false,
-      "comparable_to_table3": true,
-      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_50shot_seed456"
-    }
-  },
-  {
-    "model_name": "tfidf_argmax",
     "mode": "full",
     "oos_recall": 0.125,
     "in_domain_acc": 0.8893333333333333,
     "f1_oos": 0.22007042253521128,
     "auroc": 0.8719016666666666,
     "au_ioc": 0.7851603333333332,
-    "latency_ms": 1.5221625159028918,
+    "latency_ms": 1.491169175133109,
     "n_shots": null,
     "seed": null,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "tfidf_threshold",
@@ -517,11 +23,13 @@
     "f1_oos": 0.4478442280945758,
     "auroc": 0.8719016666666666,
     "au_ioc": 0.7807251111111111,
-    "latency_ms": 3.160562460543588,
+    "latency_ms": 3.0621481221169233,
     "n_shots": null,
     "seed": null,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_argmax",
@@ -531,11 +39,13 @@
     "f1_oos": 0.6014930678990402,
     "auroc": 0.8976577777777779,
     "au_ioc": 0.6765961111111112,
-    "latency_ms": 14.390923314495012,
+    "latency_ms": 14.413165800506249,
     "n_shots": null,
     "seed": null,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_threshold",
@@ -545,11 +55,13 @@
     "f1_oos": 0.4207492795389049,
     "auroc": 0.8976577777777779,
     "au_ioc": 0.7657776666666667,
-    "latency_ms": 14.240735830971971,
+    "latency_ms": 14.313481682911515,
     "n_shots": null,
     "seed": null,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_argmax",
@@ -559,11 +71,13 @@
     "f1_oos": 0.4558756287151349,
     "auroc": 0.9625393333333333,
     "au_ioc": 0.4540027777777778,
-    "latency_ms": 7.120463378960267,
+    "latency_ms": 7.106881719082594,
     "n_shots": null,
     "seed": null,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_threshold",
@@ -573,11 +87,13 @@
     "f1_oos": 0.6468305304010349,
     "auroc": 0.9625393333333333,
     "au_ioc": 0.8535777777777778,
-    "latency_ms": 6.983470958657563,
+    "latency_ms": 6.981936665251851,
     "n_shots": null,
     "seed": null,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_argmax",
@@ -587,11 +103,13 @@
     "f1_oos": 0.19964028776978418,
     "auroc": 0.9610691111111112,
     "au_ioc": 0.884948111111111,
-    "latency_ms": 19.5950574206654,
+    "latency_ms": 19.009318337775767,
     "n_shots": null,
     "seed": null,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_threshold",
@@ -601,740 +119,3324 @@
     "f1_oos": 0.7221217600964437,
     "auroc": 0.9610691111111112,
     "au_ioc": 0.8817528888888888,
-    "latency_ms": 20.956030882662162,
+    "latency_ms": 18.97785250330344,
     "n_shots": null,
     "seed": null,
     "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "autointent_classic-light",
-    "mode": "full",
-    "oos_recall": 0.835,
-    "in_domain_acc": 0.9399733214762116,
-    "f1_oos": 0.8413098236775819,
-    "auroc": 0.9737283236994219,
-    "au_ioc": 0.8624255224544242,
-    "latency_ms": 0.19218253903090954,
-    "n_shots": null,
-    "seed": 42,
-    "is_reference": false,
     "extra": {
-      "preset": "classic-light",
-      "embedder": "intfloat/multilingual-e5-large-instruct",
-      "pilot": false,
-      "comparable_to_table3": true,
-      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_full_seed42"
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_pilot",
-    "mode": "10shot",
-    "oos_recall": 0.623,
-    "in_domain_acc": 0.8617163183637172,
-    "f1_oos": 0.6827397260273973,
-    "auroc": 0.9329951089373054,
-    "au_ioc": 0.8317528901734104,
-    "latency_ms": 0.18636926310136914,
-    "n_shots": 10,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "unknown",
-      "pilot": true
-    }
-  },
-  {
-    "model_name": "autointent_classic-light",
-    "mode": "10shot",
-    "oos_recall": 0.613,
-    "in_domain_acc": 0.921520675855936,
-    "f1_oos": 0.7182190978324546,
-    "auroc": 0.9579995553579368,
-    "au_ioc": 0.7432064250778124,
-    "latency_ms": 0.22253007860854268,
-    "n_shots": 10,
-    "seed": 42,
-    "is_reference": false,
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "intfloat/multilingual-e5-large-instruct",
-      "pilot": false,
-      "comparable_to_table3": true,
-      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_10shot_seed42"
+      "source": "standard"
     }
   },
   {
     "model_name": "tfidf_argmax",
     "mode": "10shot",
-    "oos_recall": 0.0,
-    "in_domain_acc": 0.7434415295686972,
-    "f1_oos": 0.0,
-    "auroc": 0.7747594486438417,
-    "au_ioc": 0.5899831036016007,
-    "latency_ms": 1.1760433833114803,
+    "oos_recall": 0.002,
+    "in_domain_acc": 0.732,
+    "f1_oos": 0.003992015968063872,
+    "auroc": 0.7308283333333333,
+    "au_ioc": 0.5469396666666666,
+    "latency_ms": 1.2107759562786669,
     "n_shots": 10,
-    "seed": 123,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "tfidf_threshold",
     "mode": "10shot",
-    "oos_recall": 0.116,
-    "in_domain_acc": 0.7389951089373055,
-    "f1_oos": 0.20121422376409367,
-    "auroc": 0.7747594486438417,
-    "au_ioc": 0.5895350155624722,
-    "latency_ms": 2.6994175207801163,
+    "oos_recall": 0.087,
+    "in_domain_acc": 0.7257777777777777,
+    "f1_oos": 0.15371024734982333,
+    "auroc": 0.7308283333333333,
+    "au_ioc": 0.5464235555555556,
+    "latency_ms": 2.5901882967446,
     "n_shots": 10,
-    "seed": 123,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_argmax",
     "mode": "10shot",
-    "oos_recall": 0.943,
-    "in_domain_acc": 0.36082703423743884,
-    "f1_oos": 0.42515779981965734,
-    "auroc": 0.8270765895953758,
-    "au_ioc": 0.35051244997776787,
-    "latency_ms": 1.6528183221817017,
+    "oos_recall": 0.941,
+    "in_domain_acc": 0.3655555555555556,
+    "f1_oos": 0.4242560865644725,
+    "auroc": 0.8247384444444444,
+    "au_ioc": 0.35931966666666665,
+    "latency_ms": 1.3984206807799637,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.29,
+    "in_domain_acc": 0.6575555555555556,
+    "f1_oos": 0.3853820598006645,
+    "auroc": 0.8247384444444444,
+    "au_ioc": 0.5833855555555556,
+    "latency_ms": 1.4066441578324884,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.998,
+    "in_domain_acc": 0.1971111111111111,
+    "f1_oos": 0.3566833452466047,
+    "auroc": 0.9446043333333333,
+    "au_ioc": 0.19554288888888888,
+    "latency_ms": 0.7500158611219376,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.51,
+    "in_domain_acc": 0.8026666666666666,
+    "f1_oos": 0.637101811367895,
+    "auroc": 0.9446043333333333,
+    "au_ioc": 0.7779446666666667,
+    "latency_ms": 0.7600366789847612,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.259,
+    "in_domain_acc": 0.8566666666666667,
+    "f1_oos": 0.405320813771518,
+    "auroc": 0.9450124444444444,
+    "au_ioc": 0.8203221111111111,
+    "latency_ms": 1.8228449439629912,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.481,
+    "in_domain_acc": 0.8528888888888889,
+    "f1_oos": 0.6279373368146214,
+    "auroc": 0.9450124444444444,
+    "au_ioc": 0.8186066666666667,
+    "latency_ms": 1.767973320093006,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.001,
+    "in_domain_acc": 0.7406666666666667,
+    "f1_oos": 0.001998001998001998,
+    "auroc": 0.7394322222222223,
+    "au_ioc": 0.5615086666666667,
+    "latency_ms": 1.1899684427771717,
     "n_shots": 10,
     "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.127,
+    "in_domain_acc": 0.732,
+    "f1_oos": 0.21237458193979933,
+    "auroc": 0.7394322222222223,
+    "au_ioc": 0.5607783333333334,
+    "latency_ms": 2.4817166989669204,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.952,
+    "in_domain_acc": 0.35777777777777775,
+    "f1_oos": 0.4243369734789392,
+    "auroc": 0.829534,
+    "au_ioc": 0.35185066666666664,
+    "latency_ms": 1.5494108223356307,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_threshold",
     "mode": "10shot",
     "oos_recall": 0.273,
-    "in_domain_acc": 0.6587372165406847,
-    "f1_oos": 0.3696682464454976,
-    "auroc": 0.8270765895953758,
-    "au_ioc": 0.5831866385060027,
-    "latency_ms": 1.3773158576805145,
+    "in_domain_acc": 0.6522222222222223,
+    "f1_oos": 0.3726962457337884,
+    "auroc": 0.829534,
+    "au_ioc": 0.5802908888888889,
+    "latency_ms": 1.4183075039181858,
     "n_shots": 10,
     "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_argmax",
     "mode": "10shot",
     "oos_recall": 0.999,
-    "in_domain_acc": 0.20075589150733658,
-    "f1_oos": 0.3578080229226361,
-    "auroc": 0.9469811027123166,
-    "au_ioc": 0.19816907514450866,
-    "latency_ms": 0.7970325031783432,
+    "in_domain_acc": 0.1971111111111111,
+    "f1_oos": 0.35723225460396923,
+    "auroc": 0.9482933333333332,
+    "au_ioc": 0.19591233333333333,
+    "latency_ms": 0.8208833844400942,
     "n_shots": 10,
     "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_threshold",
     "mode": "10shot",
-    "oos_recall": 0.393,
-    "in_domain_acc": 0.8210315695864829,
-    "f1_oos": 0.5428176795580111,
-    "auroc": 0.9469811027123166,
-    "au_ioc": 0.79258781680747,
-    "latency_ms": 0.8107608358841389,
+    "oos_recall": 0.572,
+    "in_domain_acc": 0.8146666666666667,
+    "f1_oos": 0.6854403834631516,
+    "auroc": 0.9482933333333332,
+    "au_ioc": 0.7904095555555556,
+    "latency_ms": 0.7869850017596036,
     "n_shots": 10,
     "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_argmax",
     "mode": "10shot",
-    "oos_recall": 0.258,
-    "in_domain_acc": 0.859715429079591,
-    "f1_oos": 0.403125,
-    "auroc": 0.9436569586482881,
-    "au_ioc": 0.823377612272121,
-    "latency_ms": 1.4848341583274305,
+    "oos_recall": 0.284,
+    "in_domain_acc": 0.8606666666666667,
+    "f1_oos": 0.4362519201228879,
+    "auroc": 0.9434207777777778,
+    "au_ioc": 0.8229705555555555,
+    "latency_ms": 1.6386084037367254,
     "n_shots": 10,
     "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_threshold",
     "mode": "10shot",
-    "oos_recall": 0.451,
-    "in_domain_acc": 0.8563806136060471,
-    "f1_oos": 0.6001330671989354,
-    "auroc": 0.9436569586482881,
-    "au_ioc": 0.8221209426411739,
-    "latency_ms": 1.374866720288992,
+    "oos_recall": 0.503,
+    "in_domain_acc": 0.8553333333333333,
+    "f1_oos": 0.6403564608529599,
+    "auroc": 0.9434207777777778,
+    "au_ioc": 0.8206964444444445,
+    "latency_ms": 1.7419483454432338,
     "n_shots": 10,
     "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "tfidf_argmax",
     "mode": "10shot",
-    "oos_recall": 0.0,
-    "in_domain_acc": 0.737661182747888,
-    "f1_oos": 0.0,
-    "auroc": 0.7631370609159627,
-    "au_ioc": 0.5771362827923522,
-    "latency_ms": 1.2598966609220952,
+    "oos_recall": 0.001,
+    "in_domain_acc": 0.726,
+    "f1_oos": 0.001998001998001998,
+    "auroc": 0.7358238888888888,
+    "au_ioc": 0.5466200000000001,
+    "latency_ms": 1.2132900999858975,
     "n_shots": 10,
     "seed": 456,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "tfidf_threshold",
     "mode": "10shot",
-    "oos_recall": 0.147,
-    "in_domain_acc": 0.7269897732325478,
-    "f1_oos": 0.23767178658043653,
-    "auroc": 0.7631370609159627,
-    "au_ioc": 0.5759086260560249,
-    "latency_ms": 2.2582308761775494,
+    "oos_recall": 0.098,
+    "in_domain_acc": 0.7202222222222222,
+    "f1_oos": 0.17058311575282856,
+    "auroc": 0.7358238888888888,
+    "au_ioc": 0.5461736666666667,
+    "latency_ms": 2.3124508431646973,
     "n_shots": 10,
     "seed": 456,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_argmax",
     "mode": "10shot",
     "oos_recall": 0.944,
-    "in_domain_acc": 0.358603823921743,
-    "f1_oos": 0.4246513720197931,
-    "auroc": 0.8270460204535349,
-    "au_ioc": 0.3514823254779902,
-    "latency_ms": 1.5746308234520257,
+    "in_domain_acc": 0.35977777777777775,
+    "f1_oos": 0.4247469066366704,
+    "auroc": 0.8266005555555556,
+    "au_ioc": 0.3479797777777778,
+    "latency_ms": 1.6259550221730024,
     "n_shots": 10,
     "seed": 456,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_threshold",
     "mode": "10shot",
-    "oos_recall": 0.216,
-    "in_domain_acc": 0.6651845264562027,
-    "f1_oos": 0.3202372127501853,
-    "auroc": 0.8270460204535349,
-    "au_ioc": 0.5834745442418853,
-    "latency_ms": 1.367013220442459,
+    "oos_recall": 0.377,
+    "in_domain_acc": 0.6442222222222223,
+    "f1_oos": 0.4498806682577566,
+    "auroc": 0.8266005555555556,
+    "au_ioc": 0.5754314444444444,
+    "latency_ms": 1.3737707817927003,
     "n_shots": 10,
     "seed": 456,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_argmax",
     "mode": "10shot",
-    "oos_recall": 1.0,
-    "in_domain_acc": 0.1856380613606047,
-    "f1_oos": 0.354295837023915,
-    "auroc": 0.946178746109382,
-    "au_ioc": 0.18222043130280124,
-    "latency_ms": 0.7899241195991635,
-    "n_shots": 10,
-    "seed": 456,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_minilm_threshold",
-    "mode": "10shot",
-    "oos_recall": 0.502,
-    "in_domain_acc": 0.8212538906180524,
-    "f1_oos": 0.6338383838383839,
-    "auroc": 0.946178746109382,
-    "au_ioc": 0.794466429524233,
-    "latency_ms": 0.7457117002923042,
-    "n_shots": 10,
-    "seed": 456,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_e5large_argmax",
-    "mode": "10shot",
-    "oos_recall": 0.276,
-    "in_domain_acc": 0.8652734548688306,
-    "f1_oos": 0.425597532767926,
-    "auroc": 0.9451251667407736,
-    "au_ioc": 0.828882169853268,
-    "latency_ms": 1.522537439595908,
-    "n_shots": 10,
-    "seed": 456,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_e5large_threshold",
-    "mode": "10shot",
-    "oos_recall": 0.604,
-    "in_domain_acc": 0.8568252556691863,
-    "f1_oos": 0.7139479905437353,
-    "auroc": 0.9451251667407736,
-    "au_ioc": 0.8239554246331703,
-    "latency_ms": 1.784044224768877,
-    "n_shots": 10,
-    "seed": 456,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "tfidf_argmax",
-    "mode": "20shot",
-    "oos_recall": 0.004,
-    "in_domain_acc": 0.8068030235660294,
-    "f1_oos": 0.00796812749003984,
-    "auroc": 0.8141907514450868,
-    "au_ioc": 0.6704655402401067,
-    "latency_ms": 1.40371008310467,
-    "n_shots": 20,
-    "seed": 123,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "tfidf_threshold",
-    "mode": "20shot",
-    "oos_recall": 0.123,
-    "in_domain_acc": 0.8045798132503335,
-    "f1_oos": 0.21447253705318223,
-    "auroc": 0.8141907514450868,
-    "au_ioc": 0.670275789239662,
-    "latency_ms": 2.8791724611073732,
-    "n_shots": 20,
-    "seed": 123,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_bert_argmax",
-    "mode": "20shot",
-    "oos_recall": 0.916,
-    "in_domain_acc": 0.49288572698977323,
-    "f1_oos": 0.4810924369747899,
-    "auroc": 0.8563806136060471,
-    "au_ioc": 0.47720564695420187,
-    "latency_ms": 2.9903616453520954,
-    "n_shots": 20,
-    "seed": 123,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_bert_threshold",
-    "mode": "20shot",
-    "oos_recall": 0.266,
-    "in_domain_acc": 0.7367718986216096,
-    "f1_oos": 0.37972876516773735,
-    "auroc": 0.8563806136060471,
-    "au_ioc": 0.6648021342819032,
-    "latency_ms": 2.863294961862266,
-    "n_shots": 20,
-    "seed": 123,
-    "is_reference": false,
-    "extra": {}
-  },
-  {
-    "model_name": "cosine_minilm_argmax",
-    "mode": "20shot",
     "oos_recall": 0.999,
-    "in_domain_acc": 0.2647843485993775,
-    "f1_oos": 0.37848077287365034,
-    "auroc": 0.9560486883059137,
-    "au_ioc": 0.25868130280124496,
-    "latency_ms": 1.496958319330588,
-    "n_shots": 20,
-    "seed": 123,
+    "in_domain_acc": 0.20044444444444445,
+    "f1_oos": 0.3580645161290323,
+    "auroc": 0.9464742222222223,
+    "au_ioc": 0.196839,
+    "latency_ms": 0.8201225404627621,
+    "n_shots": 10,
+    "seed": 456,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_threshold",
-    "mode": "20shot",
-    "oos_recall": 0.574,
-    "in_domain_acc": 0.8405958203646064,
-    "f1_oos": 0.694074969770254,
-    "auroc": 0.9560486883059137,
-    "au_ioc": 0.8189085148955091,
-    "latency_ms": 1.3337208167649806,
-    "n_shots": 20,
-    "seed": 123,
+    "mode": "10shot",
+    "oos_recall": 0.546,
+    "in_domain_acc": 0.8164444444444444,
+    "f1_oos": 0.662621359223301,
+    "auroc": 0.9464742222222223,
+    "au_ioc": 0.7909407777777778,
+    "latency_ms": 0.7430916000157595,
+    "n_shots": 10,
+    "seed": 456,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_argmax",
-    "mode": "20shot",
-    "oos_recall": 0.198,
-    "in_domain_acc": 0.8923966207203201,
-    "f1_oos": 0.328086164043082,
-    "auroc": 0.9537636727434415,
-    "au_ioc": 0.8597261004891062,
-    "latency_ms": 3.8741974951699376,
-    "n_shots": 20,
-    "seed": 123,
+    "mode": "10shot",
+    "oos_recall": 0.281,
+    "in_domain_acc": 0.8648888888888889,
+    "f1_oos": 0.4326404926866821,
+    "auroc": 0.942489888888889,
+    "au_ioc": 0.8253613333333334,
+    "latency_ms": 1.5274050028529018,
+    "n_shots": 10,
+    "seed": 456,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_threshold",
-    "mode": "20shot",
-    "oos_recall": 0.549,
-    "in_domain_acc": 0.8877278790573588,
-    "f1_oos": 0.68625,
-    "auroc": 0.9537636727434415,
-    "au_ioc": 0.8577540017785683,
-    "latency_ms": 3.6010867776349187,
-    "n_shots": 20,
-    "seed": 123,
+    "mode": "10shot",
+    "oos_recall": 0.561,
+    "in_domain_acc": 0.8573333333333333,
+    "f1_oos": 0.6854001221747098,
+    "auroc": 0.942489888888889,
+    "au_ioc": 0.821504,
+    "latency_ms": 1.76180076203309,
+    "n_shots": 10,
+    "seed": 456,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "tfidf_argmax",
     "mode": "20shot",
-    "oos_recall": 0.001,
-    "in_domain_acc": 0.7976878612716763,
-    "f1_oos": 0.001998001998001998,
-    "auroc": 0.8189307469986661,
-    "au_ioc": 0.6697941307247666,
-    "latency_ms": 1.4195683330763131,
+    "oos_recall": 0.002,
+    "in_domain_acc": 0.7955555555555556,
+    "f1_oos": 0.003992015968063872,
+    "auroc": 0.7706446666666666,
+    "au_ioc": 0.6296382222222222,
+    "latency_ms": 1.467092583188787,
     "n_shots": 20,
-    "seed": 456,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "tfidf_threshold",
     "mode": "20shot",
-    "oos_recall": 0.157,
-    "in_domain_acc": 0.7934637616718542,
-    "f1_oos": 0.2629815745393635,
-    "auroc": 0.8189307469986661,
-    "au_ioc": 0.6692187638950645,
-    "latency_ms": 2.9921100451610982,
+    "oos_recall": 0.066,
+    "in_domain_acc": 0.7951111111111111,
+    "f1_oos": 0.12290502793296089,
+    "auroc": 0.7706446666666666,
+    "au_ioc": 0.6296204444444444,
+    "latency_ms": 3.400317500345409,
     "n_shots": 20,
-    "seed": 456,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_argmax",
     "mode": "20shot",
-    "oos_recall": 0.916,
-    "in_domain_acc": 0.4733214762116496,
-    "f1_oos": 0.47399741267787837,
-    "auroc": 0.8507810137839039,
-    "au_ioc": 0.46355135615829257,
-    "latency_ms": 3.044624141184613,
+    "oos_recall": 0.911,
+    "in_domain_acc": 0.482,
+    "f1_oos": 0.4730010384215992,
+    "auroc": 0.8527297777777778,
+    "au_ioc": 0.46583022222222226,
+    "latency_ms": 2.9027782974299043,
     "n_shots": 20,
-    "seed": 456,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_threshold",
     "mode": "20shot",
     "oos_recall": 0.3,
-    "in_domain_acc": 0.7187638950644731,
-    "f1_oos": 0.40899795501022496,
-    "auroc": 0.8507810137839039,
-    "au_ioc": 0.6470920409070698,
-    "latency_ms": 2.745153324212879,
+    "in_domain_acc": 0.7297777777777777,
+    "f1_oos": 0.4073319755600815,
+    "auroc": 0.8527297777777778,
+    "au_ioc": 0.6584217777777779,
+    "latency_ms": 3.0177391006145626,
     "n_shots": 20,
-    "seed": 456,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.997,
+    "in_domain_acc": 0.27311111111111114,
+    "f1_oos": 0.3801715919923737,
+    "auroc": 0.9534518888888889,
+    "au_ioc": 0.2718266666666667,
+    "latency_ms": 1.429344059433788,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.447,
+    "in_domain_acc": 0.8417777777777777,
+    "f1_oos": 0.5936254980079682,
+    "auroc": 0.9534518888888889,
+    "au_ioc": 0.8173264444444444,
+    "latency_ms": 1.3347007788252085,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.203,
+    "in_domain_acc": 0.8888888888888888,
+    "f1_oos": 0.3338815789473684,
+    "auroc": 0.9508897777777777,
+    "au_ioc": 0.8543781111111111,
+    "latency_ms": 3.900854013627395,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.538,
+    "in_domain_acc": 0.8824444444444445,
+    "f1_oos": 0.670404984423676,
+    "auroc": 0.9508897777777777,
+    "au_ioc": 0.8514693333333334,
+    "latency_ms": 3.6410375323612243,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.003,
+    "in_domain_acc": 0.7955555555555556,
+    "f1_oos": 0.005982053838484547,
+    "auroc": 0.7800115555555555,
+    "au_ioc": 0.6374106666666667,
+    "latency_ms": 1.555160901043564,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.088,
+    "in_domain_acc": 0.7911111111111111,
+    "f1_oos": 0.1572832886505809,
+    "auroc": 0.7800115555555555,
+    "au_ioc": 0.6370632222222222,
+    "latency_ms": 3.0363849783316255,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.927,
+    "in_domain_acc": 0.4866666666666667,
+    "f1_oos": 0.4839467501957713,
+    "auroc": 0.8580936666666668,
+    "au_ioc": 0.47481255555555557,
+    "latency_ms": 3.1097933545242995,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.249,
+    "in_domain_acc": 0.7242222222222222,
+    "f1_oos": 0.36034732272069464,
+    "auroc": 0.8580936666666668,
+    "au_ioc": 0.6549793333333334,
+    "latency_ms": 2.7499508461914957,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_argmax",
     "mode": "20shot",
     "oos_recall": 0.999,
-    "in_domain_acc": 0.2636727434415296,
-    "f1_oos": 0.3779080764138453,
-    "auroc": 0.9523828368163629,
-    "au_ioc": 0.2628958425967096,
-    "latency_ms": 1.454943282296881,
+    "in_domain_acc": 0.27066666666666667,
+    "f1_oos": 0.3801369863013699,
+    "auroc": 0.9541957777777778,
+    "au_ioc": 0.26534233333333335,
+    "latency_ms": 1.5275149210356176,
     "n_shots": 20,
-    "seed": 456,
+    "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_threshold",
     "mode": "20shot",
-    "oos_recall": 0.408,
-    "in_domain_acc": 0.8368163628279235,
-    "f1_oos": 0.5615966964900206,
-    "auroc": 0.9523828368163629,
-    "au_ioc": 0.8101974210760338,
-    "latency_ms": 1.348310902249068,
+    "oos_recall": 0.514,
+    "in_domain_acc": 0.8433333333333334,
+    "f1_oos": 0.6539440203562341,
+    "auroc": 0.9541957777777778,
+    "au_ioc": 0.8192952222222222,
+    "latency_ms": 1.33506991667673,
     "n_shots": 20,
-    "seed": 456,
+    "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_argmax",
     "mode": "20shot",
-    "oos_recall": 0.22,
-    "in_domain_acc": 0.8808359270787016,
-    "f1_oos": 0.35714285714285715,
-    "auroc": 0.9508267007558915,
-    "au_ioc": 0.8460511338372609,
-    "latency_ms": 3.7925999786239117,
+    "oos_recall": 0.233,
+    "in_domain_acc": 0.8864444444444445,
+    "f1_oos": 0.3736968724939856,
+    "auroc": 0.9500740000000001,
+    "au_ioc": 0.8514721111111111,
+    "latency_ms": 3.8992641936056316,
     "n_shots": 20,
-    "seed": 456,
+    "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_threshold",
     "mode": "20shot",
-    "oos_recall": 0.536,
-    "in_domain_acc": 0.8750555802578924,
-    "f1_oos": 0.6742138364779874,
-    "auroc": 0.9508267007558915,
-    "au_ioc": 0.8432065362383282,
-    "latency_ms": 3.690866659162566,
+    "oos_recall": 0.633,
+    "in_domain_acc": 0.8757777777777778,
+    "f1_oos": 0.7326388888888888,
+    "auroc": 0.9500740000000001,
+    "au_ioc": 0.8459026666666667,
+    "latency_ms": 3.881740045035258,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.003,
+    "in_domain_acc": 0.7986666666666666,
+    "f1_oos": 0.005982053838484547,
+    "auroc": 0.7766257777777776,
+    "au_ioc": 0.6346922222222222,
+    "latency_ms": 1.5490233805030584,
     "n_shots": 20,
     "seed": 456,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.111,
+    "in_domain_acc": 0.7908888888888889,
+    "f1_oos": 0.19039451114922812,
+    "auroc": 0.7766257777777776,
+    "au_ioc": 0.6340952222222223,
+    "latency_ms": 3.093267537187785,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.918,
+    "in_domain_acc": 0.47933333333333333,
+    "f1_oos": 0.4775032509752926,
+    "auroc": 0.8530695555555555,
+    "au_ioc": 0.46233811111111106,
+    "latency_ms": 3.0929617071524262,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.321,
+    "in_domain_acc": 0.7162222222222222,
+    "f1_oos": 0.42601194426011946,
+    "auroc": 0.8530695555555555,
+    "au_ioc": 0.6480157777777777,
+    "latency_ms": 3.004055062774569,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.999,
+    "in_domain_acc": 0.2771111111111111,
+    "f1_oos": 0.38224603022766407,
+    "auroc": 0.9538248888888889,
+    "au_ioc": 0.2762781111111111,
+    "latency_ms": 1.5595925226807594,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.535,
+    "in_domain_acc": 0.8471111111111111,
+    "f1_oos": 0.6666666666666666,
+    "auroc": 0.9538248888888889,
+    "au_ioc": 0.8230642222222222,
+    "latency_ms": 1.4347334206104279,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.219,
+    "in_domain_acc": 0.8924444444444445,
+    "f1_oos": 0.3563873067534581,
+    "auroc": 0.9510067777777778,
+    "au_ioc": 0.8560336666666666,
+    "latency_ms": 3.810202428139746,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.539,
+    "in_domain_acc": 0.8857777777777778,
+    "f1_oos": 0.677561282212445,
+    "auroc": 0.9510067777777778,
+    "au_ioc": 0.8532103333333334,
+    "latency_ms": 3.698303260607645,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "tfidf_argmax",
     "mode": "50shot",
-    "oos_recall": 0.032,
-    "in_domain_acc": 0.8686082703423744,
-    "f1_oos": 0.061895551257253385,
-    "auroc": 0.8701495108937306,
-    "au_ioc": 0.768671520675856,
-    "latency_ms": 1.427099178545177,
+    "oos_recall": 0.035,
+    "in_domain_acc": 0.8613333333333333,
+    "f1_oos": 0.06750241080038573,
+    "auroc": 0.8374552222222222,
+    "au_ioc": 0.7369593333333333,
+    "latency_ms": 1.4193948882166296,
     "n_shots": 50,
-    "seed": 123,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "tfidf_threshold",
     "mode": "50shot",
-    "oos_recall": 0.13,
-    "in_domain_acc": 0.8668297020898177,
-    "f1_oos": 0.22608695652173913,
-    "auroc": 0.8701495108937306,
-    "au_ioc": 0.7685078923966208,
-    "latency_ms": 3.074165101861581,
+    "oos_recall": 0.286,
+    "in_domain_acc": 0.8426666666666667,
+    "f1_oos": 0.4033850493653032,
+    "auroc": 0.8374552222222222,
+    "au_ioc": 0.7325481111111112,
+    "latency_ms": 2.9286333662457764,
     "n_shots": 50,
-    "seed": 123,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_argmax",
     "mode": "50shot",
-    "oos_recall": 0.875,
-    "in_domain_acc": 0.614495331258337,
-    "f1_oos": 0.5472170106316447,
-    "auroc": 0.8793321476211651,
-    "au_ioc": 0.5912162072032014,
-    "latency_ms": 6.947585055604577,
+    "oos_recall": 0.883,
+    "in_domain_acc": 0.6122222222222222,
+    "f1_oos": 0.5496420790538438,
+    "auroc": 0.8809000000000001,
+    "au_ioc": 0.5971386666666666,
+    "latency_ms": 6.968419180484489,
     "n_shots": 50,
-    "seed": 123,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_threshold",
     "mode": "50shot",
-    "oos_recall": 0.258,
-    "in_domain_acc": 0.791907514450867,
-    "f1_oos": 0.3799705449189985,
-    "auroc": 0.8793321476211651,
-    "au_ioc": 0.7240606936416185,
-    "latency_ms": 6.795459114946425,
+    "oos_recall": 0.233,
+    "in_domain_acc": 0.7937777777777778,
+    "f1_oos": 0.35383447228549736,
+    "auroc": 0.8809000000000001,
+    "au_ioc": 0.7269198888888888,
+    "latency_ms": 6.970336623489857,
     "n_shots": 50,
-    "seed": 123,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_argmax",
     "mode": "50shot",
     "oos_recall": 0.997,
-    "in_domain_acc": 0.3679413072476656,
-    "f1_oos": 0.4155032298395499,
-    "auroc": 0.9581954201867496,
-    "au_ioc": 0.36554991107158735,
-    "latency_ms": 3.416099998867139,
+    "in_domain_acc": 0.38666666666666666,
+    "f1_oos": 0.4229056203605514,
+    "auroc": 0.9592388888888889,
+    "au_ioc": 0.3838935555555556,
+    "latency_ms": 3.324282477842644,
     "n_shots": 50,
-    "seed": 123,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_threshold",
     "mode": "50shot",
-    "oos_recall": 0.526,
-    "in_domain_acc": 0.8674966651845265,
-    "f1_oos": 0.6591478696741855,
-    "auroc": 0.9581954201867496,
-    "au_ioc": 0.8456475100044465,
-    "latency_ms": 3.284967520739883,
+    "oos_recall": 0.538,
+    "in_domain_acc": 0.8591111111111112,
+    "f1_oos": 0.6775818639798489,
+    "auroc": 0.9592388888888889,
+    "au_ioc": 0.836794888888889,
+    "latency_ms": 3.3596808824222535,
     "n_shots": 50,
-    "seed": 123,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_argmax",
     "mode": "50shot",
-    "oos_recall": 0.149,
-    "in_domain_acc": 0.912850155624722,
-    "f1_oos": 0.2582322357019064,
-    "auroc": 0.9563970653623833,
-    "au_ioc": 0.8805148955091151,
-    "latency_ms": 9.440580063965172,
+    "oos_recall": 0.142,
+    "in_domain_acc": 0.9057777777777778,
+    "f1_oos": 0.24781849912739964,
+    "auroc": 0.9567466666666666,
+    "au_ioc": 0.873018,
+    "latency_ms": 9.140274175442755,
     "n_shots": 50,
-    "seed": 123,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_threshold",
     "mode": "50shot",
-    "oos_recall": 0.517,
-    "in_domain_acc": 0.9081814139617608,
-    "f1_oos": 0.6615483045425464,
-    "auroc": 0.9563970653623833,
-    "au_ioc": 0.8786843041351713,
-    "latency_ms": 9.57855669897981,
+    "oos_recall": 0.505,
+    "in_domain_acc": 0.9004444444444445,
+    "f1_oos": 0.6528765352294764,
+    "auroc": 0.9567466666666666,
+    "au_ioc": 0.8707995555555557,
+    "latency_ms": 9.105050797807053,
     "n_shots": 50,
-    "seed": 123,
+    "seed": 42,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "tfidf_argmax",
     "mode": "50shot",
-    "oos_recall": 0.033,
-    "in_domain_acc": 0.862383281458426,
-    "f1_oos": 0.06382978723404255,
-    "auroc": 0.8693216985326813,
-    "au_ioc": 0.7633518230324587,
-    "latency_ms": 1.4096433366648853,
+    "oos_recall": 0.035,
+    "in_domain_acc": 0.8628888888888889,
+    "f1_oos": 0.0674373795761079,
+    "auroc": 0.8418772222222222,
+    "au_ioc": 0.7398254444444444,
+    "latency_ms": 1.4304224017541856,
     "n_shots": 50,
-    "seed": 456,
+    "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "tfidf_threshold",
     "mode": "50shot",
-    "oos_recall": 0.224,
-    "in_domain_acc": 0.85482436638506,
-    "f1_oos": 0.35,
-    "auroc": 0.8693216985326813,
-    "au_ioc": 0.7621871943085816,
-    "latency_ms": 2.912888377904892,
+    "oos_recall": 0.124,
+    "in_domain_acc": 0.8604444444444445,
+    "f1_oos": 0.21583986074847694,
+    "auroc": 0.8418772222222222,
+    "au_ioc": 0.7396229999999999,
+    "latency_ms": 3.2494141370989382,
     "n_shots": 50,
-    "seed": 456,
+    "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_argmax",
     "mode": "50shot",
-    "oos_recall": 0.878,
-    "in_domain_acc": 0.6131614050689195,
-    "f1_oos": 0.5518541797611565,
-    "auroc": 0.8800043352601157,
-    "au_ioc": 0.5946631836371721,
-    "latency_ms": 7.483776693698019,
+    "oos_recall": 0.884,
+    "in_domain_acc": 0.6175555555555555,
+    "f1_oos": 0.5551020408163265,
+    "auroc": 0.8829011111111111,
+    "au_ioc": 0.602257111111111,
+    "latency_ms": 7.081480860942975,
     "n_shots": 50,
-    "seed": 456,
+    "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_bert_threshold",
     "mode": "50shot",
-    "oos_recall": 0.23,
-    "in_domain_acc": 0.7907959092930191,
-    "f1_oos": 0.34874905231235787,
-    "auroc": 0.8800043352601157,
-    "au_ioc": 0.7228882836816363,
-    "latency_ms": 7.133691625203937,
+    "oos_recall": 0.302,
+    "in_domain_acc": 0.7871111111111111,
+    "f1_oos": 0.42565186751233264,
+    "auroc": 0.8829011111111111,
+    "au_ioc": 0.7247227777777778,
+    "latency_ms": 6.802967480616644,
     "n_shots": 50,
-    "seed": 456,
+    "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_argmax",
     "mode": "50shot",
     "oos_recall": 0.999,
-    "in_domain_acc": 0.3717207647843486,
-    "f1_oos": 0.4178168130489335,
-    "auroc": 0.9600235660293465,
-    "au_ioc": 0.37073065807025346,
-    "latency_ms": 3.89909002231434,
+    "in_domain_acc": 0.37955555555555553,
+    "f1_oos": 0.42098609355246525,
+    "auroc": 0.9606372222222223,
+    "au_ioc": 0.3774504444444444,
+    "latency_ms": 3.364268314326182,
     "n_shots": 50,
-    "seed": 456,
+    "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_minilm_threshold",
     "mode": "50shot",
-    "oos_recall": 0.534,
-    "in_domain_acc": 0.858603823921743,
-    "f1_oos": 0.672120830711139,
-    "auroc": 0.9600235660293465,
-    "au_ioc": 0.8370276789684303,
-    "latency_ms": 3.5826307989191264,
+    "oos_recall": 0.564,
+    "in_domain_acc": 0.8577777777777778,
+    "f1_oos": 0.6924493554327809,
+    "auroc": 0.9606372222222223,
+    "au_ioc": 0.8372745555555555,
+    "latency_ms": 3.269835897954181,
     "n_shots": 50,
-    "seed": 456,
+    "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_argmax",
     "mode": "50shot",
-    "oos_recall": 0.152,
-    "in_domain_acc": 0.9084037349933304,
-    "f1_oos": 0.2632034632034632,
-    "auroc": 0.9568870609159628,
-    "au_ioc": 0.8756505113383726,
-    "latency_ms": 10.538123316364363,
+    "oos_recall": 0.157,
+    "in_domain_acc": 0.904,
+    "f1_oos": 0.2704565030146425,
+    "auroc": 0.9568503333333332,
+    "au_ioc": 0.8727156666666667,
+    "latency_ms": 9.037579972064123,
     "n_shots": 50,
-    "seed": 456,
+    "seed": 123,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
   },
   {
     "model_name": "cosine_e5large_threshold",
     "mode": "50shot",
-    "oos_recall": 0.632,
-    "in_domain_acc": 0.8975100044464206,
-    "f1_oos": 0.7387492694330801,
-    "auroc": 0.9568870609159628,
-    "au_ioc": 0.8698288128056915,
-    "latency_ms": 10.626065880060196,
+    "oos_recall": 0.548,
+    "in_domain_acc": 0.8975555555555556,
+    "f1_oos": 0.6824408468244084,
+    "auroc": 0.9568503333333332,
+    "au_ioc": 0.8701022222222221,
+    "latency_ms": 9.222666777204722,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.033,
+    "in_domain_acc": 0.8551111111111112,
+    "f1_oos": 0.0637065637065637,
+    "auroc": 0.8377783333333334,
+    "au_ioc": 0.7327771111111111,
+    "latency_ms": 1.428215104388073,
     "n_shots": 50,
     "seed": 456,
     "is_reference": false,
-    "extra": {}
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.109,
+    "in_domain_acc": 0.8528888888888889,
+    "f1_oos": 0.1927497789566755,
+    "auroc": 0.8377783333333334,
+    "au_ioc": 0.732574111111111,
+    "latency_ms": 2.8942416550125927,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.882,
+    "in_domain_acc": 0.6164444444444445,
+    "f1_oos": 0.5554156171284634,
+    "auroc": 0.8801864444444443,
+    "au_ioc": 0.5936760000000001,
+    "latency_ms": 6.969662479823455,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.264,
+    "in_domain_acc": 0.7906666666666666,
+    "f1_oos": 0.384,
+    "auroc": 0.8801864444444443,
+    "au_ioc": 0.7240066666666667,
+    "latency_ms": 6.934314123354852,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.998,
+    "in_domain_acc": 0.38422222222222224,
+    "f1_oos": 0.42279178140224527,
+    "auroc": 0.9598995555555555,
+    "au_ioc": 0.38186877777777783,
+    "latency_ms": 3.406610081437975,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.552,
+    "in_domain_acc": 0.8631111111111112,
+    "f1_oos": 0.6844389336639801,
+    "auroc": 0.9598995555555555,
+    "au_ioc": 0.8419286666666667,
+    "latency_ms": 3.367804136360064,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.154,
+    "in_domain_acc": 0.9086666666666666,
+    "f1_oos": 0.2664359861591695,
+    "auroc": 0.9575855555555557,
+    "au_ioc": 0.8764904444444445,
+    "latency_ms": 9.101554158842191,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.468,
+    "in_domain_acc": 0.9046666666666666,
+    "f1_oos": 0.625250501002004,
+    "auroc": 0.9575855555555557,
+    "au_ioc": 0.8752321111111111,
+    "latency_ms": 9.162921654060483,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "full",
+    "oos_recall": 0.096,
+    "in_domain_acc": 0.89,
+    "f1_oos": 0.17281728172817282,
+    "auroc": 0.874036111111111,
+    "au_ioc": 0.7922456666666666,
+    "latency_ms": 1.4025767613202333,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "full",
+    "oos_recall": 0.284,
+    "in_domain_acc": 0.876,
+    "f1_oos": 0.40804597701149425,
+    "auroc": 0.874036111111111,
+    "au_ioc": 0.7892669999999999,
+    "latency_ms": 2.9195533401798457,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "full",
+    "oos_recall": 0.846,
+    "in_domain_acc": 0.6955555555555556,
+    "f1_oos": 0.6014930678990402,
+    "auroc": 0.8976581111111113,
+    "au_ioc": 0.6765961111111112,
+    "latency_ms": 63.200059060472995,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "full",
+    "oos_recall": 0.292,
+    "in_domain_acc": 0.8237777777777778,
+    "f1_oos": 0.4207492795389049,
+    "auroc": 0.8976581111111113,
+    "au_ioc": 0.7657776666666667,
+    "latency_ms": 17.505725002847612,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "full",
+    "oos_recall": 0.997,
+    "in_domain_acc": 0.45955555555555555,
+    "f1_oos": 0.4558756287151349,
+    "auroc": 0.9625394444444444,
+    "au_ioc": 0.4540027777777778,
+    "latency_ms": 15.542632455471903,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "full",
+    "oos_recall": 0.5,
+    "in_domain_acc": 0.8742222222222222,
+    "f1_oos": 0.6468305304010349,
+    "auroc": 0.9625394444444444,
+    "au_ioc": 0.8535777777777778,
+    "latency_ms": 6.993819235358387,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "full",
+    "oos_recall": 0.111,
+    "in_domain_acc": 0.9142222222222223,
+    "f1_oos": 0.19964028776978418,
+    "auroc": 0.961069111111111,
+    "au_ioc": 0.884948111111111,
+    "latency_ms": 152.49096084502526,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "full",
+    "oos_recall": 0.599,
+    "in_domain_acc": 0.9071111111111111,
+    "f1_oos": 0.7221217600964437,
+    "auroc": 0.961069111111111,
+    "au_ioc": 0.8817528888888888,
+    "latency_ms": 19.254207559861243,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.001,
+    "in_domain_acc": 0.7331111111111112,
+    "f1_oos": 0.001998001998001998,
+    "auroc": 0.7348896666666666,
+    "au_ioc": 0.5551436666666667,
+    "latency_ms": 1.4817591977771372,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.166,
+    "in_domain_acc": 0.72,
+    "f1_oos": 0.25917252146760345,
+    "auroc": 0.7348896666666666,
+    "au_ioc": 0.5536634444444444,
+    "latency_ms": 3.043022460769862,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.941,
+    "in_domain_acc": 0.3655555555555556,
+    "f1_oos": 0.4242560865644725,
+    "auroc": 0.8247384444444446,
+    "au_ioc": 0.35931966666666665,
+    "latency_ms": 1.6324283182621002,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.29,
+    "in_domain_acc": 0.6575555555555556,
+    "f1_oos": 0.3853820598006645,
+    "auroc": 0.8247384444444446,
+    "au_ioc": 0.5833855555555556,
+    "latency_ms": 1.3949199952185154,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.998,
+    "in_domain_acc": 0.1971111111111111,
+    "f1_oos": 0.3566833452466047,
+    "auroc": 0.9446043333333333,
+    "au_ioc": 0.19554288888888888,
+    "latency_ms": 0.821701519889757,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.51,
+    "in_domain_acc": 0.8026666666666666,
+    "f1_oos": 0.637101811367895,
+    "auroc": 0.9446043333333333,
+    "au_ioc": 0.7779446666666667,
+    "latency_ms": 0.7512641826178879,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.259,
+    "in_domain_acc": 0.8566666666666667,
+    "f1_oos": 0.405320813771518,
+    "auroc": 0.9450124444444445,
+    "au_ioc": 0.8203221111111111,
+    "latency_ms": 1.7699917184654623,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.481,
+    "in_domain_acc": 0.8528888888888889,
+    "f1_oos": 0.6279373368146214,
+    "auroc": 0.9450124444444445,
+    "au_ioc": 0.8186066666666667,
+    "latency_ms": 1.7885025218129158,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.001,
+    "in_domain_acc": 0.742,
+    "f1_oos": 0.001998001998001998,
+    "auroc": 0.7647345555555556,
+    "au_ioc": 0.5854086666666667,
+    "latency_ms": 1.5831526031251997,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.168,
+    "in_domain_acc": 0.7308888888888889,
+    "f1_oos": 0.26666666666666666,
+    "auroc": 0.7647345555555556,
+    "au_ioc": 0.584183,
+    "latency_ms": 3.0557166412472725,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.952,
+    "in_domain_acc": 0.35777777777777775,
+    "f1_oos": 0.4243369734789392,
+    "auroc": 0.8295341111111111,
+    "au_ioc": 0.35185066666666664,
+    "latency_ms": 1.3937366637401283,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.273,
+    "in_domain_acc": 0.6522222222222223,
+    "f1_oos": 0.3726962457337884,
+    "auroc": 0.8295341111111111,
+    "au_ioc": 0.5802908888888889,
+    "latency_ms": 1.380055076442659,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.999,
+    "in_domain_acc": 0.1971111111111111,
+    "f1_oos": 0.35723225460396923,
+    "auroc": 0.9482933333333332,
+    "au_ioc": 0.19591233333333333,
+    "latency_ms": 0.7571992406155914,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.572,
+    "in_domain_acc": 0.8146666666666667,
+    "f1_oos": 0.6854403834631516,
+    "auroc": 0.9482933333333332,
+    "au_ioc": 0.7904095555555556,
+    "latency_ms": 0.7450166752096266,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.284,
+    "in_domain_acc": 0.8606666666666667,
+    "f1_oos": 0.4362519201228879,
+    "auroc": 0.9434207777777778,
+    "au_ioc": 0.8229726666666667,
+    "latency_ms": 1.7458099743817002,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.503,
+    "in_domain_acc": 0.8553333333333333,
+    "f1_oos": 0.6403564608529599,
+    "auroc": 0.9434207777777778,
+    "au_ioc": 0.8206985555555556,
+    "latency_ms": 1.7681667231954634,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.002,
+    "in_domain_acc": 0.7255555555555555,
+    "f1_oos": 0.003992015968063872,
+    "auroc": 0.7541331111111111,
+    "au_ioc": 0.5642172222222221,
+    "latency_ms": 1.4783516980241984,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.154,
+    "in_domain_acc": 0.7146666666666667,
+    "f1_oos": 0.24620303756994405,
+    "auroc": 0.7541331111111111,
+    "au_ioc": 0.5631473333333334,
+    "latency_ms": 3.0182941595558077,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.944,
+    "in_domain_acc": 0.35977777777777775,
+    "f1_oos": 0.4247469066366704,
+    "auroc": 0.8266005555555554,
+    "au_ioc": 0.3479797777777778,
+    "latency_ms": 1.3815432949922979,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.377,
+    "in_domain_acc": 0.6442222222222223,
+    "f1_oos": 0.4498806682577566,
+    "auroc": 0.8266005555555554,
+    "au_ioc": 0.5754314444444444,
+    "latency_ms": 1.3878273987211287,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.999,
+    "in_domain_acc": 0.20044444444444445,
+    "f1_oos": 0.3580645161290323,
+    "auroc": 0.9464742222222223,
+    "au_ioc": 0.196839,
+    "latency_ms": 0.7612682785838842,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.546,
+    "in_domain_acc": 0.8164444444444444,
+    "f1_oos": 0.662621359223301,
+    "auroc": 0.9464742222222223,
+    "au_ioc": 0.7909407777777778,
+    "latency_ms": 0.7465524098370224,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "10shot",
+    "oos_recall": 0.281,
+    "in_domain_acc": 0.8648888888888889,
+    "f1_oos": 0.4326404926866821,
+    "auroc": 0.9424897777777778,
+    "au_ioc": 0.8253613333333334,
+    "latency_ms": 1.7794683016836643,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.561,
+    "in_domain_acc": 0.8573333333333333,
+    "f1_oos": 0.6854001221747098,
+    "auroc": 0.9424897777777778,
+    "au_ioc": 0.821504,
+    "latency_ms": 1.7758349399082363,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.006,
+    "in_domain_acc": 0.798,
+    "f1_oos": 0.011904761904761904,
+    "auroc": 0.7904431111111111,
+    "au_ioc": 0.6504867777777777,
+    "latency_ms": 1.4777383406180888,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.161,
+    "in_domain_acc": 0.7886666666666666,
+    "f1_oos": 0.26009693053311794,
+    "auroc": 0.7904431111111111,
+    "au_ioc": 0.6497244444444444,
+    "latency_ms": 3.039214954478666,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.911,
+    "in_domain_acc": 0.482,
+    "f1_oos": 0.4730010384215992,
+    "auroc": 0.8527297777777778,
+    "au_ioc": 0.46583022222222226,
+    "latency_ms": 2.781627580989152,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.3,
+    "in_domain_acc": 0.7297777777777777,
+    "f1_oos": 0.4073319755600815,
+    "auroc": 0.8527297777777778,
+    "au_ioc": 0.6584217777777779,
+    "latency_ms": 2.782052484108135,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.997,
+    "in_domain_acc": 0.27311111111111114,
+    "f1_oos": 0.3801715919923737,
+    "auroc": 0.9534516666666667,
+    "au_ioc": 0.2718266666666667,
+    "latency_ms": 1.3579841842874885,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.447,
+    "in_domain_acc": 0.8417777777777777,
+    "f1_oos": 0.5936254980079682,
+    "auroc": 0.9534516666666667,
+    "au_ioc": 0.8173264444444444,
+    "latency_ms": 1.350067596649751,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.203,
+    "in_domain_acc": 0.8888888888888888,
+    "f1_oos": 0.3338815789473684,
+    "auroc": 0.9508897777777777,
+    "au_ioc": 0.8543781111111111,
+    "latency_ms": 3.728190816473216,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.538,
+    "in_domain_acc": 0.8824444444444445,
+    "f1_oos": 0.670404984423676,
+    "auroc": 0.9508897777777777,
+    "au_ioc": 0.8514693333333334,
+    "latency_ms": 3.703822518000379,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.005,
+    "in_domain_acc": 0.8024444444444444,
+    "f1_oos": 0.009940357852882704,
+    "auroc": 0.8006991111111111,
+    "au_ioc": 0.6597354444444443,
+    "latency_ms": 1.4736824994906783,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.097,
+    "in_domain_acc": 0.7975555555555556,
+    "f1_oos": 0.1704745166959578,
+    "auroc": 0.8006991111111111,
+    "au_ioc": 0.6594674444444444,
+    "latency_ms": 3.052827420178801,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.927,
+    "in_domain_acc": 0.4866666666666667,
+    "f1_oos": 0.4839467501957713,
+    "auroc": 0.8580937777777776,
+    "au_ioc": 0.47481255555555557,
+    "latency_ms": 2.8614758397452533,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.249,
+    "in_domain_acc": 0.7242222222222222,
+    "f1_oos": 0.36034732272069464,
+    "auroc": 0.8580937777777776,
+    "au_ioc": 0.6549793333333334,
+    "latency_ms": 2.796471758047119,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.999,
+    "in_domain_acc": 0.27066666666666667,
+    "f1_oos": 0.3801369863013699,
+    "auroc": 0.9541957777777776,
+    "au_ioc": 0.26534233333333335,
+    "latency_ms": 1.3604424986988306,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.514,
+    "in_domain_acc": 0.8433333333333334,
+    "f1_oos": 0.6539440203562341,
+    "auroc": 0.9541957777777776,
+    "au_ioc": 0.8192952222222222,
+    "latency_ms": 1.3560808228794485,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.233,
+    "in_domain_acc": 0.8864444444444445,
+    "f1_oos": 0.3736968724939856,
+    "auroc": 0.9500738888888889,
+    "au_ioc": 0.8514721111111111,
+    "latency_ms": 3.791190757183358,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.633,
+    "in_domain_acc": 0.8757777777777778,
+    "f1_oos": 0.7326388888888888,
+    "auroc": 0.9500738888888889,
+    "au_ioc": 0.8459026666666667,
+    "latency_ms": 3.7007908581290394,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.007,
+    "in_domain_acc": 0.7982222222222223,
+    "f1_oos": 0.013888888888888888,
+    "auroc": 0.7961842222222223,
+    "au_ioc": 0.6526262222222222,
+    "latency_ms": 1.5094240417238325,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.191,
+    "in_domain_acc": 0.7844444444444445,
+    "f1_oos": 0.2954369682907966,
+    "auroc": 0.7961842222222223,
+    "au_ioc": 0.6509306666666668,
+    "latency_ms": 3.041150817880407,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.918,
+    "in_domain_acc": 0.47933333333333333,
+    "f1_oos": 0.4775032509752926,
+    "auroc": 0.8530695555555555,
+    "au_ioc": 0.46233811111111106,
+    "latency_ms": 2.876345015829429,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.321,
+    "in_domain_acc": 0.7162222222222222,
+    "f1_oos": 0.42601194426011946,
+    "auroc": 0.8530695555555555,
+    "au_ioc": 0.6480157777777777,
+    "latency_ms": 2.8081183950416744,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.999,
+    "in_domain_acc": 0.2771111111111111,
+    "f1_oos": 0.38224603022766407,
+    "auroc": 0.9538248888888889,
+    "au_ioc": 0.2762781111111111,
+    "latency_ms": 1.3512266834732145,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.535,
+    "in_domain_acc": 0.8471111111111111,
+    "f1_oos": 0.6666666666666666,
+    "auroc": 0.9538248888888889,
+    "au_ioc": 0.8230642222222222,
+    "latency_ms": 1.3555050012655556,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "20shot",
+    "oos_recall": 0.219,
+    "in_domain_acc": 0.8924444444444445,
+    "f1_oos": 0.3563873067534581,
+    "auroc": 0.9510067777777775,
+    "au_ioc": 0.8560336666666666,
+    "latency_ms": 3.88081083772704,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.539,
+    "in_domain_acc": 0.8857777777777778,
+    "f1_oos": 0.677561282212445,
+    "auroc": 0.9510067777777775,
+    "au_ioc": 0.8532103333333334,
+    "latency_ms": 3.676776692736894,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.037,
+    "in_domain_acc": 0.8637777777777778,
+    "f1_oos": 0.07094918504314478,
+    "auroc": 0.8397362222222222,
+    "au_ioc": 0.7425482222222222,
+    "latency_ms": 1.4939316071104258,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.233,
+    "in_domain_acc": 0.85,
+    "f1_oos": 0.34880239520958084,
+    "auroc": 0.8397362222222222,
+    "au_ioc": 0.7405363333333334,
+    "latency_ms": 3.0187734763603657,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.883,
+    "in_domain_acc": 0.6122222222222222,
+    "f1_oos": 0.5496420790538438,
+    "auroc": 0.8809,
+    "au_ioc": 0.5971386666666666,
+    "latency_ms": 7.050397502025589,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.233,
+    "in_domain_acc": 0.7937777777777778,
+    "f1_oos": 0.35383447228549736,
+    "auroc": 0.8809,
+    "au_ioc": 0.7269198888888888,
+    "latency_ms": 6.927540734177455,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.997,
+    "in_domain_acc": 0.38666666666666666,
+    "f1_oos": 0.4229056203605514,
+    "auroc": 0.9592388888888889,
+    "au_ioc": 0.3838935555555556,
+    "latency_ms": 3.3225941832643002,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.538,
+    "in_domain_acc": 0.8591111111111112,
+    "f1_oos": 0.6775818639798489,
+    "auroc": 0.9592388888888889,
+    "au_ioc": 0.836794888888889,
+    "latency_ms": 3.321569097461179,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.142,
+    "in_domain_acc": 0.9057777777777778,
+    "f1_oos": 0.24781849912739964,
+    "auroc": 0.9567466666666665,
+    "au_ioc": 0.873018,
+    "latency_ms": 9.175855818903074,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.505,
+    "in_domain_acc": 0.9004444444444445,
+    "f1_oos": 0.6528765352294764,
+    "auroc": 0.9567466666666665,
+    "au_ioc": 0.8707995555555557,
+    "latency_ms": 9.150414082687348,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.037,
+    "in_domain_acc": 0.8646666666666667,
+    "f1_oos": 0.07094918504314478,
+    "auroc": 0.844701888888889,
+    "au_ioc": 0.7459342222222223,
+    "latency_ms": 1.4933375362306833,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.212,
+    "in_domain_acc": 0.8531111111111112,
+    "f1_oos": 0.3266563944530046,
+    "auroc": 0.844701888888889,
+    "au_ioc": 0.744307111111111,
+    "latency_ms": 3.1311916827689856,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.884,
+    "in_domain_acc": 0.6175555555555555,
+    "f1_oos": 0.5551020408163265,
+    "auroc": 0.882900888888889,
+    "au_ioc": 0.602257111111111,
+    "latency_ms": 6.941465740092099,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.302,
+    "in_domain_acc": 0.7871111111111111,
+    "f1_oos": 0.42565186751233264,
+    "auroc": 0.882900888888889,
+    "au_ioc": 0.7247227777777778,
+    "latency_ms": 6.92440329818055,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.999,
+    "in_domain_acc": 0.37955555555555553,
+    "f1_oos": 0.42098609355246525,
+    "auroc": 0.9606372222222223,
+    "au_ioc": 0.3774504444444444,
+    "latency_ms": 3.38827159604989,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.564,
+    "in_domain_acc": 0.8577777777777778,
+    "f1_oos": 0.6924493554327809,
+    "auroc": 0.9606372222222223,
+    "au_ioc": 0.8372745555555555,
+    "latency_ms": 3.3564897847827524,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.157,
+    "in_domain_acc": 0.904,
+    "f1_oos": 0.2704565030146425,
+    "auroc": 0.9568503333333335,
+    "au_ioc": 0.8727156666666667,
+    "latency_ms": 9.074642439372838,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.548,
+    "in_domain_acc": 0.8975555555555556,
+    "f1_oos": 0.6824408468244084,
+    "auroc": 0.9568503333333335,
+    "au_ioc": 0.8701022222222221,
+    "latency_ms": 9.142814121441916,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.037,
+    "in_domain_acc": 0.858,
+    "f1_oos": 0.07094918504314478,
+    "auroc": 0.8415269999999999,
+    "au_ioc": 0.7394516666666666,
+    "latency_ms": 1.4883958373684436,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "tfidf_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.245,
+    "in_domain_acc": 0.8448888888888889,
+    "f1_oos": 0.3643122676579926,
+    "auroc": 0.8415269999999999,
+    "au_ioc": 0.7373313333333333,
+    "latency_ms": 3.0395749770104885,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.882,
+    "in_domain_acc": 0.6164444444444445,
+    "f1_oos": 0.5554156171284634,
+    "auroc": 0.8801864444444445,
+    "au_ioc": 0.5936760000000001,
+    "latency_ms": 6.937759215943515,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_bert_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.264,
+    "in_domain_acc": 0.7906666666666666,
+    "f1_oos": 0.384,
+    "auroc": 0.8801864444444445,
+    "au_ioc": 0.7240066666666667,
+    "latency_ms": 6.921226677950472,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.998,
+    "in_domain_acc": 0.38422222222222224,
+    "f1_oos": 0.42279178140224527,
+    "auroc": 0.9598995555555555,
+    "au_ioc": 0.38186877777777783,
+    "latency_ms": 3.3617266779765487,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_minilm_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.552,
+    "in_domain_acc": 0.8631111111111112,
+    "f1_oos": 0.6844389336639801,
+    "auroc": 0.9598995555555555,
+    "au_ioc": 0.8419286666666667,
+    "latency_ms": 3.338625864125788,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_argmax",
+    "mode": "50shot",
+    "oos_recall": 0.154,
+    "in_domain_acc": 0.9086666666666666,
+    "f1_oos": 0.2664359861591695,
+    "auroc": 0.9575855555555555,
+    "au_ioc": 0.8764906666666668,
+    "latency_ms": 9.28233411977999,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "cosine_e5large_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.468,
+    "in_domain_acc": 0.9046666666666666,
+    "f1_oos": 0.625250501002004,
+    "auroc": 0.9575855555555555,
+    "au_ioc": 0.8752323333333334,
+    "latency_ms": 9.06819159630686,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "full",
+    "oos_recall": 0.557,
+    "in_domain_acc": 0.9577777777777777,
+    "f1_oos": 0.698870765370138,
+    "auroc": 0.9734826666666666,
+    "au_ioc": 0.940226888888889,
+    "latency_ms": 0.1985908206552267,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_standard_full_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "10shot",
+    "oos_recall": 0.534,
+    "in_domain_acc": 0.9188888888888889,
+    "f1_oos": 0.6716981132075471,
+    "auroc": 0.9617380000000001,
+    "au_ioc": 0.8971521111111112,
+    "latency_ms": 0.19482250208966434,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_standard_10shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "10shot",
+    "oos_recall": 0.66,
+    "in_domain_acc": 0.9217777777777778,
+    "f1_oos": 0.7512805919180421,
+    "auroc": 0.9609826666666669,
+    "au_ioc": 0.899656,
+    "latency_ms": 0.19002916407771409,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_standard_10shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "10shot",
+    "oos_recall": 0.638,
+    "in_domain_acc": 0.9242222222222222,
+    "f1_oos": 0.7440233236151603,
+    "auroc": 0.9627902222222222,
+    "au_ioc": 0.9024498888888888,
+    "latency_ms": 0.1819749129936099,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_standard_10shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "20shot",
+    "oos_recall": 0.704,
+    "in_domain_acc": 0.9351111111111111,
+    "f1_oos": 0.7844011142061281,
+    "auroc": 0.9682024444444445,
+    "au_ioc": 0.9161587777777778,
+    "latency_ms": 0.18011570209637284,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_standard_20shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "20shot",
+    "oos_recall": 0.714,
+    "in_domain_acc": 0.9428888888888889,
+    "f1_oos": 0.7906976744186046,
+    "auroc": 0.9692851111111112,
+    "au_ioc": 0.924927,
+    "latency_ms": 0.1961708173621446,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_standard_20shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "20shot",
+    "oos_recall": 0.513,
+    "in_domain_acc": 0.934,
+    "f1_oos": 0.6497783407219759,
+    "auroc": 0.9473559999999999,
+    "au_ioc": 0.9011192222222222,
+    "latency_ms": 0.17886338056996465,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_standard_20shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "50shot",
+    "oos_recall": 0.573,
+    "in_domain_acc": 0.9535555555555556,
+    "f1_oos": 0.7100371747211895,
+    "auroc": 0.9725368888888889,
+    "au_ioc": 0.9353467777777777,
+    "latency_ms": 0.19478999776765704,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_standard_50shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "50shot",
+    "oos_recall": 0.608,
+    "in_domain_acc": 0.9597777777777777,
+    "f1_oos": 0.735632183908046,
+    "auroc": 0.9728097777777778,
+    "au_ioc": 0.9414312222222222,
+    "latency_ms": 0.21081668441183865,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_standard_50shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "50shot",
+    "oos_recall": 0.595,
+    "in_domain_acc": 0.9555555555555556,
+    "f1_oos": 0.7296137339055794,
+    "auroc": 0.9727897777777779,
+    "au_ioc": 0.9367938888888889,
+    "latency_ms": 0.19552492420189083,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_standard_50shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "full",
+    "oos_recall": 0.562,
+    "in_domain_acc": 0.9586666666666667,
+    "f1_oos": 0.7033792240300375,
+    "auroc": 0.9741273333333332,
+    "au_ioc": 0.941443888888889,
+    "latency_ms": 28.491310802055523,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_full_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "10shot",
+    "oos_recall": 0.669,
+    "in_domain_acc": 0.9135555555555556,
+    "f1_oos": 0.755079006772009,
+    "auroc": 0.9595153333333334,
+    "au_ioc": 0.8917623333333333,
+    "latency_ms": 0.20732165430672467,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_10shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "10shot",
+    "oos_recall": 0.666,
+    "in_domain_acc": 0.9186666666666666,
+    "f1_oos": 0.7516930022573364,
+    "auroc": 0.9624377777777777,
+    "au_ioc": 0.8986645555555556,
+    "latency_ms": 0.1829984039068222,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_10shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "10shot",
+    "oos_recall": 0.889,
+    "in_domain_acc": 0.8746666666666667,
+    "f1_oos": 0.7822261328640563,
+    "auroc": 0.9618924444444444,
+    "au_ioc": 0.8605532222222223,
+    "latency_ms": 0.20694836508482695,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_10shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "20shot",
+    "oos_recall": 0.812,
+    "in_domain_acc": 0.9215555555555556,
+    "f1_oos": 0.8202020202020202,
+    "auroc": 0.9692637777777777,
+    "au_ioc": 0.9058308888888889,
+    "latency_ms": 0.1723716373089701,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_20shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "20shot",
+    "oos_recall": 0.711,
+    "in_domain_acc": 0.9417777777777778,
+    "f1_oos": 0.7891231964483907,
+    "auroc": 0.969404,
+    "au_ioc": 0.9232862222222222,
+    "latency_ms": 0.17787832184694707,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_20shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "20shot",
+    "oos_recall": 0.693,
+    "in_domain_acc": 0.9315555555555556,
+    "f1_oos": 0.7602852441031267,
+    "auroc": 0.9571664444444444,
+    "au_ioc": 0.9075950000000002,
+    "latency_ms": 0.17663424368947744,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_20shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "50shot",
+    "oos_recall": 0.599,
+    "in_domain_acc": 0.9555555555555556,
+    "f1_oos": 0.7295980511571255,
+    "auroc": 0.9736288888888889,
+    "au_ioc": 0.938142888888889,
+    "latency_ms": 0.17561832326464355,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_50shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "50shot",
+    "oos_recall": 0.608,
+    "in_domain_acc": 0.9593333333333334,
+    "f1_oos": 0.7347432024169185,
+    "auroc": 0.9716566666666666,
+    "au_ioc": 0.9398532222222222,
+    "latency_ms": 0.1817949372343719,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_50shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light",
+    "mode": "50shot",
+    "oos_recall": 0.604,
+    "in_domain_acc": 0.9526666666666667,
+    "f1_oos": 0.7321212121212122,
+    "auroc": 0.9725733333333333,
+    "au_ioc": 0.9345358888888888,
+    "latency_ms": 0.18098662025295198,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_50shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "full",
+    "oos_recall": 0.557,
+    "in_domain_acc": 0.9577777777777777,
+    "f1_oos": 0.698870765370138,
+    "auroc": 0.9734826666666666,
+    "au_ioc": 0.940226888888889,
+    "latency_ms": 0.183547455817461,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_standard_full_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "10shot",
+    "oos_recall": 0.534,
+    "in_domain_acc": 0.9188888888888889,
+    "f1_oos": 0.6716981132075471,
+    "auroc": 0.9617380000000001,
+    "au_ioc": 0.8971521111111112,
+    "latency_ms": 0.1245491998270154,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_standard_10shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "10shot",
+    "oos_recall": 0.66,
+    "in_domain_acc": 0.9217777777777778,
+    "f1_oos": 0.7512805919180421,
+    "auroc": 0.9609826666666669,
+    "au_ioc": 0.899656,
+    "latency_ms": 0.12072749552316964,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_standard_10shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "10shot",
+    "oos_recall": 0.638,
+    "in_domain_acc": 0.9242222222222222,
+    "f1_oos": 0.7440233236151603,
+    "auroc": 0.9627902222222222,
+    "au_ioc": 0.9024498888888888,
+    "latency_ms": 0.12029994511976838,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_standard_10shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "20shot",
+    "oos_recall": 0.704,
+    "in_domain_acc": 0.9351111111111111,
+    "f1_oos": 0.7844011142061281,
+    "auroc": 0.9682024444444445,
+    "au_ioc": 0.9161587777777778,
+    "latency_ms": 0.11998161557130516,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_standard_20shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "20shot",
+    "oos_recall": 0.714,
+    "in_domain_acc": 0.9428888888888889,
+    "f1_oos": 0.7906976744186046,
+    "auroc": 0.9692851111111112,
+    "au_ioc": 0.924927,
+    "latency_ms": 0.1200942404102534,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_standard_20shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "20shot",
+    "oos_recall": 0.513,
+    "in_domain_acc": 0.934,
+    "f1_oos": 0.6497783407219759,
+    "auroc": 0.9473559999999999,
+    "au_ioc": 0.9011192222222222,
+    "latency_ms": 0.12062413850799203,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_standard_20shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "50shot",
+    "oos_recall": 0.573,
+    "in_domain_acc": 0.9535555555555556,
+    "f1_oos": 0.7100371747211895,
+    "auroc": 0.9725368888888889,
+    "au_ioc": 0.9353467777777777,
+    "latency_ms": 0.13169658253900707,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_standard_50shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "50shot",
+    "oos_recall": 0.608,
+    "in_domain_acc": 0.9597777777777777,
+    "f1_oos": 0.735632183908046,
+    "auroc": 0.9728097777777778,
+    "au_ioc": 0.9414312222222222,
+    "latency_ms": 0.1197975326795131,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_standard_50shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "50shot",
+    "oos_recall": 0.595,
+    "in_domain_acc": 0.9555555555555556,
+    "f1_oos": 0.7296137339055794,
+    "auroc": 0.9727897777777779,
+    "au_ioc": 0.9367938888888889,
+    "latency_ms": 0.1206717174500227,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "standard",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_standard_50shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "full",
+    "oos_recall": 0.562,
+    "in_domain_acc": 0.9586666666666667,
+    "f1_oos": 0.7033792240300375,
+    "auroc": 0.9741273333333332,
+    "au_ioc": 0.941443888888889,
+    "latency_ms": 0.12253994238562882,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_full_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "10shot",
+    "oos_recall": 0.669,
+    "in_domain_acc": 0.9135555555555556,
+    "f1_oos": 0.755079006772009,
+    "auroc": 0.9595153333333334,
+    "au_ioc": 0.8917623333333333,
+    "latency_ms": 0.12010492035187781,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_10shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "10shot",
+    "oos_recall": 0.666,
+    "in_domain_acc": 0.9186666666666666,
+    "f1_oos": 0.7516930022573364,
+    "auroc": 0.9624377777777777,
+    "au_ioc": 0.8986645555555556,
+    "latency_ms": 0.12058658758178353,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_10shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "10shot",
+    "oos_recall": 0.889,
+    "in_domain_acc": 0.8746666666666667,
+    "f1_oos": 0.7822261328640563,
+    "auroc": 0.9618924444444444,
+    "au_ioc": 0.8605532222222223,
+    "latency_ms": 0.12949414202012122,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_10shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "20shot",
+    "oos_recall": 0.812,
+    "in_domain_acc": 0.9215555555555556,
+    "f1_oos": 0.8202020202020202,
+    "auroc": 0.9692637777777777,
+    "au_ioc": 0.9058308888888889,
+    "latency_ms": 0.1215767185203731,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_20shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "20shot",
+    "oos_recall": 0.711,
+    "in_domain_acc": 0.9417777777777778,
+    "f1_oos": 0.7891231964483907,
+    "auroc": 0.969404,
+    "au_ioc": 0.9232862222222222,
+    "latency_ms": 0.14342575799673796,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_20shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "20shot",
+    "oos_recall": 0.693,
+    "in_domain_acc": 0.9315555555555556,
+    "f1_oos": 0.7602852441031267,
+    "auroc": 0.9571664444444444,
+    "au_ioc": 0.9075950000000002,
+    "latency_ms": 0.1343341765459627,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_20shot_seed456"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "50shot",
+    "oos_recall": 0.599,
+    "in_domain_acc": 0.9555555555555556,
+    "f1_oos": 0.7295980511571255,
+    "auroc": 0.9736288888888889,
+    "au_ioc": 0.938142888888889,
+    "latency_ms": 0.1369608601089567,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_50shot_seed42"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "50shot",
+    "oos_recall": 0.608,
+    "in_domain_acc": 0.9593333333333334,
+    "f1_oos": 0.7347432024169185,
+    "auroc": 0.9716566666666666,
+    "au_ioc": 0.9398532222222222,
+    "latency_ms": 0.14832164160907269,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_50shot_seed123"
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "50shot",
+    "oos_recall": 0.604,
+    "in_domain_acc": 0.9526666666666667,
+    "f1_oos": 0.7321212121212122,
+    "auroc": 0.9725733333333333,
+    "au_ioc": 0.9345358888888888,
+    "latency_ms": 0.1959700183942914,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_fixed": false,
+      "pilot": false,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_50shot_seed456"
+    }
   }
 ]
