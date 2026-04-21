@@ -161,6 +161,24 @@ python scripts/train_autointent.py --source <source> --mode fewshot --n_shots <n
 python scripts/eval_autointent.py --source <source> --model_dir runs/<model_dir>
 ```
 
+### Framework Benchmarks (CLI, без ноутбука)
+
+```bash
+# Все framework-обёртки: autogluon + h2o + lama
+uv run python tasks/oos_detection/scripts/run_framework_benchmarks.py \
+  --frameworks autogluon h2o lama \
+  --sources standard deeppavlov \
+  --n-shots 10 20 50 \
+  --seeds 42 123 456 \
+  --run-full \
+  --run-fewshot
+
+# Краткий summary по metrics.json
+uv run python tasks/oos_detection/scripts/summarize_results.py
+```
+
+Результаты сохраняются в `tasks/oos_detection/results/metrics.json` через существующий `Evaluator.save(...)`.
+
 ### Параметры
 
 | Параметр | Значения | Описание |
