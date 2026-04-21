@@ -233,3 +233,4 @@ results/*.pt
 # Experiment logs
 wandb/
 runs/
+AutogluonModels/

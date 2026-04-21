@@ -4,7 +4,7 @@ import logging
 
 import numpy as np
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sentence_transformers import SentenceTransformer
 
 from .base import BaseFrameworkWrapper
 
@@ -15,33 +15,54 @@ class H2OWrapper(BaseFrameworkWrapper):
     """
     H2O AutoML wrapper for OOS detection.
 
-    H2O backend does not provide a robust native text pipeline for this setup,
-    so we use TF-IDF features and train H2O AutoML on tabular vectors.
+    Uses pre-trained sentence embeddings (multilingual-e5-large-instruct) as features
+    and trains H2O AutoML on the resulting tabular vectors.
     """
 
     def __init__(
         self,
         default_threshold: float = 0.5,
+        embedder_name: str = "intfloat/multilingual-e5-large-instruct",
         max_models: int = 5,
         max_runtime_secs: int = 600,
-        max_features: int = 20000,
-        ngram_range: tuple[int, int] = (1, 2),
         seed: int = 42,
     ):
         super().__init__(model_name="h2o_threshold", default_threshold=default_threshold)
+        self.embedder_name = embedder_name
         self.max_models = max_models
         self.max_runtime_secs = max_runtime_secs
         self.seed = seed
 
-        self._vectorizer = TfidfVectorizer(
-            max_features=max_features,
-            ngram_range=ngram_range,
-            sublinear_tf=True,
-        )
+        self._embedder: SentenceTransformer | None = None
         self._aml = None
         self._label_to_id: dict[int, str] = {}
         self._id_to_label: dict[str, int] = {}
         self._feature_names: list[str] = []
+        self._h2o_initialized: bool = False
+
+    def __del__(self):
+        if self._h2o_initialized:
+            try:
+                import h2o
+                h2o.cluster().shutdown()
+                LOGGER.info("H2O cluster shut down.")
+            except Exception:
+                pass
+
+    def _get_embedder(self) -> SentenceTransformer:
+        if self._embedder is None:
+            self._embedder = SentenceTransformer(self.embedder_name)
+        return self._embedder
+
+    def _embed(self, texts: list[str]) -> np.ndarray:
+        model = self._get_embedder()
+        return np.asarray(
+            model.encode(
+                texts,
+                normalize_embeddings=True,
+                show_progress_bar=False,
+            )
+        )
 
     def fit(self, train_texts: list[str], train_labels: list[int]) -> "H2OWrapper":
         try:
@@ -55,19 +76,19 @@ class H2OWrapper(BaseFrameworkWrapper):
         if not x_texts:
             raise ValueError("No in-domain samples after filtering OOS labels.")
 
-        x_matrix = self._vectorizer.fit_transform(x_texts)
-        x_dense = x_matrix.toarray()
-        self._feature_names = [f"f_{idx}" for idx in range(x_dense.shape[1])]
+        embeddings = self._embed(x_texts)
+        self._feature_names = [f"f_{idx}" for idx in range(embeddings.shape[1])]
 
         unique_labels = sorted(set(y_labels))
         self._label_to_id = {label: str(i) for i, label in enumerate(unique_labels)}
         self._id_to_label = {v: k for k, v in self._label_to_id.items()}
         y_internal = [self._label_to_id[label] for label in y_labels]
 
-        frame = pd.DataFrame(x_dense, columns=self._feature_names)
+        frame = pd.DataFrame(embeddings, columns=self._feature_names)
         frame["label"] = y_internal
 
         h2o.init()
+        self._h2o_initialized = True
         train_h2o = h2o.H2OFrame(frame)
         train_h2o["label"] = train_h2o["label"].asfactor()
 
@@ -80,8 +101,9 @@ class H2OWrapper(BaseFrameworkWrapper):
         aml.train(x=self._feature_names, y="label", training_frame=train_h2o)
         self._aml = aml
         LOGGER.info(
-            "H2O fit done on %d in-domain samples. e5-large-instruct external embedder is not supported for this backend.",
+            "H2O fit done on %d in-domain samples using %s embeddings.",
             len(x_texts),
+            self.embedder_name,
         )
         return self
 
@@ -91,8 +113,8 @@ class H2OWrapper(BaseFrameworkWrapper):
 
         import h2o
 
-        x_matrix = self._vectorizer.transform(texts).toarray()
-        frame = pd.DataFrame(x_matrix, columns=self._feature_names)
+        embeddings = self._embed(texts)
+        frame = pd.DataFrame(embeddings, columns=self._feature_names)
         test_h2o = h2o.H2OFrame(frame)
         pred_h2o = self._aml.leader.predict(test_h2o)
         return pred_h2o.as_data_frame(use_pandas=True)

@@ -3438,5 +3438,56 @@
       "comparable_to_table3": false,
       "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_autoembedder_deeppavlov_50shot_seed456"
     }
+  },
+  {
+    "model_name": "lama_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.537,
+    "in_domain_acc": 0.9324444444444444,
+    "f1_oos": 0.6683260734287492,
+    "auroc": 0.951772111111111,
+    "au_ioc": 0.9035600000000001,
+    "latency_ms": 506.3842125842348,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "framework": "lama",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "h2o_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.469,
+    "in_domain_acc": 0.9342222222222222,
+    "f1_oos": 0.6166995397764629,
+    "auroc": 0.9543535555555555,
+    "au_ioc": 0.9070800000000001,
+    "latency_ms": 1776.426889197901,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "framework": "h2o",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.483,
+    "in_domain_acc": 0.8397777777777777,
+    "f1_oos": 0.5777511961722488,
+    "auroc": 0.9215384444444445,
+    "au_ioc": 0.8108350000000001,
+    "latency_ms": 514.4891825364903,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
   }
 ]

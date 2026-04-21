@@ -16,6 +16,9 @@ dependencies = [
     "optuna>=3.0",
     "wandb",
     "python-dotenv",
+    "lightautoml>=0.3.8",
+    "h2o>=3.44",
+    "autogluon.tabular>=1.0",
 ]
 
 [build-system]

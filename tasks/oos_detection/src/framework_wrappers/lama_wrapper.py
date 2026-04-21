@@ -1,6 +1,12 @@
 from __future__ import annotations
 
 import logging
+import os
+
+# Mac CPU settings to avoid multiprocessing fork/spawn issues and OMP oversubscription
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
 
 import numpy as np
 import pandas as pd
@@ -24,7 +30,7 @@ class LAMAWrapper(BaseFrameworkWrapper):
         default_threshold: float = 0.5,
         embedder_name: str = "intfloat/multilingual-e5-large-instruct",
         timeout: int = 600,
-        cpu_limit: int = 4,
+        cpu_limit: int = 1,
         seed: int = 42,
     ):
         super().__init__(model_name="lama_threshold", default_threshold=default_threshold)
