@@ -49,8 +49,17 @@ class BaseFrameworkWrapper(ABC):
             raise ValueError("Validation texts are empty, cannot calibrate threshold.")
 
         y_true = np.asarray(val_labels)
-        oos_scores = np.asarray(self.predict_proba(val_texts))
+        oos_scores = np.asarray(self.predict_proba(val_texts), dtype=float)
         y_in_domain = np.asarray(self._predict_in_domain(val_texts))
+
+        if oos_scores.size == 0:
+            raise ValueError("predict_proba returned no OOS scores for validation texts.")
+
+        score_std = float(np.std(oos_scores))
+        if score_std < 1e-6:
+            raise RuntimeError(
+                "OOS scores degenerate (std < 1e-6) — model likely failed to train or scores are constant."
+            )
 
         thresholds = np.linspace(float(oos_scores.min()), float(oos_scores.max()), n_thresholds)
         best_threshold = float(thresholds[0])
