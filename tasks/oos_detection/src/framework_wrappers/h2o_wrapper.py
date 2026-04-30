@@ -24,7 +24,7 @@ class H2OWrapper(BaseFrameworkWrapper):
         default_threshold: float = 0.5,
         embedder_name: str = "intfloat/multilingual-e5-large-instruct",
         max_models: int = 5,
-        max_runtime_secs: int = 600,
+        max_runtime_secs: int = 1500,
         seed: int = 42,
     ):
         super().__init__(model_name="h2o_threshold", default_threshold=default_threshold)
@@ -87,6 +87,10 @@ class H2OWrapper(BaseFrameworkWrapper):
         frame = pd.DataFrame(embeddings, columns=self._feature_names)
         frame["label"] = y_internal
 
+        try:
+            h2o.cluster().shutdown(prompt=False)
+        except Exception:
+            pass
         h2o.init()
         self._h2o_initialized = True
         train_h2o = h2o.H2OFrame(frame)
@@ -99,6 +103,11 @@ class H2OWrapper(BaseFrameworkWrapper):
             sort_metric="mean_per_class_error",
         )
         aml.train(x=self._feature_names, y="label", training_frame=train_h2o)
+        if aml.leader is None:
+            raise RuntimeError(
+                "H2O AutoML produced no leader model (empty or failed run). "
+                "Try increasing max_runtime_secs or check the training frame."
+            )
         self._aml = aml
         LOGGER.info(
             "H2O fit done on %d in-domain samples using %s embeddings.",

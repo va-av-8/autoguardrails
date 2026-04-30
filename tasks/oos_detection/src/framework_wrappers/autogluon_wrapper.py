@@ -74,13 +74,22 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
         train_df = pd.DataFrame(embeddings, columns=self._feature_names)
         train_df["label"] = y_labels
 
-        self._predictor = TabularPredictor(label="label", problem_type="multiclass")
+        self._predictor = TabularPredictor(
+            label="label",
+            problem_type="multiclass",
+            learner_kwargs={"random_state": self.seed},
+        )
         self._predictor.fit(
             train_data=train_df,
             time_limit=self.time_limit,
             ag_args_fit={"num_cpus": self.num_cpus},
             verbosity=0,
         )
+        lb = self._predictor.leaderboard(extra_info=False, silent=True)
+        if lb is None or len(lb) == 0:
+            raise RuntimeError(
+                "AutoGluon produced an empty leaderboard — training likely failed."
+            )
 
         LOGGER.info(
             "AutoGluon fit done on %d in-domain samples using %s embeddings.",
