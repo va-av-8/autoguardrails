@@ -40,7 +40,9 @@ Vanilla-примеров в eval нет.
 включая CSAM-категорию. При отображении примеров избегать
 воспроизведения контента из этих категорий.
 
-## Few-shot протокол
+## Подготовка данных
+
+### Few-shot протокол
 
 - Balanced sampling: N примеров на класс (safe / jailbreak)
 - n_shots: [10, 20, 50], seeds: [42, 123, 456], итого 9 runs
@@ -49,9 +51,38 @@ Vanilla-примеров в eval нет.
 - Соответствует практике WildGuard (NeurIPS 2024):
   uniform mixture при обучении и оценке
 
+```bash
+python scripts/prepare_data.py  # few-shot по умолчанию
+```
+
+### Full-train подвыборки (100K)
+
+Для AutoML экспериментов (AutoGluon, H2O, LightAutoML) используются
+стратифицированные 100K подвыборки из train-сплита.
+
+**Обоснование размера:** Shi et al. 2021 (NeurIPS D&B) downsampled
+крупные текстовые датасеты (jigsaw toxicity, mercari) до 100K
+для computational tractability AutoML. Jigsaw toxicity — структурно
+ближайший родственник jailbreak detection.
+
+**Стратификация:**
+- 50/50 баланс safe vs jailbreak (по 50K)
+- Внутри каждого класса сохранена оригинальная пропорция vanilla/adversarial
+
+```bash
+python scripts/prepare_data.py --full_subset
+```
+
+**Выходные файлы:**
+- `data/processed/wildjailbreak_full100k_seed42.json`
+- `data/processed/wildjailbreak_full100k_seed123.json`
+- `data/processed/wildjailbreak_full100k_seed456.json`
+
+**Формат:** идентичен few-shot (AutoIntent-совместимый JSON).
+
 ## Метрики
 
-Все функции в `shared/metrics.py`, параметр `oos_label=1`.
+Все функции в `src/metrics.py`, параметр `oos_label=1`.
 
 ### Основные
 
