@@ -24,13 +24,11 @@ class H2OWrapper(BaseFrameworkWrapper):
         default_threshold: float = 0.5,
         embedder_name: str = "intfloat/multilingual-e5-large-instruct",
         max_models: int = 5,
-        max_runtime_secs: int = 1500,
         seed: int = 42,
     ):
         super().__init__(model_name="h2o_threshold", default_threshold=default_threshold)
         self.embedder_name = embedder_name
         self.max_models = max_models
-        self.max_runtime_secs = max_runtime_secs
         self.seed = seed
 
         self._embedder: SentenceTransformer | None = None
@@ -86,6 +84,9 @@ class H2OWrapper(BaseFrameworkWrapper):
 
         frame = pd.DataFrame(embeddings, columns=self._feature_names)
         frame["label"] = y_internal
+        frame["_text"] = x_texts
+        frame = frame.sort_values(by=["label", "_text"], kind="mergesort").reset_index(drop=True)
+        frame = frame.drop(columns=["_text"])
 
         try:
             h2o.cluster().shutdown(prompt=False)
@@ -98,7 +99,6 @@ class H2OWrapper(BaseFrameworkWrapper):
 
         aml = H2OAutoML(
             max_models=self.max_models,
-            max_runtime_secs=self.max_runtime_secs,
             seed=self.seed,
             sort_metric="mean_per_class_error",
         )
