@@ -45,7 +45,7 @@ sys.path.insert(0, str(project_root))
 from autointent import Pipeline, Dataset as AIDataset
 from autointent.configs import LoggingConfig, EmbedderConfig, DataConfig
 
-from shared.metrics import evaluate_jailbreak
+from tasks.jailbreak_detection.src.metrics import evaluate_jailbreak
 
 
 def get_data_dir() -> Path:

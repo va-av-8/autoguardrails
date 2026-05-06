@@ -38,7 +38,7 @@ task_dir = script_dir.parent
 project_root = task_dir.parent.parent
 sys.path.insert(0, str(project_root))
 
-from shared.metrics import evaluate_jailbreak
+from tasks.jailbreak_detection.src.metrics import evaluate_jailbreak
 
 
 MODEL_SIZES = {
@@ -144,17 +144,22 @@ def predict_batch(
     return generated
 
 
-def save_results(results: dict, output_dir: Path, model_key: str) -> None:
-    """Save results to metrics.json, merging with existing results."""
+def save_results(results: dict, output_dir: Path) -> None:
+    """Save results to metrics.json, appending to existing list."""
     output_path = output_dir / "metrics.json"
 
     if output_path.exists():
         with open(output_path, "r", encoding="utf-8") as f:
             all_results = json.load(f)
+        if not isinstance(all_results, list):
+            # Convert dict format to list if needed
+            all_results = list(all_results.values()) if all_results else []
     else:
-        all_results = {}
+        all_results = []
 
-    all_results[model_key] = results
+    # Remove existing entry with same model_name
+    all_results = [r for r in all_results if r.get("model_name") != results["model_name"]]
+    all_results.append(results)
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(all_results, f, indent=2, ensure_ascii=False)
@@ -305,7 +310,9 @@ def main():
 
     # Save results
     results = {
+        "model_name": model_key,
         "model": model_name,
+        "mode": "zero-shot",
         "test_size": len(prompts),
         "f1": metrics["f1"],
         "precision": metrics["precision"],
@@ -316,7 +323,7 @@ def main():
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
-    save_results(results, args.output_dir, model_key)
+    save_results(results, args.output_dir)
 
 
 if __name__ == "__main__":

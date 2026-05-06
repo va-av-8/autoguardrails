@@ -33,7 +33,7 @@ task_dir = script_dir.parent
 project_root = task_dir.parent.parent
 sys.path.insert(0, str(project_root))
 
-from shared.metrics import evaluate_jailbreak
+from tasks.jailbreak_detection.src.metrics import evaluate_jailbreak
 
 
 def load_eval_binary(path: Path) -> list[dict]:
@@ -118,16 +118,21 @@ def predict_with_chunking(
 
 
 def save_results(results: dict, output_dir: Path) -> None:
-    """Save results to metrics.json, merging with existing results."""
+    """Save results to metrics.json, appending to existing list."""
     output_path = output_dir / "metrics.json"
 
     if output_path.exists():
         with open(output_path, "r", encoding="utf-8") as f:
             all_results = json.load(f)
+        if not isinstance(all_results, list):
+            # Convert dict format to list if needed
+            all_results = list(all_results.values()) if all_results else []
     else:
-        all_results = {}
+        all_results = []
 
-    all_results["promptguard2_86m"] = results
+    # Remove existing entry with same model_name
+    all_results = [r for r in all_results if r.get("model_name") != results["model_name"]]
+    all_results.append(results)
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(all_results, f, indent=2, ensure_ascii=False)
@@ -256,7 +261,9 @@ def main():
 
     # Save results
     results = {
+        "model_name": "promptguard2_86m",
         "model": model_name,
+        "mode": "zero-shot",
         "test_size": len(prompts),
         "f1": metrics["f1"],
         "precision": metrics["precision"],
