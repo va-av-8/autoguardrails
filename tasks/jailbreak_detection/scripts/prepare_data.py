@@ -12,6 +12,9 @@
     # Full-train 100K подвыборки для AutoML
     python scripts/prepare_data.py --full_subset
 
+    Датасет allenai/wildjailbreak на Hugging Face закрытый (gated): на странице датасета
+    нужно принять условия, затем авторизация — huggingface-cli login или переменная HF_TOKEN.
+
     # С кастомными параметрами
     python scripts/prepare_data.py \
         --raw_train data/raw/wildjailbreak_train.jsonl \
@@ -33,11 +36,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import warnings
 from pathlib import Path
 
 import numpy as np
 from datasets import load_dataset
+from datasets.exceptions import DatasetNotFoundError
 
 
 # Constants
@@ -47,6 +52,21 @@ VANILLA_TYPES = {"vanilla_harmful", "vanilla_benign"}
 ADVERSARIAL_TYPES = {"adversarial_harmful", "adversarial_benign"}
 DEFAULT_N_SHOTS = [10, 20, 50]
 DEFAULT_SEEDS = [42, 123, 456]
+
+
+def _hf_token() -> str | None:
+    """Токен для gated-датасетов (HF_TOKEN или HUGGING_FACE_HUB_TOKEN)."""
+    return os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
+
+
+def _print_hf_gated_help() -> None:
+    print("\n" + "=" * 60)
+    print("WildJailbreak (allenai/wildjailbreak) — gated dataset на Hugging Face.")
+    print("1) Откройте страницу датасета и примите условия доступа.")
+    print("2) Токен: https://huggingface.co/settings/tokens")
+    print("3) Выполните:  huggingface-cli login")
+    print("   или:        export HF_TOKEN=<ваш_токен>")
+    print("=" * 60 + "\n")
 
 
 def get_binary_label(data_type: str) -> str:
@@ -92,28 +112,44 @@ def load_and_save_raw(output_dir: Path) -> tuple[list[dict], list[dict]]:
 
     print("Loading WildJailbreak from HuggingFace...")
 
+    dl_mode = os.environ.get("HF_DATASETS_DOWNLOAD_MODE")  # напр. force_redownload
+    _ld_extra: dict = {"token": _hf_token()}
+    if dl_mode:
+        _ld_extra["download_mode"] = dl_mode
+
     # Load train split (has columns: vanilla, adversarial, completion, data_type)
     print("Loading train split...")
-    train_dataset = load_dataset(
-        "allenai/wildjailbreak",
-        data_files={"train": "train/train.tsv"},
-        split="train",
-        delimiter="\t",
-        keep_default_na=False
-    )
+    try:
+        train_dataset = load_dataset(
+            "allenai/wildjailbreak",
+            data_files={"train": "train/train.tsv"},
+            split="train",
+            delimiter="\t",
+            keep_default_na=False,
+            **_ld_extra,
+        )
+    except DatasetNotFoundError:
+        _print_hf_gated_help()
+        raise
+
     train_data = list(train_dataset)
     print(f"Train loaded: {len(train_data)} examples")
 
     # Load eval split separately (has columns: adversarial, label, data_type)
     # Note: eval split has different schema - adversarial contains the prompt
     print("Loading eval split...")
-    eval_dataset = load_dataset(
-        "allenai/wildjailbreak",
-        data_files={"test": "eval/eval.tsv"},
-        split="test",
-        delimiter="\t",
-        keep_default_na=False
-    )
+    try:
+        eval_dataset = load_dataset(
+            "allenai/wildjailbreak",
+            data_files={"test": "eval/eval.tsv"},
+            split="test",
+            delimiter="\t",
+            keep_default_na=False,
+            **_ld_extra,
+        )
+    except DatasetNotFoundError:
+        _print_hf_gated_help()
+        raise
     eval_data = list(eval_dataset)
     print(f"Eval loaded: {len(eval_data)} examples")
 

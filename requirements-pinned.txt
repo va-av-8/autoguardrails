@@ -1,0 +1,29 @@
+# Совместимо с autointent==0.2.0 (см. PyPI requires_dist: datasets<4, transformers>=4.49,<5).
+# Установка одной командой:
+#   pip install -r requirements-pinned.txt
+# Или по слоям (ниже порядок для ручной отладки):
+#
+#   pip install torch==2.5.1
+#   pip install transformers==4.49.0 datasets==3.6.0 sentence-transformers==3.4.1
+#   pip install autointent==0.2.0
+#   pip install -r requirements-pinned.txt --no-deps   # только если уже стоят транзитивы — обычно не нужно
+
+torch==2.5.1
+# Должны совпадать с torch (иначе transformers/torchvision ломаются при смешении с образом Kaggle):
+torchvision==0.20.1
+torchaudio==2.5.1
+transformers==4.49.0
+datasets==3.6.0
+sentence-transformers==3.4.1
+autointent==0.2.0
+
+scikit-learn>=1.5,<2
+pandas>=2.0
+numpy>=1.24,<3
+matplotlib>=3.7
+seaborn>=0.12
+optuna>=4,<5
+wandb>=0.19,<1
+python-dotenv>=1,<2
+
+pytest==8.4.2
