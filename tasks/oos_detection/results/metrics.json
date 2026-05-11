@@ -2655,7 +2655,7 @@
     "f1_oos": 0.7844011142061281,
     "auroc": 0.9682024444444445,
     "au_ioc": 0.9161587777777778,
-    "latency_ms": 0.18011570209637284,
+    "latency_ms": 0.21962250117212534,
     "n_shots": 20,
     "seed": 42,
     "is_reference": false,
@@ -2677,7 +2677,7 @@
     "f1_oos": 0.7906976744186046,
     "auroc": 0.9692851111111112,
     "au_ioc": 0.924927,
-    "latency_ms": 0.1961708173621446,
+    "latency_ms": 0.20310168038122356,
     "n_shots": 20,
     "seed": 123,
     "is_reference": false,
@@ -2699,7 +2699,7 @@
     "f1_oos": 0.6497783407219759,
     "auroc": 0.9473559999999999,
     "au_ioc": 0.9011192222222222,
-    "latency_ms": 0.17886338056996465,
+    "latency_ms": 0.20108342170715332,
     "n_shots": 20,
     "seed": 456,
     "is_reference": false,
@@ -2875,7 +2875,7 @@
     "f1_oos": 0.8202020202020202,
     "auroc": 0.9692637777777777,
     "au_ioc": 0.9058308888888889,
-    "latency_ms": 0.1723716373089701,
+    "latency_ms": 0.20934995845891535,
     "n_shots": 20,
     "seed": 42,
     "is_reference": false,
@@ -2897,7 +2897,7 @@
     "f1_oos": 0.7891231964483907,
     "auroc": 0.969404,
     "au_ioc": 0.9232862222222222,
-    "latency_ms": 0.17787832184694707,
+    "latency_ms": 0.18739331513643265,
     "n_shots": 20,
     "seed": 123,
     "is_reference": false,
@@ -2919,7 +2919,7 @@
     "f1_oos": 0.7602852441031267,
     "auroc": 0.9571664444444444,
     "au_ioc": 0.9075950000000002,
-    "latency_ms": 0.17663424368947744,
+    "latency_ms": 0.19457577844150364,
     "n_shots": 20,
     "seed": 456,
     "is_reference": false,
@@ -4083,6 +4083,346 @@
     "extra": {
       "framework": "lama",
       "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.629,
+    "in_domain_acc": 0.9091111111111111,
+    "f1_oos": 0.7188571428571429,
+    "auroc": 0.9475231111111112,
+    "au_ioc": 0.8809684444444446,
+    "latency_ms": 77.78695079730824,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.494,
+    "in_domain_acc": 0.9204444444444444,
+    "f1_oos": 0.6345536287732819,
+    "auroc": 0.9523551111111112,
+    "au_ioc": 0.8927125555555557,
+    "latency_ms": 74.82204087777063,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.604,
+    "in_domain_acc": 0.9211111111111111,
+    "f1_oos": 0.7085043988269795,
+    "auroc": 0.9527911111111113,
+    "au_ioc": 0.8939394444444444,
+    "latency_ms": 75.28490336146206,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.574,
+    "in_domain_acc": 0.9395555555555556,
+    "f1_oos": 0.6961795027289266,
+    "auroc": 0.9609584444444446,
+    "au_ioc": 0.9171645555555556,
+    "latency_ms": 579.2299324914347,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.479,
+    "in_domain_acc": 0.9497777777777778,
+    "f1_oos": 0.630678077682686,
+    "auroc": 0.9606004444444445,
+    "au_ioc": 0.9210946666666668,
+    "latency_ms": 75.19098249729723,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.504,
+    "in_domain_acc": 0.9346666666666666,
+    "f1_oos": 0.6432673899170389,
+    "auroc": 0.9622421111111112,
+    "au_ioc": 0.9126903333333334,
+    "latency_ms": 569.4631183089223,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.685,
+    "in_domain_acc": 0.9504444444444444,
+    "f1_oos": 0.7824100513992005,
+    "auroc": 0.970162,
+    "au_ioc": 0.9316899999999999,
+    "latency_ms": 642.4168765742797,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.637,
+    "in_domain_acc": 0.9573333333333334,
+    "f1_oos": 0.7565320665083135,
+    "auroc": 0.9735577777777777,
+    "au_ioc": 0.9395316666666668,
+    "latency_ms": 602.4521192209795,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.706,
+    "in_domain_acc": 0.9537777777777777,
+    "f1_oos": 0.7977401129943503,
+    "auroc": 0.9734142222222221,
+    "au_ioc": 0.9372497777777777,
+    "latency_ms": 627.6928692217916,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.629,
+    "in_domain_acc": 0.9091111111111111,
+    "f1_oos": 0.7188571428571429,
+    "auroc": 0.9475231111111111,
+    "au_ioc": 0.8809684444444446,
+    "latency_ms": 73.74446410220116,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.494,
+    "in_domain_acc": 0.9204444444444444,
+    "f1_oos": 0.6345536287732819,
+    "auroc": 0.9523550000000001,
+    "au_ioc": 0.8927125555555557,
+    "latency_ms": 73.23169342125766,
+    "n_shots": 10,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "10shot",
+    "oos_recall": 0.604,
+    "in_domain_acc": 0.9211111111111111,
+    "f1_oos": 0.7085043988269795,
+    "auroc": 0.952791111111111,
+    "au_ioc": 0.8939394444444444,
+    "latency_ms": 74.27210592082702,
+    "n_shots": 10,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.574,
+    "in_domain_acc": 0.9395555555555556,
+    "f1_oos": 0.6961795027289266,
+    "auroc": 0.9609584444444443,
+    "au_ioc": 0.9171645555555556,
+    "latency_ms": 579.3812582863029,
+    "n_shots": 20,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.479,
+    "in_domain_acc": 0.9497777777777778,
+    "f1_oos": 0.630678077682686,
+    "auroc": 0.9606004444444445,
+    "au_ioc": 0.9210946666666668,
+    "latency_ms": 74.4235324987676,
+    "n_shots": 20,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "20shot",
+    "oos_recall": 0.504,
+    "in_domain_acc": 0.9346666666666666,
+    "f1_oos": 0.6432673899170389,
+    "auroc": 0.9622418888888888,
+    "au_ioc": 0.9126903333333334,
+    "latency_ms": 552.8660016739741,
+    "n_shots": 20,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.688,
+    "in_domain_acc": 0.9486666666666667,
+    "f1_oos": 0.782707622298066,
+    "auroc": 0.9686199999999999,
+    "au_ioc": 0.9293299999999999,
+    "latency_ms": 74.62307500070892,
+    "n_shots": 50,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.637,
+    "in_domain_acc": 0.9573333333333334,
+    "f1_oos": 0.7565320665083135,
+    "auroc": 0.9735577777777777,
+    "au_ioc": 0.9395316666666668,
+    "latency_ms": 605.3684566612355,
+    "n_shots": 50,
+    "seed": 123,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "50shot",
+    "oos_recall": 0.706,
+    "in_domain_acc": 0.9537777777777777,
+    "f1_oos": 0.7977401129943503,
+    "auroc": 0.9734142222222222,
+    "au_ioc": 0.9372497777777777,
+    "latency_ms": 624.5581017399672,
+    "n_shots": 50,
+    "seed": 456,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "deeppavlov"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "full",
+    "oos_recall": 0.679,
+    "in_domain_acc": 0.9588888888888889,
+    "f1_oos": 0.7858796296296297,
+    "auroc": 0.9741955555555555,
+    "au_ioc": 0.9411513333333335,
+    "latency_ms": 81.55066835926846,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "standard"
+    }
+  },
+  {
+    "model_name": "autogluon_threshold",
+    "mode": "full",
+    "oos_recall": 0.642,
+    "in_domain_acc": 0.9615555555555556,
+    "f1_oos": 0.7642857142857142,
+    "auroc": 0.9752493333333333,
+    "au_ioc": 0.9446473333333335,
+    "latency_ms": 86.36542256223038,
+    "n_shots": null,
+    "seed": null,
+    "is_reference": false,
+    "extra": {
+      "framework": "autogluon",
+      "source": "deeppavlov"
     }
   }
 ]
