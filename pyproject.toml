@@ -21,6 +21,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest==8.4.2"]
+automl = [
+    "autogluon.tabular>=1.2,<2",
+    "h2o>=3.46,<4",
+    "lightautoml>=0.3.8,<1",
+]
 
 [build-system]
 requires = ["setuptools>=68"]
