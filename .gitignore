@@ -229,6 +229,7 @@ data/processed/*.json
 # Results (large files)
 results/*.pkl
 results/*.pt
+tasks/*/results/*.csv
 
 # Experiment logs
 wandb/

@@ -1,0 +1,15 @@
+{
+  "geometric_analysis": {
+    "silhouette_score": 0.08824682235717773,
+    "separation_ratio": 1.105810284614563
+  },
+  "probe_train_to_eval": {
+    "roc_auc": 0.7868404761904761,
+    "pr_auc": 0.970179884853883
+  },
+  "pipeline_comparison": {
+    "pipeline_roc_mean": 0.7575650793650793,
+    "difference": 0.029275396825396816,
+    "verdict": "PROBE_SAME"
+  }
+}

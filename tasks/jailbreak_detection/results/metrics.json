@@ -1,569 +1,5 @@
 [
   {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "10shot",
-    "n_shots": 10,
-    "seed": 42,
-    "f1": 0.757155001416832,
-    "precision": 0.8737737083060824,
-    "recall": 0.668,
-    "over_refusal_rate": 0.919047619047619,
-    "recall_adversarial_harmful": 0.668,
-    "timestamp": "2026-05-09T22:19:30.379821+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_10shot_seed42",
-      "eval_counts": {
-        "tp": 1336,
-        "fp": 193,
-        "fn": 664,
-        "tn": 17,
-        "fnr_jailbreak": 0.332,
-        "fpr_safe": 0.919047619047619,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": 0.06386554621848738,
-        "margin_std": 0.23444903183925153,
-        "margin_min": -1.0,
-        "margin_max": 0.7142857142857142,
-        "score_col0_mean": 0.46806722689075636,
-        "score_col1_mean": 0.5319327731092436,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "10shot",
-    "n_shots": 10,
-    "seed": 123,
-    "f1": 0.7306634056863345,
-    "precision": 0.9402045633359559,
-    "recall": 0.5975,
-    "over_refusal_rate": 0.3619047619047619,
-    "recall_adversarial_harmful": 0.5975,
-    "timestamp": "2026-05-09T22:20:17.935094+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_10shot_seed123",
-      "eval_counts": {
-        "tp": 1195,
-        "fp": 76,
-        "fn": 805,
-        "tn": 134,
-        "fnr_jailbreak": 0.4025,
-        "fpr_safe": 0.3619047619047619,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": -0.0006184319834903354,
-        "margin_std": 0.08993603757094001,
-        "margin_min": -0.933126300573349,
-        "margin_max": 0.948159784078598,
-        "score_col0_mean": 0.9232228647394957,
-        "score_col1_mean": 0.9226044327560053,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "10shot",
-    "n_shots": 10,
-    "seed": 456,
-    "f1": 0.7828402366863906,
-    "precision": 0.9586956521739131,
-    "recall": 0.6615,
-    "over_refusal_rate": 0.2714285714285714,
-    "recall_adversarial_harmful": 0.6615,
-    "timestamp": "2026-05-09T22:21:06.708451+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_10shot_seed456",
-      "eval_counts": {
-        "tp": 1323,
-        "fp": 57,
-        "fn": 677,
-        "tn": 153,
-        "fnr_jailbreak": 0.3385,
-        "fpr_safe": 0.2714285714285714,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": 0.10465595868555091,
-        "margin_std": 0.22334802977688112,
-        "margin_min": -0.7195084160123266,
-        "margin_max": 1.0,
-        "score_col0_mean": 0.44767202065722456,
-        "score_col1_mean": 0.5523279793427754,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "20shot",
-    "n_shots": 20,
-    "seed": 42,
-    "f1": 0.8670520231213873,
-    "precision": 0.9136212624584718,
-    "recall": 0.825,
-    "over_refusal_rate": 0.7428571428571429,
-    "recall_adversarial_harmful": 0.825,
-    "timestamp": "2026-05-09T22:22:19.072544+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_20shot_seed42",
-      "eval_counts": {
-        "tp": 1650,
-        "fp": 156,
-        "fn": 350,
-        "tn": 54,
-        "fnr_jailbreak": 0.175,
-        "fpr_safe": 0.7428571428571429,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": 0.17482284921057084,
-        "margin_std": 0.36219885798717555,
-        "margin_min": -0.9163356721401215,
-        "margin_max": 0.9643391966819763,
-        "score_col0_mean": 0.7572106131601117,
-        "score_col1_mean": 0.9320334623706826,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "20shot",
-    "n_shots": 20,
-    "seed": 123,
-    "f1": 0.7497005988023953,
-    "precision": 0.9343283582089552,
-    "recall": 0.626,
-    "over_refusal_rate": 0.41904761904761906,
-    "recall_adversarial_harmful": 0.626,
-    "timestamp": "2026-05-09T22:23:08.343917+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_20shot_seed123",
-      "eval_counts": {
-        "tp": 1252,
-        "fp": 88,
-        "fn": 748,
-        "tn": 122,
-        "fnr_jailbreak": 0.374,
-        "fpr_safe": 0.41904761904761906,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": 0.008588931746612308,
-        "margin_std": 0.17425869036759442,
-        "margin_min": -0.949090451002121,
-        "margin_max": 0.9540207087993622,
-        "score_col0_mean": 0.9088983533608967,
-        "score_col1_mean": 0.9174872851075091,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "20shot",
-    "n_shots": 20,
-    "seed": 456,
-    "f1": 0.7713270142180095,
-    "precision": 0.9462209302325582,
-    "recall": 0.651,
-    "over_refusal_rate": 0.3523809523809524,
-    "recall_adversarial_harmful": 0.651,
-    "timestamp": "2026-05-09T22:23:57.957371+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_20shot_seed456",
-      "eval_counts": {
-        "tp": 1302,
-        "fp": 74,
-        "fn": 698,
-        "tn": 136,
-        "fnr_jailbreak": 0.349,
-        "fpr_safe": 0.3523809523809524,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": 0.13909064769786714,
-        "margin_std": 0.4131944562323417,
-        "margin_min": -0.8875039013111616,
-        "margin_max": 0.9289799687663047,
-        "score_col0_mean": 0.4304546761510665,
-        "score_col1_mean": 0.5695453238489335,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "50shot",
-    "n_shots": 50,
-    "seed": 42,
-    "f1": 0.8188888888888889,
-    "precision": 0.92125,
-    "recall": 0.737,
-    "over_refusal_rate": 0.6,
-    "recall_adversarial_harmful": 0.737,
-    "timestamp": "2026-05-09T22:25:15.631251+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_50shot_seed42",
-      "eval_counts": {
-        "tp": 1474,
-        "fp": 126,
-        "fn": 526,
-        "tn": 84,
-        "fnr_jailbreak": 0.263,
-        "fpr_safe": 0.6,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": 0.05007131168121699,
-        "margin_std": 0.08567696274606647,
-        "margin_min": -0.2578888085997182,
-        "margin_max": 0.3210345272574473,
-        "score_col0_mean": 0.47496434415939137,
-        "score_col1_mean": 0.5250356558406085,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "50shot",
-    "n_shots": 50,
-    "seed": 123,
-    "f1": 0.8132963988919668,
-    "precision": 0.9118012422360249,
-    "recall": 0.734,
-    "over_refusal_rate": 0.6761904761904762,
-    "recall_adversarial_harmful": 0.734,
-    "timestamp": "2026-05-09T22:26:10.665763+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_50shot_seed123",
-      "eval_counts": {
-        "tp": 1468,
-        "fp": 142,
-        "fn": 532,
-        "tn": 68,
-        "fnr_jailbreak": 0.266,
-        "fpr_safe": 0.6761904761904762,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": 0.1424841096117592,
-        "margin_std": 0.252666502699031,
-        "margin_min": -0.6237032009129053,
-        "margin_max": 1.0,
-        "score_col0_mean": 0.4287579451941204,
-        "score_col1_mean": 0.5712420548058796,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "50shot",
-    "n_shots": 50,
-    "seed": 456,
-    "f1": 0.5602260685270223,
-    "precision": 0.9542719614921781,
-    "recall": 0.3965,
-    "over_refusal_rate": 0.18095238095238095,
-    "recall_adversarial_harmful": 0.3965,
-    "timestamp": "2026-05-09T22:27:03.361734+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_50shot_seed456",
-      "eval_counts": {
-        "tp": 793,
-        "fp": 38,
-        "fn": 1207,
-        "tn": 172,
-        "fnr_jailbreak": 0.6035,
-        "fpr_safe": 0.18095238095238095,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": -0.09428580021389865,
-        "margin_std": 0.30998347809184074,
-        "margin_min": -0.8280664913233986,
-        "margin_max": 0.7542778672925674,
-        "score_col0_mean": 0.5471429001069493,
-        "score_col1_mean": 0.4528570998930507,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "full",
-    "n_shots": null,
-    "seed": 42,
-    "f1": 0.9030927835051547,
-    "precision": 0.9319148936170213,
-    "recall": 0.876,
-    "over_refusal_rate": 0.6095238095238096,
-    "recall_adversarial_harmful": 0.876,
-    "timestamp": "2026-05-09T22:36:51.157337+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_full_seed42",
-      "eval_counts": {
-        "tp": 1752,
-        "fp": 128,
-        "fn": 248,
-        "tn": 82,
-        "fnr_jailbreak": 0.124,
-        "fpr_safe": 0.6095238095238096,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": 0.6146606334841629,
-        "margin_std": 0.44762065562952413,
-        "margin_min": -1.0,
-        "margin_max": 1.0,
-        "score_col0_mean": 0.19266968325791856,
-        "score_col1_mean": 0.8073303167420814,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "full",
-    "n_shots": null,
-    "seed": 123,
-    "f1": 0.9044553180530518,
-    "precision": 0.9325544344131704,
-    "recall": 0.878,
-    "over_refusal_rate": 0.6047619047619047,
-    "recall_adversarial_harmful": 0.878,
-    "timestamp": "2026-05-09T22:46:33.105729+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_full_seed123",
-      "eval_counts": {
-        "tp": 1756,
-        "fp": 127,
-        "fn": 244,
-        "tn": 83,
-        "fnr_jailbreak": 0.122,
-        "fpr_safe": 0.6047619047619047,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": 0.5959276018099547,
-        "margin_std": 0.4356943532100635,
-        "margin_min": -1.0,
-        "margin_max": 1.0,
-        "score_col0_mean": 0.20203619909502263,
-        "score_col1_mean": 0.7979638009049774,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
-    "model_name": "autointent_classic-light_autoembedder",
-    "mode": "full",
-    "n_shots": null,
-    "seed": 456,
-    "f1": 0.9161783439490446,
-    "precision": 0.934025974025974,
-    "recall": 0.899,
-    "over_refusal_rate": 0.6047619047619047,
-    "recall_adversarial_harmful": 0.899,
-    "timestamp": "2026-05-09T22:55:52.019169+00:00",
-    "extra": {
-      "preset": "classic-light",
-      "embedder": "auto (optimized by AutoML)",
-      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
-      "embedder_fixed": false,
-      "pilot": false,
-      "model_dir": "/kaggle/working/kaggle_jailbreak_standalone/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_full_seed456",
-      "eval_counts": {
-        "tp": 1798,
-        "fp": 127,
-        "fn": 202,
-        "tn": 83,
-        "fnr_jailbreak": 0.101,
-        "fpr_safe": 0.6047619047619047,
-        "n_eval": 2210,
-        "n_safe_true": 210,
-        "n_jailbreak_true": 2000
-      },
-      "decision_module_attrs": {
-        "_n_classes": 2,
-        "_multilabel": false,
-        "_oos": false
-      },
-      "scores_eval_summary": {
-        "n_scored": 2210,
-        "n_score_dims": 2,
-        "margin_mean": 0.6173755656108598,
-        "margin_std": 0.4304962822089417,
-        "margin_min": -1.0,
-        "margin_max": 1.0,
-        "score_col0_mean": 0.19131221719457017,
-        "score_col1_mean": 0.8086877828054297,
-        "note": "col0≈safe intent col1≈jailbreak (classic-light binary setup)"
-      }
-    }
-  },
-  {
     "model_name": "autogluon",
     "mode": "10shot",
     "n_shots": 10,
@@ -63757,6 +63193,654 @@
       "n_safe": 50000,
       "n_jailbreak": 50000,
       "training_time_sec": 1042.384533882141
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "10shot",
+    "n_shots": 10,
+    "seed": 42,
+    "f1": 0.757155001416832,
+    "precision": 0.8737737083060824,
+    "recall": 0.668,
+    "over_refusal_rate": 0.919047619047619,
+    "recall_adversarial_harmful": 0.668,
+    "timestamp": "2026-05-23T23:17:14.682270+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_10shot_seed42",
+      "eval_counts": {
+        "tp": 1336,
+        "fp": 193,
+        "fn": 664,
+        "tn": 17,
+        "fnr_jailbreak": 0.332,
+        "fpr_safe": 0.919047619047619,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "k": 7,
+        "weights": "uniform",
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": 0.06399482870071105,
+        "margin_std": 0.2345712986020297,
+        "margin_min": -1.0,
+        "margin_max": 0.7142857142857142,
+        "score_col0_mean": 0.4680025856496444,
+        "score_col1_mean": 0.5319974143503554,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "10shot",
+    "n_shots": 10,
+    "seed": 123,
+    "f1": 0.7306634056863345,
+    "precision": 0.9402045633359559,
+    "recall": 0.5975,
+    "over_refusal_rate": 0.3619047619047619,
+    "recall_adversarial_harmful": 0.5975,
+    "timestamp": "2026-05-23T23:17:20.718305+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_10shot_seed123",
+      "eval_counts": {
+        "tp": 1195,
+        "fp": 76,
+        "fn": 805,
+        "tn": 134,
+        "fnr_jailbreak": 0.4025,
+        "fpr_safe": 0.3619047619047619,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "k": 4,
+        "weights": "closest",
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": -0.0006184566209758569,
+        "margin_std": 0.08993602284577379,
+        "margin_min": -0.9331262111663818,
+        "margin_max": 0.9481596350669861,
+        "score_col0_mean": 0.9232228320243672,
+        "score_col1_mean": 0.9226043754033912,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "10shot",
+    "n_shots": 10,
+    "seed": 456,
+    "f1": 0.7828402366863906,
+    "precision": 0.9586956521739131,
+    "recall": 0.6615,
+    "over_refusal_rate": 0.2714285714285714,
+    "recall_adversarial_harmful": 0.6615,
+    "timestamp": "2026-05-23T23:17:26.721087+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_10shot_seed456",
+      "eval_counts": {
+        "tp": 1323,
+        "fp": 57,
+        "fn": 677,
+        "tn": 153,
+        "fnr_jailbreak": 0.3385,
+        "fpr_safe": 0.2714285714285714,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "k": 7,
+        "weights": "distance",
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": 0.10465611816872498,
+        "margin_std": 0.22334804761676375,
+        "margin_min": -0.7195082881280994,
+        "margin_max": 1.0,
+        "score_col0_mean": 0.4476719409156375,
+        "score_col1_mean": 0.5523280590843624,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "20shot",
+    "n_shots": 20,
+    "seed": 42,
+    "f1": 0.8670520231213873,
+    "precision": 0.9136212624584718,
+    "recall": 0.825,
+    "over_refusal_rate": 0.7428571428571429,
+    "recall_adversarial_harmful": 0.825,
+    "timestamp": "2026-05-23T23:17:38.146048+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_20shot_seed42",
+      "eval_counts": {
+        "tp": 1650,
+        "fp": 156,
+        "fn": 350,
+        "tn": 54,
+        "fnr_jailbreak": 0.175,
+        "fpr_safe": 0.7428571428571429,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "k": 4,
+        "weights": "closest",
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": 0.1748228240606472,
+        "margin_std": 0.3621988388179309,
+        "margin_min": -0.9163356423377991,
+        "margin_max": 0.9643392860889435,
+        "score_col0_mean": 0.7572105718953577,
+        "score_col1_mean": 0.9320333959560049,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "20shot",
+    "n_shots": 20,
+    "seed": 123,
+    "f1": 0.7497005988023953,
+    "precision": 0.9343283582089552,
+    "recall": 0.626,
+    "over_refusal_rate": 0.41904761904761906,
+    "recall_adversarial_harmful": 0.626,
+    "timestamp": "2026-05-23T23:17:44.619506+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_20shot_seed123",
+      "eval_counts": {
+        "tp": 1252,
+        "fp": 88,
+        "fn": 748,
+        "tn": 122,
+        "fnr_jailbreak": 0.374,
+        "fpr_safe": 0.41904761904761906,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "k": 4,
+        "weights": "closest",
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": 0.008588919340215656,
+        "margin_std": 0.17425868489355723,
+        "margin_min": -0.9490904211997986,
+        "margin_max": 0.9540210068225861,
+        "score_col0_mean": 0.9088983082258864,
+        "score_col1_mean": 0.917487227566102,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "20shot",
+    "n_shots": 20,
+    "seed": 456,
+    "f1": 0.7713270142180095,
+    "precision": 0.9462209302325582,
+    "recall": 0.651,
+    "over_refusal_rate": 0.3523809523809524,
+    "recall_adversarial_harmful": 0.651,
+    "timestamp": "2026-05-23T23:17:51.158865+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_20shot_seed456",
+      "eval_counts": {
+        "tp": 1302,
+        "fp": 74,
+        "fn": 698,
+        "tn": 136,
+        "fnr_jailbreak": 0.349,
+        "fpr_safe": 0.3523809523809524,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "cv": 3,
+        "seed": 0,
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": 0.1390915409486886,
+        "margin_std": 0.41319437748643495,
+        "margin_min": -0.8875043673188383,
+        "margin_max": 0.9289800717367367,
+        "score_col0_mean": 0.4304542295256557,
+        "score_col1_mean": 0.5695457704743443,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "50shot",
+    "n_shots": 50,
+    "seed": 42,
+    "f1": 0.8188888888888889,
+    "precision": 0.92125,
+    "recall": 0.737,
+    "over_refusal_rate": 0.6,
+    "recall_adversarial_harmful": 0.737,
+    "timestamp": "2026-05-23T23:18:02.889987+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_50shot_seed42",
+      "eval_counts": {
+        "tp": 1474,
+        "fp": 126,
+        "fn": 526,
+        "tn": 84,
+        "fnr_jailbreak": 0.263,
+        "fpr_safe": 0.6,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "cv": 3,
+        "seed": 0,
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": 0.05007140707544341,
+        "margin_std": 0.08567704303559184,
+        "margin_min": -0.25788882787229556,
+        "margin_max": 0.3210349283239027,
+        "score_col0_mean": 0.47496429646227833,
+        "score_col1_mean": 0.5250357035377217,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "50shot",
+    "n_shots": 50,
+    "seed": 123,
+    "f1": 0.8132963988919668,
+    "precision": 0.9118012422360249,
+    "recall": 0.734,
+    "over_refusal_rate": 0.6761904761904762,
+    "recall_adversarial_harmful": 0.734,
+    "timestamp": "2026-05-23T23:18:09.549010+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_50shot_seed123",
+      "eval_counts": {
+        "tp": 1468,
+        "fp": 142,
+        "fn": 532,
+        "tn": 68,
+        "fnr_jailbreak": 0.266,
+        "fpr_safe": 0.6761904761904762,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "k": 10,
+        "weights": "distance",
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": 0.14248406371111785,
+        "margin_std": 0.25266649716584244,
+        "margin_min": -0.6237043716433663,
+        "margin_max": 1.0,
+        "score_col0_mean": 0.42875796814444106,
+        "score_col1_mean": 0.5712420318555589,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "50shot",
+    "n_shots": 50,
+    "seed": 456,
+    "f1": 0.5602260685270223,
+    "precision": 0.9542719614921781,
+    "recall": 0.3965,
+    "over_refusal_rate": 0.18095238095238095,
+    "recall_adversarial_harmful": 0.3965,
+    "timestamp": "2026-05-23T23:18:15.658189+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_50shot_seed456",
+      "eval_counts": {
+        "tp": 793,
+        "fp": 38,
+        "fn": 1207,
+        "tn": 172,
+        "fnr_jailbreak": 0.6035,
+        "fpr_safe": 0.18095238095238095,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "cv": 3,
+        "seed": 0,
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": -0.09428589968856747,
+        "margin_std": 0.3099835436386452,
+        "margin_min": -0.8280661219128282,
+        "margin_max": 0.7542779927297745,
+        "score_col0_mean": 0.5471429498442837,
+        "score_col1_mean": 0.4528570501557162,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "full",
+    "n_shots": null,
+    "seed": 42,
+    "f1": 0.9030927835051547,
+    "precision": 0.9319148936170213,
+    "recall": 0.876,
+    "over_refusal_rate": 0.6095238095238096,
+    "recall_adversarial_harmful": 0.876,
+    "timestamp": "2026-05-24T20:01:05.835860+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_full_seed42",
+      "eval_counts": {
+        "tp": 1752,
+        "fp": 128,
+        "fn": 248,
+        "tn": 82,
+        "fnr_jailbreak": 0.124,
+        "fpr_safe": 0.6095238095238096,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "k": 10,
+        "weights": "uniform",
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": 0.6146606334841629,
+        "margin_std": 0.44762065562952413,
+        "margin_min": -1.0,
+        "margin_max": 1.0,
+        "score_col0_mean": 0.19266968325791856,
+        "score_col1_mean": 0.8073303167420814,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "full",
+    "n_shots": null,
+    "seed": 123,
+    "f1": 0.9044553180530518,
+    "precision": 0.9325544344131704,
+    "recall": 0.878,
+    "over_refusal_rate": 0.6047619047619047,
+    "recall_adversarial_harmful": 0.878,
+    "timestamp": "2026-05-24T21:07:35.941824+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_full_seed123",
+      "eval_counts": {
+        "tp": 1756,
+        "fp": 127,
+        "fn": 244,
+        "tn": 83,
+        "fnr_jailbreak": 0.122,
+        "fpr_safe": 0.6047619047619047,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "k": 10,
+        "weights": "uniform",
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": 0.5960180995475113,
+        "margin_std": 0.43546665003455304,
+        "margin_min": -1.0,
+        "margin_max": 1.0,
+        "score_col0_mean": 0.20199095022624436,
+        "score_col1_mean": 0.7980090497737558,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
+    }
+  },
+  {
+    "model_name": "autointent_classic-light_autoembedder",
+    "mode": "full",
+    "n_shots": null,
+    "seed": 456,
+    "f1": 0.8618331053351573,
+    "precision": 0.9516616314199395,
+    "recall": 0.7875,
+    "over_refusal_rate": 0.38095238095238093,
+    "recall_adversarial_harmful": 0.7875,
+    "timestamp": "2026-05-24T22:47:46.866810+00:00",
+    "extra": {
+      "preset": "classic-light",
+      "embedder": "auto (optimized by AutoML)",
+      "embedder_hf_model": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": false,
+      "pilot": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/jailbreak_detection/runs/autointent_classic-light_autoembedder_full_seed456",
+      "eval_counts": {
+        "tp": 1575,
+        "fp": 80,
+        "fn": 425,
+        "tn": 130,
+        "fnr_jailbreak": 0.2125,
+        "fpr_safe": 0.38095238095238093,
+        "n_eval": 2210,
+        "n_safe_true": 210,
+        "n_jailbreak_true": 2000
+      },
+      "scoring_module_attrs": {
+        "cv": 3,
+        "seed": 0,
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "decision_module_attrs": {
+        "_n_classes": 2,
+        "_multilabel": false,
+        "_oos": false
+      },
+      "scores_eval_summary": {
+        "n_scored": 2210,
+        "n_score_dims": 2,
+        "margin_mean": 0.4231506834436917,
+        "margin_std": 0.6253572746822037,
+        "margin_min": -0.9960208516053979,
+        "margin_max": 0.9999978194671753,
+        "score_col0_mean": 0.2884246582781541,
+        "score_col1_mean": 0.7115753417218459,
+        "note": "col0≈safe intent col1≈jailbreak (binary setup)"
+      }
     }
   }
 ]
