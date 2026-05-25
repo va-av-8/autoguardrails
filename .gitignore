@@ -235,3 +235,6 @@ tasks/*/results/*.csv
 wandb/
 runs/
 AutogluonModels/
+
+# Diagnostics (generated analysis files)
+tasks/*/results/diagnostics/
