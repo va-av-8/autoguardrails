@@ -60,6 +60,8 @@ import argparse
 import json
 import logging
 import os
+import random
+import re
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -96,6 +98,7 @@ def _apply_thread_env_defaults() -> None:
 _apply_thread_env_defaults()
 
 import numpy as np
+import torch
 
 sys.path.insert(0, str(project_root))
 
@@ -392,6 +395,23 @@ def get_embedder_name(pilot: bool) -> str:
     return "intfloat/multilingual-e5-large-instruct"
 
 
+def make_query_prompt_suffix(query_prompt: str | None, max_len: int = 32) -> str:
+    """
+    Build a filename suffix from query_prompt.
+
+    Returns "" if query_prompt is None/empty (backward compatibility).
+    Otherwise returns "_qp_<slug>" where slug is lowercase alphanumeric.
+    """
+    if not query_prompt:
+        return ""
+    slug = query_prompt.lower()
+    slug = re.sub(r"[^a-z0-9]+", "_", slug)
+    slug = slug.strip("_")
+    if len(slug) > max_len:
+        slug = slug[:max_len].rstrip("_")
+    return f"_qp_{slug}" if slug else ""
+
+
 def get_model_dir(
     preset: str,
     pilot: bool,
@@ -524,9 +544,10 @@ def run_metrics_filename(result: dict) -> str:
     mn = result["model_name"].replace("/", "_").replace(" ", "_")
     mode = result["mode"]
     seed = result["seed"]
+    qp_suffix = make_query_prompt_suffix(result.get("query_prompt"))
     if mode == "full":
-        return f"metrics_{mn}_full_seed{seed}.json"
-    return f"metrics_{mn}_{mode}_seed{seed}.json"
+        return f"metrics_{mn}_full_seed{seed}{qp_suffix}.json"
+    return f"metrics_{mn}_{mode}_seed{seed}{qp_suffix}.json"
 
 
 def save_run_metrics_file(result: dict, runs_dir: Path) -> Path:
@@ -610,9 +631,12 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
     # Create pipeline with selected preset
     preset = args.preset
     print(f"Using preset: {preset}")
-    pipeline = Pipeline.from_preset(preset)
+    pipeline = Pipeline.from_preset(preset, seed=args.seed)
     if not no_fix_embedder:
-        pipeline.set_config(EmbedderConfig(model_name=embedder_name))
+        embedder_kwargs: dict[str, Any] = {"model_name": embedder_name}
+        if getattr(args, "query_prompt", None) is not None:
+            embedder_kwargs["query_prompt"] = args.query_prompt
+        pipeline.set_config(EmbedderConfig(**embedder_kwargs))
 
     # Cross-validation only for few-shot (full train uses default scheme)
     if mode == "fewshot":
@@ -664,6 +688,7 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
         "mode": meta_mode,
         "n_shots": meta_n_shots,
         "seed": args.seed,
+        "query_prompt": getattr(args, "query_prompt", None),
         "embedder": embedder_name,
         "embedder_fixed": not no_fix_embedder,
         "pilot": args.pilot,
@@ -822,7 +847,8 @@ def evaluate(
 
     # Save full eval scores to JSONL for error analysis
     if scores_array is not None:
-        eval_scores_filename = f"eval_scores_{metadata['model_name']}_{metadata['mode']}_seed{metadata['seed']}.jsonl"
+        qp_suffix = make_query_prompt_suffix(getattr(args, "query_prompt", None))
+        eval_scores_filename = f"eval_scores_{metadata['model_name']}_{metadata['mode']}_seed{metadata['seed']}{qp_suffix}.jsonl"
         eval_scores_path = (runs_dir if runs_dir is not None else get_runs_dir()) / eval_scores_filename
         save_eval_scores(eval_scores_path, metadata, test_texts, y_true, y_pred, scores_array)
         print(f"Saved eval scores to: {eval_scores_path}")
@@ -842,6 +868,7 @@ def evaluate(
         "mode": metadata["mode"],
         "n_shots": metadata["n_shots"],
         "seed": metadata["seed"],
+        "query_prompt": getattr(args, "query_prompt", None),
         "f1": metrics["f1"],
         "precision": metrics["precision"],
         "recall": metrics["recall"],
@@ -991,6 +1018,15 @@ def main():
             "для отчёта по гипотезам (Kaggle output)"
         ),
     )
+    parser.add_argument(
+        "--query-prompt",
+        type=str,
+        default=None,
+        help=(
+            "Instruction prefix for query embeddings (E5-instruct). "
+            "Applies only with fixed embedder."
+        ),
+    )
     args = parser.parse_args()
 
     seeds = list(DEFAULT_SEEDS) if args.all_seeds else [args.seed]
@@ -1000,6 +1036,12 @@ def main():
 
     for run_idx, seed in enumerate(seeds, start=1):
         args.seed = seed
+        # Fix global random generators for reproducibility
+        random.seed(args.seed)
+        np.random.seed(args.seed)
+        torch.manual_seed(args.seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(args.seed)
         model_dir = get_model_dir(
             args.preset,
             args.pilot,
