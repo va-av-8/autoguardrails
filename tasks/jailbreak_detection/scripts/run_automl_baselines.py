@@ -419,6 +419,7 @@ def train_autogluon(
     model_dir: Path,
     *,
     mode: str,
+    seed: int,
     time_limit_sec: int,
     ngpu: int,
 ) -> tuple[Any, float]:
@@ -433,6 +434,7 @@ def train_autogluon(
         eval_metric="f1",
         path=str(model_dir),
         verbosity=0,
+        learner_kwargs={"random_state": seed},
     )
     ag_fit: dict[str, Any] = {"num_cpus": max(1, (os.cpu_count() or 4) - 2)}
     if ngpu > 0:
@@ -639,6 +641,7 @@ def run_one(
                     train_df,
                     mdir,
                     mode=mode,
+                    seed=seed,
                     time_limit_sec=time_limit_sec,
                     ngpu=ngpu,
                 )
