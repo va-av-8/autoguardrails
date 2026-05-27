@@ -92,6 +92,17 @@ def parse_args() -> argparse.Namespace:
         help="Path to metrics.json output file.",
     )
     parser.add_argument(
+        "--prediction-mode",
+        choices=["threshold", "argmax"],
+        default="threshold",
+        help="threshold: OOS via calibrated score; argmax: OOS as 151st class (default AutoML).",
+    )
+    parser.add_argument(
+        "--no-calibrate-threshold",
+        action="store_true",
+        help="Skip validation threshold calibration (forced for --prediction-mode argmax).",
+    )
+    parser.add_argument(
         "--continue-on-error",
         action="store_true",
         help="Continue grid run if one experiment fails.",
@@ -117,6 +128,8 @@ def main() -> None:
 
     _prepare_data_if_needed(args.sources, args.prepare_if_missing)
 
+    calibrate = not args.no_calibrate_threshold and args.prediction_mode != "argmax"
+
     results, errors = run_framework_grid(
         frameworks=args.frameworks,
         sources=args.sources,
@@ -126,6 +139,8 @@ def main() -> None:
         seeds=args.seeds,
         results_file=args.results_file,
         continue_on_error=args.continue_on_error,
+        calibrate_threshold=calibrate,
+        prediction_mode=args.prediction_mode,
     )
 
     LOGGER.info("Completed experiments: %d", len(results))

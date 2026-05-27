@@ -32,8 +32,14 @@ class LAMAWrapper(BaseFrameworkWrapper):
         timeout: int = 600,
         cpu_limit: int = 1,
         seed: int = 42,
+        prediction_mode: str = "threshold",
     ):
-        super().__init__(model_name="lama_threshold", default_threshold=default_threshold)
+        suffix = "_argmax" if prediction_mode == "argmax" else "_threshold"
+        super().__init__(
+            model_name=f"lama{suffix}",
+            default_threshold=default_threshold,
+            prediction_mode=prediction_mode,
+        )
         self.embedder_name = embedder_name
         self.timeout = timeout
         self.cpu_limit = cpu_limit
@@ -68,10 +74,7 @@ class LAMAWrapper(BaseFrameworkWrapper):
                 "LightAutoML is not installed. Install lightautoml to run lama wrapper."
             ) from exc
 
-        x_texts = [t for t, y in zip(train_texts, train_labels) if y != self.oos_label]
-        y_labels = [y for y in train_labels if y != self.oos_label]
-        if not x_texts:
-            raise ValueError("No in-domain samples after filtering OOS labels.")
+        x_texts, y_labels = self._train_texts_labels(train_texts, train_labels)
 
         embeddings = self._embed(x_texts)
         self._feature_names = [f"f_{idx}" for idx in range(embeddings.shape[1])]
@@ -110,9 +113,14 @@ class LAMAWrapper(BaseFrameworkWrapper):
 
     def predict_proba(self, texts: list[str]) -> np.ndarray:
         proba = self._predict_proba_matrix(texts)
+        if self.prediction_mode == "argmax" and self.oos_label in self._class_labels:
+            oos_idx = self._class_labels.index(self.oos_label)
+            return proba[:, oos_idx]
         return 1.0 - proba.max(axis=1)
 
     def predict(self, texts: list[str]) -> np.ndarray:
+        if self.prediction_mode == "argmax":
+            return self._predict_in_domain(texts)
         oos_scores = self.predict_proba(texts)
         in_domain_preds = self._predict_in_domain(texts)
         threshold = self._effective_threshold()

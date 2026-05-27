@@ -212,7 +212,17 @@ done
 ### Framework Benchmarks (CLI, без ноутбука)
 
 ```bash
-# Все framework-обёртки: autogluon + h2o + lama
+# Default AutoML: OOS как 151-й класс (argmax), без threshold calibration
+uv run python tasks/oos_detection/scripts/run_framework_benchmarks.py \
+  --frameworks autogluon h2o lama \
+  --sources deeppavlov \
+  --n-shots 10 20 50 \
+  --seeds 42 123 456 \
+  --run-full \
+  --run-fewshot \
+  --prediction-mode argmax
+
+# Threshold mode (in-scope only train + calibrated OOS score)
 uv run python tasks/oos_detection/scripts/run_framework_benchmarks.py \
   --frameworks autogluon h2o lama \
   --sources standard deeppavlov \
@@ -226,6 +236,8 @@ uv run python tasks/oos_detection/scripts/summarize_results.py
 ```
 
 Результаты сохраняются в `tasks/oos_detection/results/metrics.json` через существующий `Evaluator.save(...)`.
+
+**Kaggle (догоняющий AutoML argmax):** `notebooks/kaggle_oos_automl_frameworks.ipynb` — код репозитория вшит в ноутбук (без git), `HF_TOKEN` в ячейке 2, очередь прогонов строится из `metrics.json` (`python scripts/build_kaggle_automl_notebook.py`). Логи: только `RUN_START` / `RUN_FINISH`. После прогона: `python scripts/append_kaggle_automl_argmax_metrics.py` (или вручную из output).
 
 ### Параметры
 

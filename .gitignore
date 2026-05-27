@@ -234,3 +234,7 @@ results/*.pt
 wandb/
 runs/
 AutogluonModels/
+
+# Local clones / one-off exports (do not commit)
+/autoguardrails/
+metrics_clean_*.json

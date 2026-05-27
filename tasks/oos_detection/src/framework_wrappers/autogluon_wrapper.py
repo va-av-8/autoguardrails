@@ -27,8 +27,14 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
         time_limit: int | None = 600,
         num_cpus: int = 1,
         seed: int = 42,
+        prediction_mode: str = "threshold",
     ):
-        super().__init__(model_name="autogluon_threshold", default_threshold=default_threshold)
+        suffix = "_argmax" if prediction_mode == "argmax" else "_threshold"
+        super().__init__(
+            model_name=f"autogluon{suffix}",
+            default_threshold=default_threshold,
+            prediction_mode=prediction_mode,
+        )
         self.embedder_name = embedder_name
         self.time_limit = time_limit
         self.num_cpus = num_cpus
@@ -62,10 +68,7 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
                 "AutoGluon is not installed. Install autogluon.tabular to run this wrapper."
             ) from exc
 
-        x_texts = [t for t, y in zip(train_texts, train_labels) if y != self.oos_label]
-        y_labels = [y for y in train_labels if y != self.oos_label]
-        if not x_texts:
-            raise ValueError("No in-domain samples after filtering OOS labels.")
+        x_texts, y_labels = self._train_texts_labels(train_texts, train_labels)
 
         embeddings = self._embed(x_texts)
         self._feature_names = [f"f_{idx}" for idx in range(embeddings.shape[1])]
@@ -113,9 +116,16 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
         test_df = pd.DataFrame(embeddings, columns=self._feature_names)
         proba_df = self._predictor.predict_proba(test_df)
         proba = proba_df.to_numpy()
+        if self.prediction_mode == "argmax" and self._classes is not None:
+            classes = list(self._classes)
+            if self.oos_label in classes:
+                oos_idx = classes.index(self.oos_label)
+                return proba[:, oos_idx]
         return 1.0 - proba.max(axis=1)
 
     def predict(self, texts: list[str]) -> np.ndarray:
+        if self.prediction_mode == "argmax":
+            return self._predict_in_domain(texts)
         oos_scores = self.predict_proba(texts)
         in_domain_preds = self._predict_in_domain(texts)
         threshold = self._effective_threshold()
