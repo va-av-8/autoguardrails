@@ -5,8 +5,11 @@
     # Pilot (маленький embedder, быстрая валидация)
     python scripts/run_autointent.py --mode fewshot --n_shots 10 --seed 42 --pilot
 
-    # Final (оригинальный embedder e5)
+    # Final (оригинальный embedder e5, preset classic-light по умолчанию)
     python scripts/run_autointent.py --mode fewshot --n_shots 10 --seed 42
+
+    # Другой preset (classic-medium, nn-medium, zero-shot-encoders и др.)
+    python scripts/run_autointent.py --preset classic-medium --mode fewshot --n_shots 10 --seed 42
 
     # AutoML без фиксации embedder (медленнее, потенциально лучше)
     python scripts/run_autointent.py --mode fewshot --n_shots 10 --seed 42 --no-fix-embedder
@@ -33,8 +36,9 @@
       `runs/autointent_classic-medium_{N}shot_seed{S}/`,
       `runs/autointent_transformers-light_autoembedder_full_seed{S}/`
     - Метрики: results/metrics.json (числовые поля + extra: embedder, eval_counts TP/FP/FN/TN,
-      scores_eval_summary, decision_module_attrs, model_dir и т.д.)
+      scoring_module_attrs, decision_module_attrs, scores_eval_summary, model_dir и т.д.)
     - На каждый прогон оценки: runs/metrics_<model_name>_<mode>_seed<S>.json — тот же JSON-объект, что одна строка в metrics.json
+    - Полные скоры eval: runs/eval_scores_<model_name>_<mode>_seed<S>.jsonl — для анализа ошибок
     - Дублирование метрик в stdout: --print-metrics-json (Kaggle/логи, если файлы не сохранились)
     - На Kaggle после каждого append в metrics.json делается копия в
       /kaggle/working/metrics_jailbreak_latest.json (удобно до zip / конца сессии).
@@ -65,6 +69,8 @@ import logging
 import os
 import platform
 import shutil
+import random
+import re
 import sys
 import time
 from collections.abc import Callable
@@ -112,6 +118,7 @@ _apply_thread_env_defaults()
 _apply_kaggle_quiet_env()
 
 import numpy as np
+import torch
 
 sys.path.insert(0, str(project_root))
 
@@ -607,6 +614,16 @@ def pipeline_artifact_manifest(model_dir: Path) -> dict[str, Any]:
         json_files.append(info)
     manifest["json_files"] = json_files
     return manifest
+def scoring_module_attrs_from_dump(model_dir: Path) -> dict[str, Any] | None:
+    """Атрибуты scoring-модуля из dump (k, weights и др.) для логов metrics.json."""
+    p = model_dir / "scoring_module" / "simple_attrs.json"
+    if not p.is_file():
+        return None
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    return data if isinstance(data, dict) else None
 
 
 def confusion_and_rates_jailbreak_positive(
@@ -641,33 +658,36 @@ def confusion_and_rates_jailbreak_positive(
 def scoring_eval_summary_from_pipeline(
     pipeline: Pipeline,
     texts: list[str],
-) -> dict[str, Any] | None:
+) -> tuple[dict[str, Any] | None, np.ndarray | None]:
     """
     Краткая статистика по скорам scoring (margin между классами 0 и 1).
     Предполагается порядок классов как в train: 0=safe, 1=jailbreak.
+
+    Returns:
+        (summary_dict, scores_array) — summary для metrics.json и полный массив скоров.
     """
     try:
         inf_out = pipeline.predict_with_metadata(texts)
         utterances = getattr(inf_out, "utterances", None)
         if not isinstance(utterances, list) or not utterances:
-            return None
+            return None, None
         rows = []
         for u in utterances:
             sc = getattr(u, "score", None)
             if sc is None:
-                return None
+                return None, None
             rows.append(np.asarray(sc, dtype=np.float64).ravel())
         scores = np.stack(rows, axis=0)
     except Exception as exc:
         logger.debug("scoring_eval_summary_from_pipeline: %s", exc)
-        return None
+        return None, None
     if scores.ndim != 2 or scores.shape[1] < 2:
         return {
             "note": "unexpected_score_shape",
             "shape": list(scores.shape),
-        }
+        }, None
     margin = scores[:, 1] - scores[:, 0]
-    return {
+    summary = {
         "n_scored": int(scores.shape[0]),
         "n_score_dims": int(scores.shape[1]),
         "margin_mean": float(np.mean(margin)),
@@ -678,14 +698,45 @@ def scoring_eval_summary_from_pipeline(
         "score_col1_mean": float(np.mean(scores[:, 1])),
         "note": "col0≈safe intent col1≈jailbreak (binary scoring)",
     }
+    return summary, scores
 
 
-def get_model_name(
-    pilot: bool,
-    no_fix_embedder: bool,
-    *,
-    preset: str = "classic-light",
-) -> str:
+def save_eval_scores(
+    output_path: Path,
+    metadata: dict[str, Any],
+    texts: list[str],
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    scores: np.ndarray,
+) -> None:
+    """
+    Сохраняет полные скоры eval прогона в JSONL для анализа ошибок.
+
+    Формат каждой строки:
+    {"model_name", "preset", "mode", "n_shots", "seed", "idx", "text", "y_true", "y_pred", "score_safe", "score_jb"}
+    """
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        for idx, (text, yt, yp) in enumerate(zip(texts, y_true, y_pred)):
+            row = {
+                "model_name": metadata.get("model_name", ""),
+                "preset": metadata.get("preset", ""),
+                "mode": metadata.get("mode", ""),
+                "n_shots": metadata.get("n_shots"),
+                "seed": metadata.get("seed"),
+                "idx": idx,
+                "text": text,
+                "y_true": int(yt),
+                "y_pred": int(yp),
+                "score_safe": float(scores[idx, 0]),
+                "score_jb": float(scores[idx, 1]),
+            }
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    logger.info("Saved eval scores to %s (%d rows)", output_path, len(texts))
+
+
+def get_model_name(preset: str, pilot: bool, no_fix_embedder: bool) -> str:
+    """Формирует имя модели на основе пресета и флагов."""
     base = f"autointent_{preset}"
     if no_fix_embedder:
         return f"{base}_autoembedder"
@@ -700,20 +751,38 @@ def get_embedder_name(pilot: bool) -> str:
     return "intfloat/multilingual-e5-large-instruct"
 
 
+def make_query_prompt_suffix(query_prompt: str | None, max_len: int = 32) -> str:
+    """
+    Build a filename suffix from query_prompt.
+
+    Returns "" if query_prompt is None/empty (backward compatibility).
+    Otherwise returns "_qp_<slug>" where slug is lowercase alphanumeric.
+    """
+    if not query_prompt:
+        return ""
+    slug = query_prompt.lower()
+    slug = re.sub(r"[^a-z0-9]+", "_", slug)
+    slug = slug.strip("_")
+    if len(slug) > max_len:
+        slug = slug[:max_len].rstrip("_")
+    return f"_qp_{slug}" if slug else ""
+
+
 def get_model_dir(
+    preset: str,
     pilot: bool,
     no_fix_embedder: bool,
     mode: str,
     n_shots: int | None,
     seed: int,
-    *,
-    preset: str = "classic-light",
+    query_prompt: str | None = None,
 ) -> Path:
-    model_name = get_model_name(pilot, no_fix_embedder, preset=preset)
+    model_name = get_model_name(preset, pilot, no_fix_embedder)
+    qp_suffix = make_query_prompt_suffix(query_prompt)
     if mode == "full":
-        return get_runs_dir() / f"{model_name}_full_seed{seed}"
+        return get_runs_dir() / f"{model_name}_full_seed{seed}{qp_suffix}"
     assert n_shots is not None
-    return get_runs_dir() / f"{model_name}_{n_shots}shot_seed{seed}"
+    return get_runs_dir() / f"{model_name}_{n_shots}shot_seed{seed}{qp_suffix}"
 
 
 def load_fewshot_train(n_shots: int, seed: int, data_dir: Path) -> dict:
@@ -809,14 +878,15 @@ def save_metrics(result: dict, results_dir: Path) -> None:
     else:
         all_results = []
 
-    # Remove existing entry with same model_name, mode, n_shots, seed
+    # Remove existing entry with same model_name, mode, n_shots, seed, query_prompt
     all_results = [
         r for r in all_results
         if not (
             r.get("model_name") == result["model_name"] and
             r.get("mode") == result["mode"] and
             r.get("n_shots") == result.get("n_shots") and
-            r.get("seed") == result.get("seed")
+            r.get("seed") == result.get("seed") and
+            r.get("query_prompt") == result.get("query_prompt")
         )
     ]
 
@@ -834,9 +904,10 @@ def run_metrics_filename(result: dict) -> str:
     mn = result["model_name"].replace("/", "_").replace(" ", "_")
     mode = result["mode"]
     seed = result["seed"]
+    qp_suffix = make_query_prompt_suffix(result.get("query_prompt"))
     if mode == "full":
-        return f"metrics_{mn}_full_seed{seed}.json"
-    return f"metrics_{mn}_{mode}_seed{seed}.json"
+        return f"metrics_{mn}_full_seed{seed}{qp_suffix}.json"
+    return f"metrics_{mn}_{mode}_seed{seed}{qp_suffix}.json"
 
 
 def save_run_metrics_file(result: dict, runs_dir: Path) -> Path:
@@ -931,10 +1002,15 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
         "intents": intents,
     })
 
-    # Create pipeline from search-space preset (classic-light, classic-medium, nn-*, …)
-    pipeline = Pipeline.from_preset(autointent_preset)  # type: ignore[arg-type]
+    # Create pipeline with selected preset
+    preset = args.preset
+    print(f"Using preset: {preset}")
+    pipeline = Pipeline.from_preset(preset, seed=args.seed)
     if not no_fix_embedder:
-        pipeline.set_config(EmbedderConfig(model_name=embedder_name))
+        embedder_kwargs: dict[str, Any] = {"model_name": embedder_name}
+        if getattr(args, "query_prompt", None) is not None:
+            embedder_kwargs["query_prompt"] = args.query_prompt
+        pipeline.set_config(EmbedderConfig(**embedder_kwargs))
 
     # Cross-validation only for few-shot (full train uses default scheme)
     if mode == "fewshot":
@@ -982,15 +1058,15 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
         meta_n_shots = args.n_shots
 
     metadata = {
-        "model_name": get_model_name(args.pilot, no_fix_embedder, preset=cli_preset),
+        "model_name": get_model_name(args.preset, args.pilot, no_fix_embedder),
         "mode": meta_mode,
         "n_shots": meta_n_shots,
         "seed": args.seed,
+        "query_prompt": getattr(args, "query_prompt", None),
         "embedder": embedder_name,
         "embedder_fixed": not no_fix_embedder,
         "pilot": args.pilot,
-        "preset": cli_preset,
-        "autointent_preset": autointent_preset,
+        "preset": args.preset,
         "task": "jailbreak_detection",
         "approach": "binary_classification",  # Not OOS detection
     }
@@ -1068,6 +1144,9 @@ def evaluate(
     mode = getattr(args, "mode", "fewshot")
     if metadata_path.exists():
         metadata = json.loads(metadata_path.read_text())
+        # Ensure preset is set (for backward compatibility with old train_metadata.json)
+        if "preset" not in metadata:
+            metadata["preset"] = args.preset
     else:
         if mode == "full":
             meta_mode = "full"
@@ -1076,7 +1155,7 @@ def evaluate(
             meta_mode = f"{args.n_shots}shot"
             meta_n_shots = args.n_shots
         metadata = {
-            "model_name": get_model_name(args.pilot, no_fix_embedder, preset=cli_preset),
+            "model_name": get_model_name(args.preset, args.pilot, no_fix_embedder),
             "mode": meta_mode,
             "n_shots": meta_n_shots,
             "seed": args.seed,
@@ -1087,8 +1166,7 @@ def evaluate(
             ),
             "embedder_fixed": not no_fix_embedder,
             "pilot": args.pilot,
-            "preset": cli_preset,
-            "autointent_preset": autointent_preset,
+            "preset": args.preset,
         }
 
     hf_emb = metadata.get("embedder_hf_model") or embedder_hf_model_from_dump(model_dir)
@@ -1165,15 +1243,29 @@ def evaluate(
     print(f"  undecided/None treated as jailbreak: {raw_pred_none}")
     print()
 
-    # Compute metrics
-    print("Computing metrics...")
-    metrics = evaluate_jailbreak(y_true, y_pred, data_types, oos_label=1)
+    # Compute metrics                                                                                                                                                                 
+    print("Computing metrics...")                                                                                                                                                     
+    metrics = evaluate_jailbreak(y_true, y_pred, data_types, oos_label=1)                                                                                                             
 
-    eval_counts = confusion_and_rates_jailbreak_positive(y_true, y_pred, positive_label=1)
-    prediction_by_type = prediction_distribution_by_type(y_true, y_pred, data_types)
-    decision_attrs_json = _json_size_limited(decision_module_attrs_from_dump(model_dir))
-    scores_eval_summary = scoring_eval_summary_from_pipeline(pipeline, test_texts)
-    eval_elapsed_sec = time.perf_counter() - eval_started_at
+    eval_counts = confusion_and_rates_jailbreak_positive(y_true, y_pred, positive_label=1)                                                                                            
+    prediction_by_type = prediction_distribution_by_type(y_true, y_pred, data_types)                                                                                                  
+    decision_attrs_json = _json_size_limited(decision_module_attrs_from_dump(model_dir))                                                                                              
+
+    # Scoring module attrs                                                                                                                                                            
+    scoring_attrs_raw = scoring_module_attrs_from_dump(model_dir)                                                                                                                     
+    scoring_attrs_json: dict[str, Any] | None = scoring_attrs_raw                                                                                                                     
+
+    # Get scores summary and full scores array                                                                                                                                        
+    scores_eval_summary, scores_array = scoring_eval_summary_from_pipeline(pipeline, test_texts)                                                                                      
+    eval_elapsed_sec = time.perf_counter() - eval_started_at                                                                                                                          
+
+    # Save full eval scores to JSONL for error analysis                                                                                                                               
+    if scores_array is not None:                                                                                                                                                      
+        qp_suffix = make_query_prompt_suffix(getattr(args, "query_prompt", None))                                                                                                     
+        eval_scores_filename = f"eval_scores_{metadata['model_name']}_{metadata['mode']}_seed{metadata['seed']}{qp_suffix}.jsonl"                                                     
+        eval_scores_path = (runs_dir if runs_dir is not None else get_runs_dir()) / eval_scores_filename                                                                              
+        save_eval_scores(eval_scores_path, metadata, test_texts, y_true, y_pred, scores_array)                                                                                        
+        print(f"Saved eval scores to: {eval_scores_path}")                                                    
 
     # Print results
     print()
@@ -1190,6 +1282,7 @@ def evaluate(
         "mode": metadata["mode"],
         "n_shots": metadata["n_shots"],
         "seed": metadata["seed"],
+        "query_prompt": getattr(args, "query_prompt", None),
         "f1": metrics["f1"],
         "precision": metrics["precision"],
         "recall": metrics["recall"],
@@ -1243,6 +1336,7 @@ def evaluate(
                 "by_data_type": prediction_by_type,
             },
             "eval_counts": eval_counts,
+            "scoring_module_attrs": scoring_attrs_json,
             "decision_module_attrs": decision_attrs_json,
             "scores_eval_summary": scores_eval_summary,
             "artifact_manifest": pipeline_artifact_manifest(model_dir),
@@ -1341,6 +1435,15 @@ def main():
         help="Random seed",
     )
     parser.add_argument(
+        "--preset",
+        type=str,
+        default="classic-light",
+        help=(
+            "AutoIntent preset (default: classic-light). "
+            "Options: classic-light, classic-medium, nn-medium, zero-shot-encoders, etc."
+        ),
+    )
+    parser.add_argument(
         "--pilot",
         action="store_true",
         help="Use small embedder for fast validation",
@@ -1386,6 +1489,15 @@ def main():
             "для отчёта по гипотезам (Kaggle output)"
         ),
     )
+    parser.add_argument(
+        "--query-prompt",
+        type=str,
+        default=None,
+        help=(
+            "Instruction prefix for query embeddings (E5-instruct). "
+            "Applies only with fixed embedder."
+        ),
+    )
     args = parser.parse_args()
 
     seeds = list(DEFAULT_SEEDS) if args.all_seeds else [args.seed]
@@ -1395,13 +1507,20 @@ def main():
 
     for run_idx, seed in enumerate(seeds, start=1):
         args.seed = seed
+        # Fix global random generators for reproducibility
+        random.seed(args.seed)
+        np.random.seed(args.seed)
+        torch.manual_seed(args.seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(args.seed)
         model_dir = get_model_dir(
+            args.preset,
             args.pilot,
             args.no_fix_embedder,
             args.mode,
             args.n_shots if args.mode == "fewshot" else None,
             args.seed,
-            preset=args.preset,
+            args.query_prompt,
         )
 
         if len(seeds) > 1:

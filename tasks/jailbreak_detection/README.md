@@ -127,6 +127,8 @@ python scripts/prepare_data.py --full_subset
 |---|----------|--------|
 | HYP-JB-001 | Обобщение OOS-пайплайна на adversarial данные | запланирована |
 | HYP-JB-002 | Vanilla vs adversarial generalization gap | запланирована (ограничение: eval содержит только adversarial) |
+| HYP-JB-003 | AutoIntent как бинарный классификатор на adversarial данных | выполнена |
+| HYP-JB-004 | Asymmetric cost function для снижения Over-refusal Rate | выполнена (опровергнута) |
 
 ## Ноутбуки
 
@@ -135,6 +137,7 @@ python scripts/prepare_data.py --full_subset
 | `01_eda.ipynb` | EDA датасета WildJailbreak |
 | `02_sota_eval.ipynb` | Запуск SOTA-моделей (Colab/Kaggle) |
 | `03_autointent_fewshot.ipynb` | AutoIntent few-shot (10/20/50-shot, 3 seeds) |
+| `04_jailbreak_assymetric_cost_hypothesis.ipynb` | Проверка HYP-JB-004: asymmetric cost на дискретных точках |
 
 ## Ограничения
 
@@ -156,6 +159,12 @@ python scripts/prepare_data.py --full_subset
 
 **Модель:** AutoIntent classic-light
 **Embedder:** intfloat/multilingual-e5-large-instruct
+**Выбор эмбеддера:** AutoIntent прогонялся в двух режимах — с
+фиксированным эмбеддером и без (AutoML сам выбирает из пула моделей,
+`--no-fix-embedder`). Во всех 12 прогонах без фиксации (10/20/50-shot
+и full × 3 сида) AutoML выбрал ту же `multilingual-e5-large-instruct`,
+поэтому отдельные full-прогоны с фиксацией не проводились —
+они эквивалентны прогонам без фиксации.
 
 | n_shots | F1 | Recall | CV(F1) |
 |---------|----|--------|--------|
@@ -165,3 +174,16 @@ python scripts/prepare_data.py --full_subset
 
 Вердикт: **UNSTABLE** (overall CV = 10.3%). Оптимальная точка —
 20-shot. Высокий Over-refusal Rate (до 74%) — открытая проблема.
+
+### Артефакты: локальные модели vs metrics.json
+
+**Важно:** `results/metrics.json` содержит результаты Kaggle-прогонов
+с `--no-fix-embedder` (autoembedder), а не локальных прогонов из ноутбука 03.
+
+| Источник | model_name | embedder_fixed | Где хранится |
+|----------|------------|----------------|--------------|
+| Ноутбук 03 (локально) | `autointent_classic-light` | Yes | `runs/autointent_classic-light_*` |
+| Kaggle (metrics.json) | `autointent_classic-light_autoembedder` | No | только metrics.json |
+
+Числа совпадают, потому что AutoML выбрал тот же эмбеддер (`e5-large-instruct`).
+Локальные модели few-shot (9 штук) сохранены в `runs/`, Kaggle-модели (autoembedder, full) — нет.
