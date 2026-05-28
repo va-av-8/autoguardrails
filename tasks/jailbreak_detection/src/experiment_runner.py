@@ -303,12 +303,13 @@ def run_grid(
     jobs: list[dict] = []
     for framework in frameworks:
         if run_full:
-            jobs.append({
-                "framework": framework,
-                "mode": "full",
-                "n_shots": None,
-                "seed": 42,  # Seed for full mode (used in wrapper)
-            })
+            for seed in seeds:
+                jobs.append({
+                    "framework": framework,
+                    "mode": "full",
+                    "n_shots": None,
+                    "seed": seed,
+                })
         if run_fewshot:
             for n_shots in n_shots_list:
                 for seed in seeds:

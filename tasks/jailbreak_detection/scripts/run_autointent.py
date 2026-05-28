@@ -419,12 +419,14 @@ def get_model_dir(
     mode: str,
     n_shots: int | None,
     seed: int,
+    query_prompt: str | None = None,
 ) -> Path:
     model_name = get_model_name(preset, pilot, no_fix_embedder)
+    qp_suffix = make_query_prompt_suffix(query_prompt)
     if mode == "full":
-        return get_runs_dir() / f"{model_name}_full_seed{seed}"
+        return get_runs_dir() / f"{model_name}_full_seed{seed}{qp_suffix}"
     assert n_shots is not None
-    return get_runs_dir() / f"{model_name}_{n_shots}shot_seed{seed}"
+    return get_runs_dir() / f"{model_name}_{n_shots}shot_seed{seed}{qp_suffix}"
 
 
 def load_fewshot_train(n_shots: int, seed: int, data_dir: Path) -> dict:
@@ -520,14 +522,15 @@ def save_metrics(result: dict, results_dir: Path) -> None:
     else:
         all_results = []
 
-    # Remove existing entry with same model_name, mode, n_shots, seed
+    # Remove existing entry with same model_name, mode, n_shots, seed, query_prompt
     all_results = [
         r for r in all_results
         if not (
             r.get("model_name") == result["model_name"] and
             r.get("mode") == result["mode"] and
             r.get("n_shots") == result.get("n_shots") and
-            r.get("seed") == result.get("seed")
+            r.get("seed") == result.get("seed") and
+            r.get("query_prompt") == result.get("query_prompt")
         )
     ]
 
@@ -1049,6 +1052,7 @@ def main():
             args.mode,
             args.n_shots if args.mode == "fewshot" else None,
             args.seed,
+            args.query_prompt,
         )
 
         if len(seeds) > 1:
