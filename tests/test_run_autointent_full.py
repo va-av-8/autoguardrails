@@ -26,12 +26,12 @@ class TestFullDataPaths:
         assert ra.DEFAULT_SEEDS == (42, 123, 456)
 
     def test_get_model_name_classic_medium(self, ra):
-        assert ra.get_model_name(False, False, preset="classic-medium") == "autointent_classic-medium"
-        assert ra.get_model_name(False, True, preset="nn-medium") == "autointent_nn-medium_autoembedder"
+        assert ra.get_model_name("classic-medium", False, False) == "autointent_classic-medium"
+        assert ra.get_model_name("nn-medium", False, True) == "autointent_nn-medium_autoembedder"
 
     def test_model_dir_full(self, ra, tmp_path, monkeypatch):
         monkeypatch.setattr(ra, "get_runs_dir", lambda: tmp_path)
-        p = ra.get_model_dir(False, False, "full", None, 123)
+        p = ra.get_model_dir("classic-light", False, False, "full", None, 123)
         assert p.name == "autointent_classic-light_full_seed123"
 
 
@@ -108,6 +108,7 @@ class TestEvaluateFullMetricsExtra:
         runs_dir = tmp_path / "runs"
         runs_dir.mkdir()
         args = argparse.Namespace(
+            preset="classic-light",
             mode="full",
             pilot=False,
             no_fix_embedder=False,

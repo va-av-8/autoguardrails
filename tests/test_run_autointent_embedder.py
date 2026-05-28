@@ -25,14 +25,14 @@ def ra():
 
 class TestGetModelName:
     def test_final_fixed_embedder(self, ra):
-        assert ra.get_model_name(False, False) == "autointent_classic-light"
+        assert ra.get_model_name("classic-light", False, False) == "autointent_classic-light"
 
     def test_pilot_fixed_embedder(self, ra):
-        assert ra.get_model_name(True, False) == "autointent_classic-light_pilot"
+        assert ra.get_model_name("classic-light", True, False) == "autointent_classic-light_pilot"
 
     def test_autoembedder_overrides_pilot(self, ra):
-        assert ra.get_model_name(False, True) == "autointent_classic-light_autoembedder"
-        assert ra.get_model_name(True, True) == "autointent_classic-light_autoembedder"
+        assert ra.get_model_name("classic-light", False, True) == "autointent_classic-light_autoembedder"
+        assert ra.get_model_name("classic-light", True, True) == "autointent_classic-light_autoembedder"
 
 
 class TestGetEmbedderName:
@@ -48,8 +48,8 @@ class TestGetModelDir:
         self, ra, tmp_path, monkeypatch
     ):
         monkeypatch.setattr(ra, "get_runs_dir", lambda: tmp_path)
-        fixed = ra.get_model_dir(False, False, "fewshot", 10, 42)
-        auto = ra.get_model_dir(False, True, "fewshot", 10, 42)
+        fixed = ra.get_model_dir("classic-light", False, False, "fewshot", 10, 42)
+        auto = ra.get_model_dir("classic-light", False, True, "fewshot", 10, 42)
         assert fixed != auto
         assert "autoembedder" not in fixed.name
         assert auto.name == "autointent_classic-light_autoembedder_10shot_seed42"
@@ -133,10 +133,13 @@ class TestTrainEmbedderConfig:
         with patch.object(ra, "Pipeline") as mock_pipe:
             mock_pipe.from_preset.return_value = pipeline_inst
             args = argparse.Namespace(
+                preset="classic-light",
+                mode="fewshot",
                 n_shots=10,
                 seed=42,
                 pilot=False,
                 no_fix_embedder=True,
+                no_automl_progress=True,
             )
             out = tmp_path / "run"
             out.mkdir(parents=True)
@@ -169,10 +172,13 @@ class TestTrainEmbedderConfig:
         with patch.object(ra, "Pipeline") as mock_pipe:
             mock_pipe.from_preset.return_value = pipeline_inst
             args = argparse.Namespace(
+                preset="classic-light",
+                mode="fewshot",
                 n_shots=10,
                 seed=42,
                 pilot=False,
                 no_fix_embedder=False,
+                no_automl_progress=True,
             )
             out = tmp_path / "run"
             out.mkdir(parents=True)
@@ -218,10 +224,13 @@ def test_train_metadata_written_with_embedder_fixed_false(ra, tmp_path, monkeypa
     with patch.object(ra, "Pipeline") as mock_pipe:
         mock_pipe.from_preset.return_value = pipeline_inst
         args = argparse.Namespace(
+            preset="classic-light",
+            mode="fewshot",
             n_shots=10,
             seed=42,
             pilot=True,
             no_fix_embedder=True,
+            no_automl_progress=True,
         )
         out = tmp_path / "run"
         out.mkdir(parents=True)

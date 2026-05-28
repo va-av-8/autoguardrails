@@ -1005,7 +1005,7 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
     # Create pipeline with selected preset
     preset = args.preset
     print(f"Using preset: {preset}")
-    pipeline = Pipeline.from_preset(preset, seed=args.seed)
+    pipeline = Pipeline.from_preset(autointent_preset, seed=args.seed)
     if not no_fix_embedder:
         embedder_kwargs: dict[str, Any] = {"model_name": embedder_name}
         if getattr(args, "query_prompt", None) is not None:
@@ -1433,15 +1433,6 @@ def main():
         choices=[42, 123, 456],
         default=42,
         help="Random seed",
-    )
-    parser.add_argument(
-        "--preset",
-        type=str,
-        default="classic-light",
-        help=(
-            "AutoIntent preset (default: classic-light). "
-            "Options: classic-light, classic-medium, nn-medium, zero-shot-encoders, etc."
-        ),
     )
     parser.add_argument(
         "--pilot",

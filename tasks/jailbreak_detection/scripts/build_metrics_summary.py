@@ -7,7 +7,6 @@ Usage:
 
 Reads:
     - results/metrics.json — main metrics storage
-    - results/metrics_jailbreak_successful_14_05.json — additional metrics (different format)
     - runs/eval_scores_*.jsonl — per-example scores for ROC AUC computation
 
 Outputs:
@@ -153,46 +152,6 @@ def parse_entry_standard(entry: dict) -> dict:
     return row
 
 
-def parse_entry_flat(entry: dict) -> dict:
-    """Parse entry in flat format (metrics_jailbreak_successful_14_05.json)."""
-    row = {
-        "model_name": entry.get("model_name", ""),
-        "mode": entry.get("mode", ""),
-        "n_shots": entry.get("n_shots"),
-        "seed": entry.get("seed"),
-        "f1": entry.get("f1"),
-        "precision": entry.get("precision"),
-        "recall": entry.get("recall"),
-        "over_refusal_rate": entry.get("over_refusal_rate"),
-        "recall_adversarial_harmful": entry.get("recall_adversarial_harmful"),
-        "timestamp": entry.get("timestamp"),  # Usually None in this format
-        "preset": entry.get("preset"),
-        "embedder": entry.get("embedder"),
-        "embedder_hf_model": entry.get("embedder_hf_model"),
-        "embedder_fixed": entry.get("embedder_fixed"),
-        "pilot": entry.get("pilot"),
-        "tp": entry.get("tp"),
-        "fp": entry.get("fp"),
-        "fn": entry.get("fn"),
-        "tn": entry.get("tn"),
-        "_scores": None,  # Not available in flat format
-        "_scores_eval_summary": {},
-    }
-    return row
-
-
-def detect_format(data: list[dict]) -> str:
-    """Detect format of metrics JSON: 'standard' or 'flat'."""
-    if not data:
-        return "unknown"
-    first = data[0]
-    if "extra" in first:
-        return "standard"
-    if "tp" in first and "extra" not in first:
-        return "flat"
-    return "unknown"
-
-
 def build_summary(metrics_paths: list[Path], runs_dir: Path) -> pd.DataFrame:
     """Build summary DataFrame from metrics JSON files and eval_scores files."""
     # Load reference y_true for computing ROC AUC from extra.scores
@@ -209,15 +168,10 @@ def build_summary(metrics_paths: list[Path], runs_dir: Path) -> pd.DataFrame:
         with open(metrics_path, "r") as f:
             metrics_data = json.load(f)
 
-        fmt = detect_format(metrics_data)
-        print(f"Reading {metrics_path.name} ({len(metrics_data)} entries, format: {fmt})")
+        print(f"Reading {metrics_path.name} ({len(metrics_data)} entries)")
 
         for entry in metrics_data:
-            # Parse entry based on format
-            if fmt == "flat":
-                row = parse_entry_flat(entry)
-            else:
-                row = parse_entry_standard(entry)
+            row = parse_entry_standard(entry)
 
             model_name = row["model_name"]
             mode = row["mode"]
@@ -321,7 +275,7 @@ def main():
         type=Path,
         nargs="+",
         default=None,
-        help="Path(s) to metrics JSON files (default: results/metrics.json + results/metrics_jailbreak_successful_14_05.json)",
+        help="Path(s) to metrics JSON files (default: results/metrics.json)",
     )
     parser.add_argument(
         "--runs-dir",
@@ -348,7 +302,6 @@ def main():
     else:
         metrics_paths = [
             project_root / "results" / "metrics.json",
-            project_root / "results" / "metrics_jailbreak_successful_14_05.json",
         ]
 
     print(f"Reading eval_scores from: {runs_dir}")
