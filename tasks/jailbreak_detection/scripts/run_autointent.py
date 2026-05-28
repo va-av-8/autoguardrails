@@ -20,8 +20,8 @@
     # Full train (100K stratified wildjailbreak_full100k_seed{S}.json из prepare_data --full_subset)
     python scripts/run_autointent.py --mode full --seed 42
 
-    # Full на всех сидах (42, 123, 456) подряд
-    python scripts/run_autointent.py --mode full --all-seeds
+    # Другой search-space пресет (classic-medium, nn-medium, zero-shot-encoders, transformers-light, …)
+    python scripts/run_autointent.py --mode fewshot --n_shots 20 --seed 42 --preset classic-medium
 
 Данные:
     - Few-shot train: data/processed/train_shot{N}_seed{S}.json
@@ -32,14 +32,16 @@
     - Eval binary: data/processed/wildjailbreak_eval_binary.jsonl (для метрик)
 
 Результаты:
-    - Модель few-shot: runs/autointent_{preset}_{N}shot_seed{S}/
-    - Модель few-shot (автоэмбеддер): runs/autointent_{preset}_autoembedder_{N}shot_seed{S}/
-    - Модель full: runs/autointent_{preset}_full_seed{S}/ (и аналоги для pilot / autoembedder)
+    - Каталоги runs: имя включает пресет, напр.
+      `runs/autointent_classic-medium_{N}shot_seed{S}/`,
+      `runs/autointent_transformers-light_autoembedder_full_seed{S}/`
     - Метрики: results/metrics.json (числовые поля + extra: embedder, eval_counts TP/FP/FN/TN,
       scoring_module_attrs, decision_module_attrs, scores_eval_summary, model_dir и т.д.)
     - На каждый прогон оценки: runs/metrics_<model_name>_<mode>_seed<S>.json — тот же JSON-объект, что одна строка в metrics.json
     - Полные скоры eval: runs/eval_scores_<model_name>_<mode>_seed<S>.jsonl — для анализа ошибок
     - Дублирование метрик в stdout: --print-metrics-json (Kaggle/логи, если файлы не сохранились)
+    - На Kaggle после каждого append в metrics.json делается копия в
+      /kaggle/working/metrics_jailbreak_latest.json (удобно до zip / конца сессии).
 
     Пример: few-shot без фиксации эмбеддера на всех сидах:
         python scripts/run_autointent.py --mode fewshot --n_shots 10 --no-fix-embedder --all-seeds
@@ -52,17 +54,25 @@
     полоса Optuna (tqdm) по числу trials в текущем узле (scoring/decision);
     строка «Overall HPO (estimate)» — грубая доля по этапам HPO (не покрывает долгий первый embed внутри trial).
     Отключить: --no-automl-progress
+
+Kaggle / меньше «красного» stderr:
+    при наличии /kaggle/working (или JAILBREAK_QUIET_LOGS=1) поднимается уровень root-log,
+    глушатся sentence_transformers/transformers/optuna и tqdm через env (см. _apply_kaggle_quiet_env).
 """
 
 from __future__ import annotations
 
 import argparse
+import importlib.metadata as importlib_metadata
 import json
 import logging
 import os
+import platform
+import shutil
 import random
 import re
 import sys
+import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -95,7 +105,17 @@ def _apply_thread_env_defaults() -> None:
             os.environ[key] = value
 
 
+def _apply_kaggle_quiet_env() -> None:
+    """Меньше HF/tqdm в stderr на Kaggle; TRANSFORMERS_* до import torch/transformers."""
+    if not Path("/kaggle/working").exists() and os.environ.get("JAILBREAK_QUIET_LOGS") != "1":
+        return
+    os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
+    os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+    os.environ.setdefault("TQDM_DISABLE", "1")
+
+
 _apply_thread_env_defaults()
+_apply_kaggle_quiet_env()
 
 import numpy as np
 import torch
@@ -109,17 +129,148 @@ from tasks.jailbreak_detection.src.metrics import evaluate_jailbreak
 
 logger = logging.getLogger(__name__)
 
+# Имена search-space пресетов AutoIntent (autointent==0.2.0, см. SearchSpacePreset).
+SEARCH_SPACE_PRESETS: tuple[str, ...] = (
+    "classic-heavy",
+    "classic-light",
+    "classic-medium",
+    "nn-heavy",
+    "nn-medium",
+    "transformers-heavy",
+    "transformers-light",
+    "transformers-no-hpo",
+    "zero-shot-llm",
+    "zero-shot-encoders",
+)
+
+# CLI-алиасы (имя в отчётах / model_name) → фактический SearchSpacePreset AutoIntent.
+PRESET_ALIASES: dict[str, str] = {
+    "bert-finetune": "transformers-light",
+}
+
+# Все допустимые значения --preset (включая алиасы).
+CLI_PRESET_CHOICES: tuple[str, ...] = tuple(
+    sorted({*SEARCH_SPACE_PRESETS, *PRESET_ALIASES.keys()})
+)
+
+# Пресеты, где scoring использует intent.description (zero-shot encoders / LLM).
+PRESETS_REQUIRING_INTENT_DESCRIPTIONS: frozenset[str] = frozenset(
+    {"zero-shot-encoders", "zero-shot-llm"}
+)
+
+# Описания классов для AutoIntent Intent.description (binary safe/jailbreak).
+JAILBREAK_BINARY_INTENTS: tuple[dict[str, Any], ...] = (
+    {
+        "id": 0,
+        "name": "safe",
+        "description": (
+            "A benign user request that should not be classified as a jailbreak "
+            "or harmful instruction."
+        ),
+    },
+    {
+        "id": 1,
+        "name": "jailbreak",
+        "description": (
+            "A harmful, adversarial, or jailbreak-style user request attempting to "
+            "bypass safety rules or elicit unsafe behavior."
+        ),
+    },
+)
+
+
+def resolve_preset(preset: str) -> tuple[str, str]:
+    """(имя для логов/metrics, имя для Pipeline.from_preset)."""
+    cli_preset = preset.strip()
+    autointent_preset = PRESET_ALIASES.get(cli_preset, cli_preset)
+    if autointent_preset not in SEARCH_SPACE_PRESETS:
+        raise ValueError(
+            f"Unknown preset {preset!r}. "
+            f"Choose from: {', '.join(CLI_PRESET_CHOICES)}"
+        )
+    return cli_preset, autointent_preset
+
+
+def preset_needs_intent_descriptions(cli_preset: str) -> bool:
+    _, autointent_preset = resolve_preset(cli_preset)
+    return autointent_preset in PRESETS_REQUIRING_INTENT_DESCRIPTIONS
+
+
+def build_binary_intents(*, with_descriptions: bool) -> list[dict[str, Any]]:
+    """AutoIntent intents для binary safe=0 / jailbreak=1."""
+    intents: list[dict[str, Any]] = []
+    for spec in JAILBREAK_BINARY_INTENTS:
+        row: dict[str, Any] = {"id": spec["id"], "name": spec["name"]}
+        if with_descriptions:
+            row["description"] = spec["description"]
+        intents.append(row)
+    return intents
+
+
+def metrics_row_for_export(result: dict) -> dict[str, Any]:
+    """Компактная строка метрик для сводных JSON (few-shot grid)."""
+    ex = result.get("extra") or {}
+    return {
+        "model_name": result.get("model_name"),
+        "preset": ex.get("preset") or ex.get("search_space_preset"),
+        "search_space_preset": ex.get("search_space_preset"),
+        "mode": result.get("mode"),
+        "n_shots": result.get("n_shots"),
+        "seed": result.get("seed"),
+        "f1": result.get("f1"),
+        "precision": result.get("precision"),
+        "recall": result.get("recall"),
+        "over_refusal_rate": result.get("over_refusal_rate"),
+        "recall_vanilla_harmful": result.get("recall_vanilla_harmful"),
+        "recall_adversarial_harmful": result.get("recall_adversarial_harmful"),
+        "embedder_hf_model": ex.get("embedder_hf_model"),
+        "model_dir": ex.get("model_dir"),
+    }
+
 
 def _configure_run_logging() -> None:
     """Один раз настраивает stderr-logging для сообщений об эмбеддере и др."""
     root = logging.getLogger()
     if root.handlers:
         return
+    quiet = Path("/kaggle/working").exists() or os.environ.get("JAILBREAK_QUIET_LOGS") == "1"
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.WARNING if quiet else logging.INFO,
         format="%(levelname)s [%(name)s] %(message)s",
         stream=sys.stderr,
+        force=True,
     )
+
+
+def _quiet_third_party_loggers() -> None:
+    """Глушит чужие INFO в stderr (Kaggle подсвечивает stderr красным)."""
+    if not Path("/kaggle/working").exists() and os.environ.get("JAILBREAK_QUIET_LOGS") != "1":
+        return
+    for name in (
+        "sentence_transformers",
+        "transformers",
+        "transformers.models",
+        "huggingface_hub",
+        "datasets",
+        "optuna",
+        "httpx",
+        "httpcore",
+        "urllib3",
+        "filelock",
+        "torch",
+    ):
+        logging.getLogger(name).setLevel(logging.ERROR)
+    logging.getLogger("autointent").setLevel(logging.WARNING)
+
+
+def _mirror_metrics_to_kaggle_working(metrics_path: Path) -> None:
+    """Копия metrics.json в корень /kaggle/working после каждого прогона (видна в Output)."""
+    kw = Path("/kaggle/working")
+    if not kw.exists() or not metrics_path.is_file():
+        return
+    dst = kw / "metrics_jailbreak_latest.json"
+    shutil.copy2(metrics_path, dst)
+    print(f"[metrics] Kaggle snapshot → {dst}", flush=True)
 
 
 # Совпадает с prepare_data.DEFAULT_SEEDS и именами wildjailbreak_full100k_seed{S}.json
@@ -258,6 +409,211 @@ def decision_module_attrs_from_dump(model_dir: Path) -> dict[str, Any] | None:
     return data if isinstance(data, dict) else None
 
 
+def _json_size_limited(value: Any, *, max_chars: int = 12_000) -> Any:
+    """Return value if JSON-serializable and small enough, otherwise a compact descriptor."""
+    try:
+        dumped = json.dumps(value, ensure_ascii=False)
+    except (TypeError, ValueError):
+        return {"_error": "non_serializable"}
+    if len(dumped) <= max_chars:
+        return value
+    if isinstance(value, dict):
+        return {
+            "_truncated": True,
+            "json_chars": len(dumped),
+            "top_level_keys": list(value.keys()),
+        }
+    if isinstance(value, list):
+        return {
+            "_truncated": True,
+            "json_chars": len(dumped),
+            "type": "list",
+            "length": len(value),
+        }
+    return {
+        "_truncated": True,
+        "json_chars": len(dumped),
+        "type": type(value).__name__,
+    }
+
+
+def _file_info(path: Path) -> dict[str, Any]:
+    """Small reproducibility descriptor for data/model files."""
+    if not path.exists():
+        return {"path": str(path), "exists": False}
+    st = path.stat()
+    return {
+        "path": str(path),
+        "exists": True,
+        "bytes": int(st.st_size),
+        "mtime_utc": datetime.fromtimestamp(st.st_mtime, timezone.utc).isoformat(),
+    }
+
+
+def _basic_text_stats(texts: list[str]) -> dict[str, Any]:
+    lengths = np.asarray([len(t) for t in texts], dtype=np.float64)
+    if len(lengths) == 0:
+        return {"n": 0}
+    return {
+        "n": int(len(texts)),
+        "chars_mean": float(np.mean(lengths)),
+        "chars_std": float(np.std(lengths)),
+        "chars_min": int(np.min(lengths)),
+        "chars_p50": float(np.percentile(lengths, 50)),
+        "chars_p95": float(np.percentile(lengths, 95)),
+        "chars_max": int(np.max(lengths)),
+    }
+
+
+def summarize_train_split(train_raw: dict, *, source_file: Path) -> dict[str, Any]:
+    """Summary of AutoIntent train split before conversion."""
+    safe = []
+    for intent in train_raw.get("intents", []):
+        safe.extend(intent.get("utterances", []))
+    jailbreak = list(train_raw.get("oos_utterances", []))
+    total = len(safe) + len(jailbreak)
+    return {
+        "source_file": _file_info(source_file),
+        "n_total": total,
+        "n_safe": len(safe),
+        "n_jailbreak": len(jailbreak),
+        "class_balance_safe": float(len(safe) / total) if total else None,
+        "class_balance_jailbreak": float(len(jailbreak) / total) if total else None,
+        "safe_text_stats": _basic_text_stats(safe),
+        "jailbreak_text_stats": _basic_text_stats(jailbreak),
+    }
+
+
+def summarize_test_split(test_raw: dict, *, source_file: Path) -> dict[str, Any]:
+    """Summary of AutoIntent test split used for inference."""
+    texts = list(test_raw.get("utterances", []))
+    labels = np.asarray(test_raw.get("labels", []))
+    return {
+        "source_file": _file_info(source_file),
+        "n_total": int(len(texts)),
+        "n_safe": int(np.sum(labels == 0)),
+        "n_jailbreak": int(np.sum(labels == 1)),
+        "text_stats": _basic_text_stats(texts),
+    }
+
+
+def summarize_eval_binary(eval_binary: list[dict], *, source_file: Path) -> dict[str, Any]:
+    """Summary of evaluation labels and WildJailbreak data_type breakdown."""
+    by_label: dict[str, int] = {}
+    by_type: dict[str, int] = {}
+    for row in eval_binary:
+        label = str(row.get("binary_label"))
+        dtype = str(row.get("data_type"))
+        by_label[label] = by_label.get(label, 0) + 1
+        by_type[dtype] = by_type.get(dtype, 0) + 1
+    return {
+        "source_file": _file_info(source_file),
+        "n_total": len(eval_binary),
+        "by_binary_label": dict(sorted(by_label.items())),
+        "by_data_type": dict(sorted(by_type.items())),
+    }
+
+
+def prediction_distribution_by_type(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    data_types: np.ndarray,
+) -> dict[str, Any]:
+    """Per-data_type counts and rates, useful for jailbreak vs benign failure analysis."""
+    out: dict[str, Any] = {}
+    for dtype in sorted({str(x) for x in data_types.tolist()}):
+        mask = data_types == dtype
+        yt = y_true[mask]
+        yp = y_pred[mask]
+        n = int(np.sum(mask))
+        pred_jb = int(np.sum(yp == 1))
+        true_jb = int(np.sum(yt == 1))
+        out[dtype] = {
+            "n": n,
+            "true_safe": int(np.sum(yt == 0)),
+            "true_jailbreak": true_jb,
+            "pred_safe": int(np.sum(yp == 0)),
+            "pred_jailbreak": pred_jb,
+            "pred_jailbreak_rate": float(pred_jb / n) if n else None,
+            "correct": int(np.sum(yt == yp)),
+            "accuracy": float(np.mean(yt == yp)) if n else None,
+        }
+    return out
+
+
+def runtime_environment_summary() -> dict[str, Any]:
+    """Runtime details for Kaggle/local reproducibility without logging secrets."""
+    packages = {}
+    for pkg in (
+        "autointent",
+        "torch",
+        "torchvision",
+        "torchaudio",
+        "transformers",
+        "sentence-transformers",
+        "datasets",
+        "numpy",
+        "scikit-learn",
+        "optuna",
+    ):
+        try:
+            packages[pkg] = importlib_metadata.version(pkg)
+        except importlib_metadata.PackageNotFoundError:
+            packages[pkg] = None
+    return {
+        "python": sys.version.replace("\n", " "),
+        "platform": platform.platform(),
+        "machine": platform.machine(),
+        "processor": platform.processor(),
+        "cwd": str(Path.cwd()),
+        "env": {
+            key: os.environ.get(key)
+            for key in (
+                "OMP_NUM_THREADS",
+                "OPENBLAS_NUM_THREADS",
+                "MKL_NUM_THREADS",
+                "VECLIB_MAXIMUM_THREADS",
+                "NUMEXPR_NUM_THREADS",
+                "LOKY_MAX_CPU_COUNT",
+                "TOKENIZERS_PARALLELISM",
+                "CUDA_VISIBLE_DEVICES",
+            )
+        },
+        "kaggle": {
+            "is_kaggle": Path("/kaggle/working").exists(),
+            "working_exists": Path("/kaggle/working").exists(),
+            "input_exists": Path("/kaggle/input").exists(),
+        },
+        "packages": packages,
+    }
+
+
+def pipeline_artifact_manifest(model_dir: Path) -> dict[str, Any]:
+    """Compact listing of saved AutoIntent modules/configs."""
+    manifest: dict[str, Any] = {
+        "model_dir": str(model_dir),
+        "exists": model_dir.exists(),
+        "top_level_entries": [],
+        "json_files": [],
+    }
+    if not model_dir.exists():
+        return manifest
+    top_entries = []
+    for p in sorted(model_dir.iterdir(), key=lambda x: x.name):
+        item = {"name": p.name, "type": "dir" if p.is_dir() else "file"}
+        if p.is_file():
+            item.update({"bytes": p.stat().st_size})
+        top_entries.append(item)
+    manifest["top_level_entries"] = top_entries
+
+    json_files = []
+    for p in sorted(model_dir.rglob("*.json"))[:80]:
+        rel = p.relative_to(model_dir)
+        info = _file_info(p)
+        info["relative_path"] = str(rel)
+        json_files.append(info)
+    manifest["json_files"] = json_files
+    return manifest
 def scoring_module_attrs_from_dump(model_dir: Path) -> dict[str, Any] | None:
     """Атрибуты scoring-модуля из dump (k, weights и др.) для логов metrics.json."""
     p = model_dir / "scoring_module" / "simple_attrs.json"
@@ -340,7 +696,7 @@ def scoring_eval_summary_from_pipeline(
         "margin_max": float(np.max(margin)),
         "score_col0_mean": float(np.mean(scores[:, 0])),
         "score_col1_mean": float(np.mean(scores[:, 1])),
-        "note": "col0≈safe intent col1≈jailbreak (binary setup)",
+        "note": "col0≈safe intent col1≈jailbreak (binary scoring)",
     }
     return summary, scores
 
@@ -540,6 +896,7 @@ def save_metrics(result: dict, results_dir: Path) -> None:
         json.dump(all_results, f, indent=2, ensure_ascii=False)
 
     print(f"Metrics saved to {metrics_path}")
+    _mirror_metrics_to_kaggle_working(metrics_path)
 
 
 def run_metrics_filename(result: dict) -> str:
@@ -565,6 +922,9 @@ def save_run_metrics_file(result: dict, runs_dir: Path) -> Path:
 
 def train(args, data_dir: Path, model_dir: Path) -> None:
     """Train AutoIntent pipeline."""
+    train_started_at = time.perf_counter()
+    cli_preset, autointent_preset = resolve_preset(getattr(args, "preset", "classic-light"))
+    args.preset = cli_preset
     no_fix_embedder = getattr(args, "no_fix_embedder", False)
     mode = getattr(args, "mode", "fewshot")
     if no_fix_embedder:
@@ -580,12 +940,16 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
     else:
         mode_label = "PILOT" if args.pilot else "FINAL"
     print(f"Mode: {mode_label}")
+    print(f"Search-space preset (CLI): {cli_preset}")
+    if autointent_preset != cli_preset:
+        print(f"AutoIntent preset: {autointent_preset}")
     print(f"Embedder: {embedder_name}")
     if no_fix_embedder:
         logger.info(
-            "Embedder policy: AutoML (preset %s); "
-            "конкретный HuggingFace id будет известен после dump в конце обучения.",
-            args.preset,
+            "Embedder policy: AutoML (search-space preset %s / %s); "
+            "HF model_name после dump.",
+            cli_preset,
+            autointent_preset,
         )
     else:
         logger.info(
@@ -602,19 +966,24 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
 
     # Load data
     if mode == "full":
+        train_source_file = data_dir / full_train_filename(args.seed)
         train_raw = load_full_train(args.seed, data_dir)
     else:
+        train_source_file = data_dir / f"train_shot{args.n_shots}_seed{args.seed}.json"
         train_raw = load_fewshot_train(args.n_shots, args.seed, data_dir)
+    test_source_file = data_dir / "test.json"
     test_raw = load_test(data_dir)
 
     train_ai = convert_to_autointent_train(train_raw)
     test_ai = convert_to_autointent_test(test_raw)
+    train_data_summary = summarize_train_split(train_raw, source_file=train_source_file)
+    test_data_summary = summarize_test_split(test_raw, source_file=test_source_file)
 
-    # Binary classification: 2 intents (no OOS)
-    intents = [
-        {"id": 0, "name": "safe"},
-        {"id": 1, "name": "jailbreak"},
-    ]
+    # Binary classification: 2 intents (no OOS); descriptions обязательны для zero-shot-encoders
+    with_descriptions = preset_needs_intent_descriptions(cli_preset)
+    intents = build_binary_intents(with_descriptions=with_descriptions)
+    if with_descriptions:
+        print("Intent descriptions: enabled (required for zero-shot encoder presets)")
 
     n_safe = len(train_raw["intents"][0]["utterances"])
     n_jailbreak = len(train_raw["oos_utterances"])
@@ -622,6 +991,8 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
     print(f"  - safe (label=0): {n_safe}")
     print(f"  - jailbreak (label=1): {n_jailbreak}")
     print(f"Test: {len(test_ai)} samples")
+    print(f"Train source: {train_source_file}")
+    print(f"Test source: {test_source_file}")
     print()
 
     # Create AutoIntent Dataset
@@ -714,6 +1085,35 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
             model_dir,
         )
 
+    train_elapsed_sec = time.perf_counter() - train_started_at
+    metadata["data_summary"] = {
+        "train": train_data_summary,
+        "test": test_data_summary,
+    }
+    metadata["run_config"] = {
+        "mode": mode,
+        "n_shots": args.n_shots if mode == "fewshot" else None,
+        "seed": args.seed,
+        "preset": cli_preset,
+        "autointent_preset": autointent_preset,
+        "pilot": args.pilot,
+        "no_fix_embedder": no_fix_embedder,
+        "data_config": (
+            {"scheme": "cv", "n_folds": 3}
+            if mode == "fewshot"
+            else {"scheme": "default_autointent"}
+        ),
+        "logging_config": {
+            "project_dir": str(model_dir),
+            "dump_modules": True,
+            "clear_ram": False,
+        },
+    }
+    metadata["runtime_environment"] = runtime_environment_summary()
+    metadata["timings"] = {
+        "train_total_sec": float(train_elapsed_sec),
+    }
+
     (model_dir / "train_metadata.json").write_text(
         json.dumps(metadata, indent=2, ensure_ascii=False),
         encoding="utf-8",
@@ -731,6 +1131,7 @@ def evaluate(
     runs_dir: Path | None = None,
 ) -> None:
     """Evaluate trained AutoIntent pipeline."""
+    eval_started_at = time.perf_counter()
     print()
     print("=" * 60)
     print("AutoIntent Evaluation (Jailbreak Detection)")
@@ -739,6 +1140,7 @@ def evaluate(
     # Load metadata
     metadata_path = model_dir / "train_metadata.json"
     no_fix_embedder = getattr(args, "no_fix_embedder", False)
+    cli_preset, autointent_preset = resolve_preset(getattr(args, "preset", "classic-light"))
     mode = getattr(args, "mode", "fewshot")
     if metadata_path.exists():
         metadata = json.loads(metadata_path.read_text())
@@ -794,6 +1196,8 @@ def evaluate(
     print()
 
     # Load test data
+    test_source_file = data_dir / "test.json"
+    eval_binary_source_file = data_dir / "wildjailbreak_eval_binary.jsonl"
     test_raw = load_test(data_dir)
     test_texts = test_raw["utterances"]
 
@@ -801,10 +1205,24 @@ def evaluate(
     eval_binary = load_eval_binary(data_dir)
     y_true = np.array([1 if r["binary_label"] == "jailbreak" else 0 for r in eval_binary])
     data_types = np.array([r["data_type"] for r in eval_binary])
+    test_data_summary = summarize_test_split(test_raw, source_file=test_source_file)
+    eval_binary_summary = summarize_eval_binary(
+        eval_binary,
+        source_file=eval_binary_source_file,
+    )
+    data_alignment = {
+        "test_utterances": len(test_texts),
+        "test_labels": len(test_raw.get("labels", [])),
+        "eval_binary_rows": len(eval_binary),
+        "aligned_lengths": len(test_texts) == len(test_raw.get("labels", [])) == len(eval_binary),
+    }
 
     print(f"Test samples: {len(test_texts)}")
     print(f"  safe: {sum(y_true == 0)}, jailbreak: {sum(y_true == 1)}")
+    print(f"Data alignment OK: {data_alignment['aligned_lengths']}")
     print()
+    if not data_alignment["aligned_lengths"]:
+        raise ValueError(f"Test/eval data length mismatch: {data_alignment}")
 
     # Predictions
     print("Running predictions...")
@@ -812,49 +1230,42 @@ def evaluate(
 
     # Binary classification: predictions are 0 (safe) or 1 (jailbreak) directly
     # None means model couldn't decide - treat as jailbreak (safer for guardrail)
+    raw_pred_none = int(sum(p is None for p in raw_preds))
+    raw_pred_values: dict[str, int] = {}
+    for pred in raw_preds:
+        key = "None" if pred is None else str(pred)
+        raw_pred_values[key] = raw_pred_values.get(key, 0) + 1
     y_pred = np.array([1 if p is None else p for p in raw_preds])
 
     print(f"Predictions: {len(y_pred)}")
     print(f"  predicted safe: {sum(y_pred == 0)}")
     print(f"  predicted jailbreak: {sum(y_pred == 1)}")
+    print(f"  undecided/None treated as jailbreak: {raw_pred_none}")
     print()
 
-    # Compute metrics
-    print("Computing metrics...")
-    metrics = evaluate_jailbreak(y_true, y_pred, data_types, oos_label=1)
+    # Compute metrics                                                                                                                                                                 
+    print("Computing metrics...")                                                                                                                                                     
+    metrics = evaluate_jailbreak(y_true, y_pred, data_types, oos_label=1)                                                                                                             
 
-    eval_counts = confusion_and_rates_jailbreak_positive(y_true, y_pred, positive_label=1)
-    decision_attrs_raw = decision_module_attrs_from_dump(model_dir)
-    decision_attrs_json: dict[str, Any] | None
-    if decision_attrs_raw is None:
-        decision_attrs_json = None
-    else:
-        try:
-            dumped = json.dumps(decision_attrs_raw)
-            if len(dumped) > 12_000:
-                decision_attrs_json = {
-                    "_truncated": True,
-                    "top_level_keys": list(decision_attrs_raw.keys()),
-                }
-            else:
-                decision_attrs_json = decision_attrs_raw
-        except (TypeError, ValueError):
-            decision_attrs_json = {"_error": "non_serializable_decision_attrs"}
+    eval_counts = confusion_and_rates_jailbreak_positive(y_true, y_pred, positive_label=1)                                                                                            
+    prediction_by_type = prediction_distribution_by_type(y_true, y_pred, data_types)                                                                                                  
+    decision_attrs_json = _json_size_limited(decision_module_attrs_from_dump(model_dir))                                                                                              
 
-    # Scoring module attrs
-    scoring_attrs_raw = scoring_module_attrs_from_dump(model_dir)
-    scoring_attrs_json: dict[str, Any] | None = scoring_attrs_raw
+    # Scoring module attrs                                                                                                                                                            
+    scoring_attrs_raw = scoring_module_attrs_from_dump(model_dir)                                                                                                                     
+    scoring_attrs_json: dict[str, Any] | None = scoring_attrs_raw                                                                                                                     
 
-    # Get scores summary and full scores array
-    scores_eval_summary, scores_array = scoring_eval_summary_from_pipeline(pipeline, test_texts)
+    # Get scores summary and full scores array                                                                                                                                        
+    scores_eval_summary, scores_array = scoring_eval_summary_from_pipeline(pipeline, test_texts)                                                                                      
+    eval_elapsed_sec = time.perf_counter() - eval_started_at                                                                                                                          
 
-    # Save full eval scores to JSONL for error analysis
-    if scores_array is not None:
-        qp_suffix = make_query_prompt_suffix(getattr(args, "query_prompt", None))
-        eval_scores_filename = f"eval_scores_{metadata['model_name']}_{metadata['mode']}_seed{metadata['seed']}{qp_suffix}.jsonl"
-        eval_scores_path = (runs_dir if runs_dir is not None else get_runs_dir()) / eval_scores_filename
-        save_eval_scores(eval_scores_path, metadata, test_texts, y_true, y_pred, scores_array)
-        print(f"Saved eval scores to: {eval_scores_path}")
+    # Save full eval scores to JSONL for error analysis                                                                                                                               
+    if scores_array is not None:                                                                                                                                                      
+        qp_suffix = make_query_prompt_suffix(getattr(args, "query_prompt", None))                                                                                                     
+        eval_scores_filename = f"eval_scores_{metadata['model_name']}_{metadata['mode']}_seed{metadata['seed']}{qp_suffix}.jsonl"                                                     
+        eval_scores_path = (runs_dir if runs_dir is not None else get_runs_dir()) / eval_scores_filename                                                                              
+        save_eval_scores(eval_scores_path, metadata, test_texts, y_true, y_pred, scores_array)                                                                                        
+        print(f"Saved eval scores to: {eval_scores_path}")                                                    
 
     # Print results
     print()
@@ -876,19 +1287,59 @@ def evaluate(
         "precision": metrics["precision"],
         "recall": metrics["recall"],
         "over_refusal_rate": metrics["over_refusal_rate"],
+        "recall_vanilla_harmful": metrics.get("recall_vanilla_harmful"),
         "recall_adversarial_harmful": metrics.get("recall_adversarial_harmful"),
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "extra": {
-            "preset": metadata.get("preset", "classic-light"),
+            "preset": metadata.get("preset", cli_preset),
+            "search_space_preset": metadata.get(
+                "autointent_preset",
+                resolve_preset(metadata.get("preset", cli_preset))[1],
+            ),
             "embedder": metadata["embedder"],
             "embedder_hf_model": hf_emb,
             "embedder_fixed": metadata.get("embedder_fixed", True),
             "pilot": metadata["pilot"],
             "model_dir": str(model_dir),
+            "data_dir": str(data_dir),
+            "results_dir": str(results_dir),
+            "run_config": {
+                "mode": mode,
+                "n_shots": metadata.get("n_shots"),
+                "seed": metadata.get("seed"),
+                "preset": metadata.get("preset", "classic-light"),
+                "pilot": metadata.get("pilot"),
+                "no_fix_embedder": no_fix_embedder,
+                "eval_only": getattr(args, "eval_only", False),
+                "train_only": getattr(args, "train_only", False),
+                "all_seeds": getattr(args, "all_seeds", False),
+            },
+            "train_metadata": metadata,
+            "runtime_environment": runtime_environment_summary(),
+            "timings": {
+                "train_total_sec": (metadata.get("timings") or {}).get("train_total_sec"),
+                "eval_total_sec": float(eval_elapsed_sec),
+            },
+            "data_summary": {
+                "train": (metadata.get("data_summary") or {}).get("train"),
+                "test": test_data_summary,
+                "eval_binary": eval_binary_summary,
+                "alignment": data_alignment,
+            },
+            "prediction_summary": {
+                "n_predictions": int(len(y_pred)),
+                "raw_prediction_values": dict(sorted(raw_pred_values.items())),
+                "raw_none_count": raw_pred_none,
+                "none_policy": "None predictions are treated as jailbreak(label=1)",
+                "pred_safe": int(np.sum(y_pred == 0)),
+                "pred_jailbreak": int(np.sum(y_pred == 1)),
+                "by_data_type": prediction_by_type,
+            },
             "eval_counts": eval_counts,
             "scoring_module_attrs": scoring_attrs_json,
             "decision_module_attrs": decision_attrs_json,
             "scores_eval_summary": scores_eval_summary,
+            "artifact_manifest": pipeline_artifact_manifest(model_dir),
         },
     }
 
@@ -901,16 +1352,22 @@ def evaluate(
             "mode": result["mode"],
             "seed": result["seed"],
             "n_shots": result["n_shots"],
+            "search_space_preset": (result.get("extra") or {}).get("search_space_preset"),
             "metrics_core": {
                 "f1": result["f1"],
                 "recall": result["recall"],
                 "over_refusal_rate": result["over_refusal_rate"],
                 "precision": result["precision"],
+                "recall_vanilla_harmful": result.get("recall_vanilla_harmful"),
+                "recall_adversarial_harmful": result.get("recall_adversarial_harmful"),
             },
             "embedder_hf_model": hf_emb,
             "eval_counts": eval_counts,
+            "prediction_summary": result["extra"]["prediction_summary"],
+            "data_summary": result["extra"]["data_summary"],
             "scores_eval_summary": scores_eval_summary,
             "decision_module_attrs": decision_attrs_json,
+            "artifact_manifest": result["extra"]["artifact_manifest"],
             "hypothesis_notes": (
                 "FNR≈fnr_jailbreak, FPR_safe≈fpr_safe; для асимметричного порога нужен "
                 "sweep по threshold на val (не только эта точка)."
@@ -939,6 +1396,7 @@ def evaluate(
 
 def main():
     _configure_run_logging()
+    _quiet_third_party_loggers()
 
     parser = argparse.ArgumentParser(
         description="Run AutoIntent on WildJailbreak (train + evaluate)"
@@ -950,6 +1408,16 @@ def main():
         help=(
             "fewshot: train_shot{N}_seed{S}.json; "
             "full: wildjailbreak_full100k_seed{S}.json (prepare_data --full_subset)"
+        ),
+    )
+    parser.add_argument(
+        "--preset",
+        type=str,
+        default="classic-light",
+        choices=list(CLI_PRESET_CHOICES),
+        help=(
+            "Search-space пресет AutoIntent (classic-medium, nn-medium, "
+            "zero-shot-encoders, transformers-light, bert-finetune→transformers-light, …)."
         ),
     )
     parser.add_argument(
