@@ -11,9 +11,6 @@
     # Другой preset (classic-medium, nn-medium, zero-shot-encoders и др.)
     python scripts/run_autointent.py --preset classic-medium --mode fewshot --n_shots 10 --seed 42
 
-    # AutoML без фиксации embedder (медленнее, потенциально лучше)
-    python scripts/run_autointent.py --mode fewshot --n_shots 10 --seed 42 --no-fix-embedder
-
     # Только оценка (модель должна существовать)
     python scripts/run_autointent.py --mode fewshot --n_shots 10 --seed 42 --eval-only
 
@@ -34,7 +31,7 @@
 Результаты:
     - Каталоги runs: имя включает пресет, напр.
       `runs/autointent_classic-medium_{N}shot_seed{S}/`,
-      `runs/autointent_transformers-light_autoembedder_full_seed{S}/`
+      `runs/autointent_classic-light_pilot_{N}shot_seed{S}/`
     - Метрики: results/metrics.json (числовые поля + extra: embedder, eval_counts TP/FP/FN/TN,
       scoring_module_attrs, decision_module_attrs, scores_eval_summary, model_dir и т.д.)
     - На каждый прогон оценки: runs/metrics_<model_name>_<mode>_seed<S>.json — тот же JSON-объект, что одна строка в metrics.json
@@ -42,9 +39,6 @@
     - Дублирование метрик в stdout: --print-metrics-json (Kaggle/логи, если файлы не сохранились)
     - На Kaggle после каждого append в metrics.json делается копия в
       /kaggle/working/metrics_jailbreak_latest.json (удобно до zip / конца сессии).
-
-    Пример: few-shot без фиксации эмбеддера на всех сидах:
-        python scripts/run_autointent.py --mode fewshot --n_shots 10 --no-fix-embedder --all-seeds
 
 Стабильность на macOS ARM:
     load_dotenv и лимиты потоков BLAS/OpenMP должны применяться до import numpy/torch.
@@ -385,7 +379,7 @@ def get_results_dir() -> Path:
 
 
 def embedder_hf_model_from_dump(model_dir: Path) -> str | None:
-    """HF id эмбеддера после pipeline.dump (актуально для --no-fix-embedder)."""
+    """HF id эмбеддера после pipeline.dump (для записи в метаданные)."""
     p = model_dir / "scoring_module" / "pydantic" / "embedder_config" / "model_dump.json"
     if not p.is_file():
         return None
@@ -735,14 +729,15 @@ def save_eval_scores(
     logger.info("Saved eval scores to %s (%d rows)", output_path, len(texts))
 
 
-def get_model_name(preset: str, pilot: bool, no_fix_embedder: bool) -> str:
+def get_model_name(preset: str, pilot: bool, query_prompt: str | None = None) -> str:
     """Формирует имя модели на основе пресета и флагов."""
     base = f"autointent_{preset}"
-    if no_fix_embedder:
-        return f"{base}_autoembedder"
     if pilot:
-        return f"{base}_pilot"
-    return base
+        base = f"{base}_pilot"
+    else:
+        base = f"{base}_e5large"
+    qp_suffix = make_query_prompt_suffix(query_prompt)
+    return f"{base}{qp_suffix}"
 
 
 def get_embedder_name(pilot: bool) -> str:
@@ -771,18 +766,16 @@ def make_query_prompt_suffix(query_prompt: str | None, max_len: int = 32) -> str
 def get_model_dir(
     preset: str,
     pilot: bool,
-    no_fix_embedder: bool,
     mode: str,
     n_shots: int | None,
     seed: int,
     query_prompt: str | None = None,
 ) -> Path:
-    model_name = get_model_name(preset, pilot, no_fix_embedder)
-    qp_suffix = make_query_prompt_suffix(query_prompt)
+    model_name = get_model_name(preset, pilot, query_prompt)
     if mode == "full":
-        return get_runs_dir() / f"{model_name}_full_seed{seed}{qp_suffix}"
+        return get_runs_dir() / f"{model_name}_full_seed{seed}"
     assert n_shots is not None
-    return get_runs_dir() / f"{model_name}_{n_shots}shot_seed{seed}{qp_suffix}"
+    return get_runs_dir() / f"{model_name}_{n_shots}shot_seed{seed}"
 
 
 def load_fewshot_train(n_shots: int, seed: int, data_dir: Path) -> dict:
@@ -904,10 +897,10 @@ def run_metrics_filename(result: dict) -> str:
     mn = result["model_name"].replace("/", "_").replace(" ", "_")
     mode = result["mode"]
     seed = result["seed"]
-    qp_suffix = make_query_prompt_suffix(result.get("query_prompt"))
+    # qp_suffix is now part of model_name
     if mode == "full":
-        return f"metrics_{mn}_full_seed{seed}{qp_suffix}.json"
-    return f"metrics_{mn}_{mode}_seed{seed}{qp_suffix}.json"
+        return f"metrics_{mn}_full_seed{seed}.json"
+    return f"metrics_{mn}_{mode}_seed{seed}.json"
 
 
 def save_run_metrics_file(result: dict, runs_dir: Path) -> Path:
@@ -925,37 +918,22 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
     train_started_at = time.perf_counter()
     cli_preset, autointent_preset = resolve_preset(getattr(args, "preset", "classic-light"))
     args.preset = cli_preset
-    no_fix_embedder = getattr(args, "no_fix_embedder", False)
     mode = getattr(args, "mode", "fewshot")
-    if no_fix_embedder:
-        embedder_name = "auto (optimized by AutoML)"
-    else:
-        embedder_name = get_embedder_name(args.pilot)
+    embedder_name = get_embedder_name(args.pilot)
 
     print("=" * 60)
     print("AutoIntent Training (Jailbreak Detection)")
     print("=" * 60)
-    if no_fix_embedder:
-        mode_label = "AUTO-EMBEDDER"
-    else:
-        mode_label = "PILOT" if args.pilot else "FINAL"
+    mode_label = "PILOT" if args.pilot else "FINAL"
     print(f"Mode: {mode_label}")
     print(f"Search-space preset (CLI): {cli_preset}")
     if autointent_preset != cli_preset:
         print(f"AutoIntent preset: {autointent_preset}")
     print(f"Embedder: {embedder_name}")
-    if no_fix_embedder:
-        logger.info(
-            "Embedder policy: AutoML (search-space preset %s / %s); "
-            "HF model_name после dump.",
-            cli_preset,
-            autointent_preset,
-        )
-    else:
-        logger.info(
-            "Embedder policy: фиксированный; HuggingFace model_name=%s",
-            embedder_name,
-        )
+    logger.info(
+        "Embedder policy: фиксированный; HuggingFace model_name=%s",
+        embedder_name,
+    )
     if mode == "full":
         print(f"Training: FULL ({full_train_filename(args.seed)}), seed={args.seed}")
     else:
@@ -1006,11 +984,11 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
     preset = args.preset
     print(f"Using preset: {preset}")
     pipeline = Pipeline.from_preset(autointent_preset, seed=args.seed)
-    if not no_fix_embedder:
-        embedder_kwargs: dict[str, Any] = {"model_name": embedder_name}
-        if getattr(args, "query_prompt", None) is not None:
-            embedder_kwargs["query_prompt"] = args.query_prompt
-        pipeline.set_config(EmbedderConfig(**embedder_kwargs))
+    # Always fix embedder (pilot uses e5-small, final uses e5-large-instruct)
+    embedder_kwargs: dict[str, Any] = {"model_name": embedder_name}
+    if getattr(args, "query_prompt", None) is not None:
+        embedder_kwargs["query_prompt"] = args.query_prompt
+    pipeline.set_config(EmbedderConfig(**embedder_kwargs))
 
     # Cross-validation only for few-shot (full train uses default scheme)
     if mode == "fewshot":
@@ -1058,13 +1036,13 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
         meta_n_shots = args.n_shots
 
     metadata = {
-        "model_name": get_model_name(args.preset, args.pilot, no_fix_embedder),
+        "model_name": get_model_name(args.preset, args.pilot, getattr(args, "query_prompt", None)),
         "mode": meta_mode,
         "n_shots": meta_n_shots,
         "seed": args.seed,
         "query_prompt": getattr(args, "query_prompt", None),
         "embedder": embedder_name,
-        "embedder_fixed": not no_fix_embedder,
+        "embedder_fixed": True,
         "pilot": args.pilot,
         "preset": args.preset,
         "task": "jailbreak_detection",
@@ -1097,7 +1075,6 @@ def train(args, data_dir: Path, model_dir: Path) -> None:
         "preset": cli_preset,
         "autointent_preset": autointent_preset,
         "pilot": args.pilot,
-        "no_fix_embedder": no_fix_embedder,
         "data_config": (
             {"scheme": "cv", "n_folds": 3}
             if mode == "fewshot"
@@ -1139,7 +1116,6 @@ def evaluate(
 
     # Load metadata
     metadata_path = model_dir / "train_metadata.json"
-    no_fix_embedder = getattr(args, "no_fix_embedder", False)
     cli_preset, autointent_preset = resolve_preset(getattr(args, "preset", "classic-light"))
     mode = getattr(args, "mode", "fewshot")
     if metadata_path.exists():
@@ -1155,16 +1131,13 @@ def evaluate(
             meta_mode = f"{args.n_shots}shot"
             meta_n_shots = args.n_shots
         metadata = {
-            "model_name": get_model_name(args.preset, args.pilot, no_fix_embedder),
+            "model_name": get_model_name(args.preset, args.pilot, getattr(args, "query_prompt", None)),
             "mode": meta_mode,
             "n_shots": meta_n_shots,
             "seed": args.seed,
-            "embedder": (
-                "auto (optimized by AutoML)"
-                if no_fix_embedder
-                else get_embedder_name(args.pilot)
-            ),
-            "embedder_fixed": not no_fix_embedder,
+            "query_prompt": getattr(args, "query_prompt", None),
+            "embedder": get_embedder_name(args.pilot),
+            "embedder_fixed": True,
             "pilot": args.pilot,
             "preset": args.preset,
         }
@@ -1177,15 +1150,6 @@ def evaluate(
     if hf_emb:
         print(f"HuggingFace embedder model: {hf_emb}")
         logger.info("Оценка: используется HF эмбеддер model_name=%s", hf_emb)
-    elif metadata.get("embedder_fixed", True):
-        logger.info(
-            "Оценка: по метаданным фиксированный режим; HF model из metadata/dump не повторён.",
-        )
-    else:
-        logger.warning(
-            "Оценка: autoembedder, но HF model_name не найден в metadata и dump (%s)",
-            model_dir,
-        )
     print("=" * 60)
     print()
 
@@ -1259,10 +1223,10 @@ def evaluate(
     scores_eval_summary, scores_array = scoring_eval_summary_from_pipeline(pipeline, test_texts)                                                                                      
     eval_elapsed_sec = time.perf_counter() - eval_started_at                                                                                                                          
 
-    # Save full eval scores to JSONL for error analysis                                                                                                                               
-    if scores_array is not None:                                                                                                                                                      
-        qp_suffix = make_query_prompt_suffix(getattr(args, "query_prompt", None))                                                                                                     
-        eval_scores_filename = f"eval_scores_{metadata['model_name']}_{metadata['mode']}_seed{metadata['seed']}{qp_suffix}.jsonl"                                                     
+    # Save full eval scores to JSONL for error analysis
+    # qp_suffix is now part of model_name
+    if scores_array is not None:
+        eval_scores_filename = f"eval_scores_{metadata['model_name']}_{metadata['mode']}_seed{metadata['seed']}.jsonl"
         eval_scores_path = (runs_dir if runs_dir is not None else get_runs_dir()) / eval_scores_filename                                                                              
         save_eval_scores(eval_scores_path, metadata, test_texts, y_true, y_pred, scores_array)                                                                                        
         print(f"Saved eval scores to: {eval_scores_path}")                                                    
@@ -1309,7 +1273,6 @@ def evaluate(
                 "seed": metadata.get("seed"),
                 "preset": metadata.get("preset", "classic-light"),
                 "pilot": metadata.get("pilot"),
-                "no_fix_embedder": no_fix_embedder,
                 "eval_only": getattr(args, "eval_only", False),
                 "train_only": getattr(args, "train_only", False),
                 "all_seeds": getattr(args, "all_seeds", False),
@@ -1440,11 +1403,6 @@ def main():
         help="Use small embedder for fast validation",
     )
     parser.add_argument(
-        "--no-fix-embedder",
-        action="store_true",
-        help="Let AutoML optimize embedder (slower, potentially better)",
-    )
-    parser.add_argument(
         "--train-only",
         action="store_true",
         help="Only train, skip evaluation",
@@ -1507,7 +1465,6 @@ def main():
         model_dir = get_model_dir(
             args.preset,
             args.pilot,
-            args.no_fix_embedder,
             args.mode,
             args.n_shots if args.mode == "fewshot" else None,
             args.seed,

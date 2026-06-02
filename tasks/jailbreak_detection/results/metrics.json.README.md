@@ -10,7 +10,7 @@
 Полные логи (prediction_summary, timings, data_summary, …) — в архиве  
 `metrics_jailbreak_successful_14_05_full_rows.json`, **не** дублируются в `metrics.json`.
 
-Обновлено: 2026-05-20 15:42 UTC
+Обновлено: 2026-05-30
 
 ---
 
@@ -27,7 +27,7 @@
 | Shots | 10, 20, 50 |
 | Seeds | 42, 123, 456 |
 | Eval | `wildjailbreak_eval_binary.jsonl`, n=2210 (adversarial_harmful 2000 + adversarial_benign 210) |
-| Флаги | `--no-fix-embedder`, пресеты classic-medium / nn-medium / zero-shot-encoders |
+| Флаги | `фиксированный эмбеддер`, пресеты classic-medium / nn-medium / zero-shot-encoders |
 
 **Строк в блоке:** 27 (3 пресета × 3 shots × 3 seeds)
 
@@ -61,45 +61,65 @@ Zero-shot по описаниям интентов; **все 9 конфигур�
 
 | # | preset | mode | n_shots | seed | F1 | ORR | model_name |
 |---|--------|------|---------|------|-----|-----|------------|
-| 1 | classic-light | 10shot | 10 | 42 | 0.7572 | 0.9190 | autointent_classic-light_autoembedder |
-| 2 | classic-light | 10shot | 10 | 123 | 0.7307 | 0.3619 | autointent_classic-light_autoembedder |
-| 3 | classic-light | 10shot | 10 | 456 | 0.7828 | 0.2714 | autointent_classic-light_autoembedder |
-| 4 | classic-light | 20shot | 20 | 42 | 0.8671 | 0.7429 | autointent_classic-light_autoembedder |
-| 5 | classic-light | 20shot | 20 | 123 | 0.7497 | 0.4190 | autointent_classic-light_autoembedder |
-| 6 | classic-light | 20shot | 20 | 456 | 0.7713 | 0.3524 | autointent_classic-light_autoembedder |
-| 7 | classic-light | 50shot | 50 | 42 | 0.8189 | 0.6000 | autointent_classic-light_autoembedder |
-| 8 | classic-light | 50shot | 50 | 123 | 0.8133 | 0.6762 | autointent_classic-light_autoembedder |
-| 9 | classic-light | 50shot | 50 | 456 | 0.5602 | 0.1810 | autointent_classic-light_autoembedder |
-| 10 | classic-light | full | None | 42 | 0.9031 | 0.6095 | autointent_classic-light_autoembedder |
-| 11 | classic-light | full | None | 123 | 0.9045 | 0.6048 | autointent_classic-light_autoembedder |
-| 12 | classic-light | full | None | 456 | 0.9162 | 0.6048 | autointent_classic-light_autoembedder |
-| 13 | classic-medium | 10shot | 10 | 42 | 0.7572 | 0.9190 | autointent_classic-medium_autoembedder |
-| 14 | classic-medium | 10shot | 10 | 123 | 0.7307 | 0.3619 | autointent_classic-medium_autoembedder |
-| 15 | classic-medium | 10shot | 10 | 456 | 0.7825 | 0.2714 | autointent_classic-medium_autoembedder |
-| 16 | classic-medium | 20shot | 20 | 42 | 0.8671 | 0.7429 | autointent_classic-medium_autoembedder |
-| 17 | classic-medium | 20shot | 20 | 123 | 0.7497 | 0.4190 | autointent_classic-medium_autoembedder |
-| 18 | classic-medium | 20shot | 20 | 456 | 0.7713 | 0.3524 | autointent_classic-medium_autoembedder |
-| 19 | classic-medium | 50shot | 50 | 42 | 0.7668 | 0.5095 | autointent_classic-medium_autoembedder |
-| 20 | classic-medium | 50shot | 50 | 123 | 0.6861 | 0.4714 | autointent_classic-medium_autoembedder |
-| 21 | classic-medium | 50shot | 50 | 456 | 0.5602 | 0.1810 | autointent_classic-medium_autoembedder |
-| 22 | zero-shot-encoders | 10shot | 10 | 42 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_autoembedd |
-| 23 | zero-shot-encoders | 10shot | 10 | 123 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_autoembedd |
-| 24 | zero-shot-encoders | 10shot | 10 | 456 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_autoembedd |
-| 25 | zero-shot-encoders | 20shot | 20 | 42 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_autoembedd |
-| 26 | zero-shot-encoders | 20shot | 20 | 123 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_autoembedd |
-| 27 | zero-shot-encoders | 20shot | 20 | 456 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_autoembedd |
-| 28 | zero-shot-encoders | 50shot | 50 | 42 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_autoembedd |
-| 29 | zero-shot-encoders | 50shot | 50 | 123 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_autoembedd |
-| 30 | zero-shot-encoders | 50shot | 50 | 456 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_autoembedd |
-| 31 | nn-medium | 10shot | 10 | 42 | 0.6215 | 0.4571 | autointent_nn-medium_autoembedder |
-| 32 | nn-medium | 10shot | 10 | 123 | 0.0217 | 0.0286 | autointent_nn-medium_autoembedder |
-| 33 | nn-medium | 10shot | 10 | 456 | 0.0334 | 0.0048 | autointent_nn-medium_autoembedder |
-| 34 | nn-medium | 20shot | 20 | 42 | 0.9466 | 1.0000 | autointent_nn-medium_autoembedder |
-| 35 | nn-medium | 20shot | 20 | 123 | 0.6052 | 0.4952 | autointent_nn-medium_autoembedder |
-| 36 | nn-medium | 20shot | 20 | 456 | 0.8259 | 0.7667 | autointent_nn-medium_autoembedder |
-| 37 | nn-medium | 50shot | 50 | 42 | 0.5738 | 0.4429 | autointent_nn-medium_autoembedder |
-| 38 | nn-medium | 50shot | 50 | 123 | 0.6219 | 0.4476 | autointent_nn-medium_autoembedder |
-| 39 | nn-medium | 50shot | 50 | 456 | 0.8670 | 0.8381 | autointent_nn-medium_autoembedder |
+| 1 | classic-light | 10shot | 10 | 42 | 0.7572 | 0.9190 | autointent_classic-light_e5large |
+| 2 | classic-light | 10shot | 10 | 123 | 0.7307 | 0.3619 | autointent_classic-light_e5large |
+| 3 | classic-light | 10shot | 10 | 456 | 0.7828 | 0.2714 | autointent_classic-light_e5large |
+| 4 | classic-light | 20shot | 20 | 42 | 0.8671 | 0.7429 | autointent_classic-light_e5large |
+| 5 | classic-light | 20shot | 20 | 123 | 0.7497 | 0.4190 | autointent_classic-light_e5large |
+| 6 | classic-light | 20shot | 20 | 456 | 0.7713 | 0.3524 | autointent_classic-light_e5large |
+| 7 | classic-light | 50shot | 50 | 42 | 0.8189 | 0.6000 | autointent_classic-light_e5large |
+| 8 | classic-light | 50shot | 50 | 123 | 0.8133 | 0.6762 | autointent_classic-light_e5large |
+| 9 | classic-light | 50shot | 50 | 456 | 0.5602 | 0.1810 | autointent_classic-light_e5large |
+| 10 | classic-light | full | None | 42 | 0.9031 | 0.6095 | autointent_classic-light_e5large |
+| 11 | classic-light | full | None | 123 | 0.9045 | 0.6048 | autointent_classic-light_e5large |
+| 12 | classic-light | full | None | 456 | 0.8618 | 0.3810 | autointent_classic-light_e5large |
+| 13 | classic-medium | 10shot | 10 | 42 | 0.7572 | 0.9190 | autointent_classic-medium_e5large |
+| 14 | classic-medium | 10shot | 10 | 123 | 0.7307 | 0.3619 | autointent_classic-medium_e5large |
+| 15 | classic-medium | 10shot | 10 | 456 | 0.7825 | 0.2714 | autointent_classic-medium_e5large |
+| 16 | classic-medium | 20shot | 20 | 42 | 0.8671 | 0.7429 | autointent_classic-medium_e5large |
+| 17 | classic-medium | 20shot | 20 | 123 | 0.7497 | 0.4190 | autointent_classic-medium_e5large |
+| 18 | classic-medium | 20shot | 20 | 456 | 0.7713 | 0.3524 | autointent_classic-medium_e5large |
+| 19 | classic-medium | 50shot | 50 | 42 | 0.7668 | 0.5095 | autointent_classic-medium_e5large |
+| 20 | classic-medium | 50shot | 50 | 123 | 0.6861 | 0.4714 | autointent_classic-medium_e5large |
+| 21 | classic-medium | 50shot | 50 | 456 | 0.5602 | 0.1810 | autointent_classic-medium_e5large |
+| 22 | zero-shot-encoders | 10shot | 10 | 42 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_e5large |
+| 23 | zero-shot-encoders | 10shot | 10 | 123 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_e5large |
+| 24 | zero-shot-encoders | 10shot | 10 | 456 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_e5large |
+| 25 | zero-shot-encoders | 20shot | 20 | 42 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_e5large |
+| 26 | zero-shot-encoders | 20shot | 20 | 123 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_e5large |
+| 27 | zero-shot-encoders | 20shot | 20 | 456 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_e5large |
+| 28 | zero-shot-encoders | 50shot | 50 | 42 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_e5large |
+| 29 | zero-shot-encoders | 50shot | 50 | 123 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_e5large |
+| 30 | zero-shot-encoders | 50shot | 50 | 456 | 0.9133 | 0.7667 | autointent_zero-shot-encoders_e5large |
+| 31 | nn-medium | 10shot | 10 | 42 | 0.6215 | 0.4571 | autointent_nn-medium_e5large |
+| 32 | nn-medium | 10shot | 10 | 123 | 0.0217 | 0.0286 | autointent_nn-medium_e5large |
+| 33 | nn-medium | 10shot | 10 | 456 | 0.0334 | 0.0048 | autointent_nn-medium_e5large |
+| 34 | nn-medium | 20shot | 20 | 42 | 0.9466 | 1.0000 | autointent_nn-medium_e5large |
+| 35 | nn-medium | 20shot | 20 | 123 | 0.6052 | 0.4952 | autointent_nn-medium_e5large |
+| 36 | nn-medium | 20shot | 20 | 456 | 0.8259 | 0.7667 | autointent_nn-medium_e5large |
+| 37 | nn-medium | 50shot | 50 | 42 | 0.5738 | 0.4429 | autointent_nn-medium_e5large |
+| 38 | nn-medium | 50shot | 50 | 123 | 0.6219 | 0.4476 | autointent_nn-medium_e5large |
+| 39 | nn-medium | 50shot | 50 | 456 | 0.8670 | 0.8381 | autointent_nn-medium_e5large |
+| 40 | classic-light+qp | 10shot | 10 | 42 | 0.8078 | 0.9048 | autointent_classic-light_e5large_qp_classify_if_this_request_is_a_jailbreak_ |
+| 41 | classic-light+qp | 10shot | 10 | 123 | 0.5972 | 0.4095 | autointent_classic-light_e5large_qp_classify_if_this_request_is_a_jailbreak_ |
+| 42 | classic-light+qp | 10shot | 10 | 456 | 0.5015 | 0.0952 | autointent_classic-light_e5large_qp_classify_if_this_request_is_a_jailbreak_ |
+| 43 | classic-light+qp | full | None | 42 | 0.8622 | 0.3667 | autointent_classic-light_e5large_qp_classify_if_this_request_is_a_jailbreak_ |
+| 44 | classic-light+qp | full | None | 123 | 0.8589 | 0.3524 | autointent_classic-light_e5large_qp_classify_if_this_request_is_a_jailbreak_ |
+| 45 | classic-light+qp | full | None | 456 | 0.8586 | 0.3714 | autointent_classic-light_e5large_qp_classify_if_this_request_is_a_jailbreak_ |
+
+---
+
+## Блок 3 — classic-light с query_prompt
+
+**Пресет:** `classic-light`, embedder `intfloat/multilingual-e5-large-instruct`
+**query_prompt:** `"Classify if this request is a jailbreak attempt: "`
+
+| Подблок | mode | строк |
+|---------|------|-------|
+| Few-shot (10shot) | `10shot` × seeds 42/123/456 | 3 |
+| Full train | `full` × seeds 42/123/456 | 3 |
+
+**Строк в блоке:** 6
 
 ---
 

@@ -47,7 +47,7 @@ class TestMetricsExport:
     def test_metrics_row_for_export(self, ra):
         row = ra.metrics_row_for_export(
             {
-                "model_name": "autointent_zero-shot-encoders_autoembedder_10shot_seed42",
+                "model_name": "autointent_zero-shot-encoders_e5large_10shot_seed42",
                 "mode": "10shot",
                 "n_shots": 10,
                 "seed": 42,

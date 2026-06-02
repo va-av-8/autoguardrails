@@ -161,7 +161,7 @@ python scripts/prepare_data.py --full_subset
 **Embedder:** intfloat/multilingual-e5-large-instruct
 **Выбор эмбеддера:** AutoIntent прогонялся в двух режимах — с
 фиксированным эмбеддером и без (AutoML сам выбирает из пула моделей,
-`--no-fix-embedder`). Во всех 12 прогонах без фиксации (10/20/50-shot
+`--pilot`). Во всех 12 прогонах без фиксации (10/20/50-shot
 и full × 3 сида) AutoML выбрал ту же `multilingual-e5-large-instruct`,
 поэтому отдельные full-прогоны с фиксацией не проводились —
 они эквивалентны прогонам без фиксации.
@@ -178,12 +178,12 @@ python scripts/prepare_data.py --full_subset
 ### Артефакты: локальные модели vs metrics.json
 
 **Важно:** `results/metrics.json` содержит результаты Kaggle-прогонов
-с `--no-fix-embedder` (autoembedder), а не локальных прогонов из ноутбука 03.
+с фиксированным эмбеддером (e5large), а не локальных прогонов из ноутбука 03.
 
 | Источник | model_name | embedder_fixed | Где хранится |
 |----------|------------|----------------|--------------|
 | Ноутбук 03 (локально) | `autointent_classic-light` | Yes | `runs/autointent_classic-light_*` |
-| Kaggle (metrics.json) | `autointent_classic-light_autoembedder` | No | только metrics.json |
+| Kaggle (metrics.json) | `autointent_classic-light_e5large` | Yes | только metrics.json |
 
-Числа совпадают, потому что AutoML выбрал тот же эмбеддер (`e5-large-instruct`).
-Локальные модели few-shot (9 штук) сохранены в `runs/`, Kaggle-модели (autoembedder, full) — нет.
+Числа совпадают — используется один и тот же эмбеддер (`e5-large-instruct`).
+Локальные модели few-shot (9 штук) сохранены в `runs/`, Kaggle-модели (e5large, full) — нет.

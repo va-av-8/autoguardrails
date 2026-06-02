@@ -1,15 +1,13 @@
 """
-Tests for embedder flags in tasks/jailbreak_detection/scripts/run_autointent.py.
+Tests for embedder configuration in tasks/jailbreak_detection/scripts/run_autointent.py.
 
-Covers --no-fix-embedder naming, paths, metrics deduplication, and train() embedder wiring.
+Covers embedder naming, paths, metrics deduplication, and train() embedder wiring.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
-import sys
-from io import StringIO
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -24,15 +22,26 @@ def ra():
 
 
 class TestGetModelName:
-    def test_final_fixed_embedder(self, ra):
-        assert ra.get_model_name("classic-light", False, False) == "autointent_classic-light"
+    def test_final_uses_e5large_suffix(self, ra):
+        assert ra.get_model_name("classic-light", False) == "autointent_classic-light_e5large"
 
-    def test_pilot_fixed_embedder(self, ra):
-        assert ra.get_model_name("classic-light", True, False) == "autointent_classic-light_pilot"
+    def test_pilot_uses_pilot_suffix(self, ra):
+        assert ra.get_model_name("classic-light", True) == "autointent_classic-light_pilot"
 
-    def test_autoembedder_overrides_pilot(self, ra):
-        assert ra.get_model_name("classic-light", False, True) == "autointent_classic-light_autoembedder"
-        assert ra.get_model_name("classic-light", True, True) == "autointent_classic-light_autoembedder"
+    def test_different_presets(self, ra):
+        assert ra.get_model_name("nn-medium", False) == "autointent_nn-medium_e5large"
+        assert ra.get_model_name("classic-medium", True) == "autointent_classic-medium_pilot"
+
+    def test_with_query_prompt(self, ra):
+        qp = "Classify if this is jailbreak: "
+        name = ra.get_model_name("classic-light", False, qp)
+        assert name.startswith("autointent_classic-light_e5large_qp_")
+        assert "classify" in name.lower()
+
+    def test_query_prompt_with_pilot(self, ra):
+        qp = "Test prompt"
+        name = ra.get_model_name("classic-light", True, qp)
+        assert name.startswith("autointent_classic-light_pilot_qp_")
 
 
 class TestGetEmbedderName:
@@ -44,21 +53,23 @@ class TestGetEmbedderName:
 
 
 class TestGetModelDir:
-    def test_autoembedder_dir_differs_from_fixed_same_shots_seed(
-        self, ra, tmp_path, monkeypatch
-    ):
+    def test_pilot_dir_differs_from_final(self, ra, tmp_path, monkeypatch):
         monkeypatch.setattr(ra, "get_runs_dir", lambda: tmp_path)
-        fixed = ra.get_model_dir("classic-light", False, False, "fewshot", 10, 42)
-        auto = ra.get_model_dir("classic-light", False, True, "fewshot", 10, 42)
-        assert fixed != auto
-        assert "autoembedder" not in fixed.name
-        assert auto.name == "autointent_classic-light_autoembedder_10shot_seed42"
-        assert fixed.name == "autointent_classic-light_10shot_seed42"
+        final = ra.get_model_dir("classic-light", False, "fewshot", 10, 42)
+        pilot = ra.get_model_dir("classic-light", True, "fewshot", 10, 42)
+        assert final != pilot
+        assert final.name == "autointent_classic-light_e5large_10shot_seed42"
+        assert pilot.name == "autointent_classic-light_pilot_10shot_seed42"
+
+    def test_full_mode_dir(self, ra, tmp_path, monkeypatch):
+        monkeypatch.setattr(ra, "get_runs_dir", lambda: tmp_path)
+        full_dir = ra.get_model_dir("classic-light", False, "full", None, 42)
+        assert full_dir.name == "autointent_classic-light_e5large_full_seed42"
 
 
 class TestSaveMetrics:
-    def test_same_seed_two_embedder_modes_both_kept(self, ra, tmp_path):
-        """Distinct model_name keeps two metrics rows (fixed vs autoembedder)."""
+    def test_different_model_names_kept_separate(self, ra, tmp_path):
+        """Distinct model_name keeps two metrics rows (pilot vs final)."""
         base = {
             "mode": "10shot",
             "n_shots": 10,
@@ -68,21 +79,21 @@ class TestSaveMetrics:
             "recall": 0.5,
             "over_refusal_rate": 0.0,
         }
-        ra.save_metrics({**base, "model_name": "autointent_classic-light"}, tmp_path)
+        ra.save_metrics({**base, "model_name": "autointent_classic-light_e5large"}, tmp_path)
         ra.save_metrics(
-            {**base, "model_name": "autointent_classic-light_autoembedder"},
+            {**base, "model_name": "autointent_classic-light_pilot"},
             tmp_path,
         )
         data = json.loads((tmp_path / "metrics.json").read_text(encoding="utf-8"))
         assert len(data) == 2
         assert {r["model_name"] for r in data} == {
-            "autointent_classic-light",
-            "autointent_classic-light_autoembedder",
+            "autointent_classic-light_e5large",
+            "autointent_classic-light_pilot",
         }
 
     def test_run_metrics_filename_matches_metrics_row(self, ra, tmp_path):
         row = {
-            "model_name": "autointent_classic-light_autoembedder",
+            "model_name": "autointent_classic-light_e5large",
             "mode": "10shot",
             "n_shots": 10,
             "seed": 42,
@@ -95,13 +106,13 @@ class TestSaveMetrics:
         }
         path = ra.save_run_metrics_file(row, tmp_path)
         assert path.name == (
-            "metrics_autointent_classic-light_autoembedder_10shot_seed42.json"
+            "metrics_autointent_classic-light_e5large_10shot_seed42.json"
         )
         assert json.loads(path.read_text(encoding="utf-8")) == row
 
 
 class TestTrainEmbedderConfig:
-    """Ensure EmbedderConfig is only applied when embedder is fixed."""
+    """Ensure EmbedderConfig is always applied (embedder is always fixed)."""
 
     @staticmethod
     def _minimal_train_dict():
@@ -110,7 +121,8 @@ class TestTrainEmbedderConfig:
             "oos_utterances": ["j"] * 10,
         }
 
-    def test_no_fix_embedder_skips_embedder_config(self, ra, tmp_path, monkeypatch):
+    def test_embedder_config_always_set(self, ra, tmp_path, monkeypatch):
+        """EmbedderConfig is always set (embedder is always fixed)."""
         monkeypatch.setattr(
             ra,
             "load_fewshot_train",
@@ -138,18 +150,18 @@ class TestTrainEmbedderConfig:
                 n_shots=10,
                 seed=42,
                 pilot=False,
-                no_fix_embedder=True,
                 no_automl_progress=True,
             )
             out = tmp_path / "run"
             out.mkdir(parents=True)
             ra.train(args, tmp_path / "data", out)
 
-        assert "EmbedderConfig" not in config_types
+        assert "EmbedderConfig" in config_types
         assert "DataConfig" in config_types
         assert "LoggingConfig" in config_types
 
-    def test_fixed_embedder_sets_embedder_config(self, ra, tmp_path, monkeypatch):
+    def test_pilot_embedder_config_set(self, ra, tmp_path, monkeypatch):
+        """EmbedderConfig is set with pilot embedder."""
         monkeypatch.setattr(
             ra,
             "load_fewshot_train",
@@ -176,8 +188,7 @@ class TestTrainEmbedderConfig:
                 mode="fewshot",
                 n_shots=10,
                 seed=42,
-                pilot=False,
-                no_fix_embedder=False,
+                pilot=True,
                 no_automl_progress=True,
             )
             out = tmp_path / "run"
@@ -187,26 +198,44 @@ class TestTrainEmbedderConfig:
         assert "EmbedderConfig" in config_types
 
 
-def test_cli_help_lists_no_fix_embedder(ra):
-    """argparse help includes --no-fix-embedder (no subprocess; uses autointent stub)."""
-    old_argv = sys.argv
-    old_stdout = sys.stdout
-    buf = StringIO()
-    try:
-        sys.argv = ["run_autointent.py", "--help"]
-        sys.stdout = buf
-        with pytest.raises(SystemExit) as exc:
-            ra.main()
-        assert exc.value.code == 0
-    finally:
-        sys.stdout = old_stdout
-        sys.argv = old_argv
+def test_train_metadata_embedder_fixed_true(ra, tmp_path, monkeypatch):
+    """Metadata always has embedder_fixed=True."""
+    monkeypatch.setattr(
+        ra,
+        "load_fewshot_train",
+        lambda n, s, d: TestTrainEmbedderConfig._minimal_train_dict(),
+    )
+    monkeypatch.setattr(
+        ra,
+        "load_test",
+        lambda d: {"utterances": ["u1", "u2"], "labels": [0, 1]},
+    )
 
-    out = buf.getvalue()
-    assert "--no-fix-embedder" in out
+    pipeline_inst = MagicMock()
+    pipeline_inst.set_config = MagicMock()
+
+    with patch.object(ra, "Pipeline") as mock_pipe:
+        mock_pipe.from_preset.return_value = pipeline_inst
+        args = argparse.Namespace(
+            preset="classic-light",
+            mode="fewshot",
+            n_shots=10,
+            seed=42,
+            pilot=False,
+            no_automl_progress=True,
+        )
+        out = tmp_path / "run"
+        out.mkdir(parents=True)
+        ra.train(args, tmp_path / "data", out)
+
+    meta = json.loads((out / "train_metadata.json").read_text(encoding="utf-8"))
+    assert meta["embedder_fixed"] is True
+    assert meta["model_name"] == "autointent_classic-light_e5large"
+    assert meta["embedder"] == "intfloat/multilingual-e5-large-instruct"
 
 
-def test_train_metadata_written_with_embedder_fixed_false(ra, tmp_path, monkeypatch):
+def test_train_metadata_pilot_embedder(ra, tmp_path, monkeypatch):
+    """Pilot mode uses small embedder."""
     monkeypatch.setattr(
         ra,
         "load_fewshot_train",
@@ -229,7 +258,6 @@ def test_train_metadata_written_with_embedder_fixed_false(ra, tmp_path, monkeypa
             n_shots=10,
             seed=42,
             pilot=True,
-            no_fix_embedder=True,
             no_automl_progress=True,
         )
         out = tmp_path / "run"
@@ -237,6 +265,6 @@ def test_train_metadata_written_with_embedder_fixed_false(ra, tmp_path, monkeypa
         ra.train(args, tmp_path / "data", out)
 
     meta = json.loads((out / "train_metadata.json").read_text(encoding="utf-8"))
-    assert meta["embedder_fixed"] is False
-    assert meta["model_name"] == "autointent_classic-light_autoembedder"
-    assert meta["embedder"] == "auto (optimized by AutoML)"
+    assert meta["embedder_fixed"] is True
+    assert meta["model_name"] == "autointent_classic-light_pilot"
+    assert meta["embedder"] == "intfloat/multilingual-e5-small"
