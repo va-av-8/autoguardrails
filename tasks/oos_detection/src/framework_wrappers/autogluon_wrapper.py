@@ -76,6 +76,9 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
 
         train_df = pd.DataFrame(embeddings, columns=self._feature_names)
         train_df["label"] = y_labels
+        train_df["_text"] = x_texts
+        train_df = train_df.sort_values(by=["label", "_text"], kind="mergesort").reset_index(drop=True)
+        train_df = train_df.drop(columns=["_text"])
 
         self._predictor = TabularPredictor(
             label="label",
