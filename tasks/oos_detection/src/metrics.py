@@ -13,6 +13,7 @@
 """
 
 from __future__ import annotations
+import os
 import time
 
 import numpy as np
@@ -146,6 +147,8 @@ def measure_latency(
     n_runs: int = 50,
 ) -> float:
     """Среднее время инференса на 1 запрос в миллисекундах."""
+    if os.environ.get("OOS_METRICS_LOG", "").lower() == "compact":
+        n_warmup, n_runs = 2, 5
     texts = texts[:100]
 
     # Warmup

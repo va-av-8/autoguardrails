@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Literal
 
 import numpy as np
 
 from tasks.oos_detection.src.metrics import f1_oos
+
+PredictionMode = Literal["argmax", "threshold"]
 
 
 class BaseFrameworkWrapper(ABC):
@@ -12,10 +15,32 @@ class BaseFrameworkWrapper(ABC):
 
     oos_label: int = -1
 
-    def __init__(self, model_name: str, default_threshold: float = 0.5):
+    def __init__(
+        self,
+        model_name: str,
+        default_threshold: float = 0.5,
+        prediction_mode: PredictionMode = "threshold",
+    ):
+        if prediction_mode not in ("argmax", "threshold"):
+            raise ValueError(f"prediction_mode must be 'argmax' or 'threshold', got {prediction_mode!r}")
+        self.prediction_mode: PredictionMode = prediction_mode
         self.model_name = model_name
         self.default_threshold = default_threshold
         self.threshold_: float | None = None
+
+    def _train_texts_labels(
+        self,
+        train_texts: list[str],
+        train_labels: list[int],
+    ) -> tuple[list[str], list[int]]:
+        """Argmax: OOS as a regular class; threshold: in-scope only."""
+        if self.prediction_mode == "argmax":
+            return list(train_texts), list(train_labels)
+        x_texts = [t for t, y in zip(train_texts, train_labels) if y != self.oos_label]
+        y_labels = [y for y in train_labels if y != self.oos_label]
+        if not x_texts:
+            raise ValueError("No in-domain samples after filtering OOS labels.")
+        return x_texts, y_labels
 
     @abstractmethod
     def fit(self, train_texts: list[str], train_labels: list[int]) -> "BaseFrameworkWrapper":

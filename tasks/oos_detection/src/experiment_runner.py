@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import contextlib
+import io
+import json
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -60,6 +64,7 @@ def run_single_experiment(
     results_file: str | Path | None = None,
     wrapper_kwargs: dict[str, Any] | None = None,
     calibrate_threshold: bool = True,
+    prediction_mode: str = "threshold",
     n_thresholds: int = 50,
 ) -> EvaluationResult:
     """Run one experiment and save result through existing Evaluator."""
@@ -70,8 +75,17 @@ def run_single_experiment(
         seed=seed,
     )
 
-    wrapper = build_wrapper(framework_name, **(wrapper_kwargs or {}))
-    wrapper.fit(train_data["texts"], train_data["labels"])
+    kwargs = {"prediction_mode": prediction_mode, **(wrapper_kwargs or {})}
+    wrapper = build_wrapper(framework_name, **kwargs)
+    quiet_fit = os.environ.get("OOS_QUIET_FIT", "").lower() in ("1", "true", "yes")
+    if quiet_fit:
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            wrapper.fit(train_data["texts"], train_data["labels"])
+    else:
+        wrapper.fit(train_data["texts"], train_data["labels"])
+
+    if prediction_mode == "argmax":
+        calibrate_threshold = False
 
     if calibrate_threshold:
         threshold = wrapper.calibrate_threshold(
@@ -91,16 +105,70 @@ def run_single_experiment(
     result_path = _resolve_results_file(results_file)
     evaluator = Evaluator(test_data=test_data, results_dir=result_path.parent)
     evaluator.metrics_file = result_path
-    result = evaluator.evaluate(
-        model=wrapper,
-        model_name=wrapper.model_name,
-        mode=mode_str,
-        n_shots=n_shots,
-        seed=seed,
-    )
-    result.extra = {"framework": framework_name, "source": source, **result.extra}
+    if quiet_fit:
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            result = evaluator.evaluate(
+                model=wrapper,
+                model_name=wrapper.model_name,
+                mode=mode_str,
+                n_shots=n_shots,
+                seed=seed,
+            )
+    else:
+        result = evaluator.evaluate(
+            model=wrapper,
+            model_name=wrapper.model_name,
+            mode=mode_str,
+            n_shots=n_shots,
+            seed=seed,
+        )
+    result.extra = {
+        "framework": framework_name,
+        "source": source,
+        "prediction_mode": prediction_mode,
+        **result.extra,
+    }
+    if is_degenerate_result(result):
+        if framework_name == "h2o" and hasattr(wrapper, "release"):
+            wrapper.release()
+        raise RuntimeError(
+            f"Degenerate predictions for {framework_name} ({mode_str}, seed={seed}): "
+            f"in_domain_acc={result.in_domain_acc:.4f}, oos_recall={result.oos_recall:.4f}"
+        )
     evaluator.save(result)
+    _log_evaluation_result(result)
+    if framework_name == "h2o" and hasattr(wrapper, "release"):
+        wrapper.release()
     return result
+
+
+def is_degenerate_result(result: EvaluationResult | dict) -> bool:
+    """Detect collapsed predict-all-OOS style metrics."""
+    if isinstance(result, EvaluationResult):
+        rec = result.to_dict()
+    else:
+        rec = result
+    ind = rec.get("in_domain_acc")
+    oos_r = rec.get("oos_recall")
+    auroc = rec.get("auroc")
+    if ind is not None and oos_r is not None and ind < 0.5 and oos_r > 0.9:
+        return True
+    if auroc is not None and auroc <= 0.55 and oos_r is not None and oos_r > 0.9:
+        return True
+    return False
+
+
+def _log_evaluation_result(result: EvaluationResult) -> None:
+    """Print metrics to stdout (compact on Kaggle via OOS_METRICS_LOG=compact)."""
+    payload = result.to_dict()
+    line = json.dumps(payload, ensure_ascii=False, default=str)
+    LOGGER.info("METRICS_RECORD %s", line)
+    if os.environ.get("OOS_METRICS_LOG", "").lower() == "compact":
+        print("RUN_FINISH " + line)
+        return
+    print(f"\n{'=' * 72}\nMETRICS_RECORD\n{'=' * 72}")
+    print(json.dumps(payload, ensure_ascii=False, indent=2, default=str))
+    print("=" * 72)
 
 
 def run_framework_grid(
@@ -113,6 +181,8 @@ def run_framework_grid(
     results_file: str | Path | None = None,
     continue_on_error: bool = False,
     wrapper_kwargs: dict[str, Any] | None = None,
+    calibrate_threshold: bool = True,
+    prediction_mode: str = "threshold",
 ) -> tuple[list[EvaluationResult], list[dict[str, Any]]]:
     """
     Run framework/source/mode grid. On failure logs metadata and continues.
@@ -162,6 +232,8 @@ def run_framework_grid(
             result = run_single_experiment(
                 results_file=results_file,
                 wrapper_kwargs=wrapper_kwargs,
+                calibrate_threshold=calibrate_threshold,
+                prediction_mode=prediction_mode,
                 **job,
             )
             results.append(result)
