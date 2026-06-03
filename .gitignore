@@ -238,3 +238,7 @@ AutogluonModels/
 
 # Diagnostics (generated analysis files)
 tasks/*/results/diagnostics/
+
+# CatBoost training logs
+catboost_info/
+**/catboost_info/
