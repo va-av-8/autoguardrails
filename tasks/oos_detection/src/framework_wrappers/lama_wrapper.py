@@ -29,7 +29,7 @@ class LAMAWrapper(BaseFrameworkWrapper):
         self,
         default_threshold: float = 0.5,
         embedder_name: str = "intfloat/multilingual-e5-large-instruct",
-        timeout: int = 600,
+        timeout: int = 3600,
         cpu_limit: int = 1,
         seed: int = 42,
         prediction_mode: str = "threshold",
@@ -49,6 +49,8 @@ class LAMAWrapper(BaseFrameworkWrapper):
         self._automl = None
         self._class_labels: list[int] = []
         self._feature_names: list[str] = []
+        # Embedding cache: (tuple of texts) -> embeddings
+        self._embed_cache: tuple[tuple[str, ...], np.ndarray] | None = None
 
     def _get_embedder(self) -> SentenceTransformer:
         if self._embedder is None:
@@ -56,14 +58,19 @@ class LAMAWrapper(BaseFrameworkWrapper):
         return self._embedder
 
     def _embed(self, texts: list[str]) -> np.ndarray:
+        key = tuple(texts)
+        if self._embed_cache is not None and self._embed_cache[0] == key:
+            return self._embed_cache[1]
         model = self._get_embedder()
-        return np.asarray(
+        embeddings = np.asarray(
             model.encode(
                 texts,
                 normalize_embeddings=True,
                 show_progress_bar=False,
             )
         )
+        self._embed_cache = (key, embeddings)
+        return embeddings
 
     def fit(self, train_texts: list[str], train_labels: list[int]) -> "LAMAWrapper":
         try:
@@ -120,6 +127,39 @@ class LAMAWrapper(BaseFrameworkWrapper):
             oos_idx = self._class_labels.index(self.oos_label)
             return proba[:, oos_idx]
         return 1.0 - proba.max(axis=1)
+
+    def predict_proba_full(self, texts: list[str]) -> np.ndarray:
+        """Return full probability matrix [n_samples, n_classes]."""
+        return self._predict_proba_matrix(texts)
+
+    def get_classes(self) -> list[int]:
+        """Return list of class labels in column order of predict_proba_full."""
+        return list(self._class_labels)
+
+    def get_model_info(self) -> dict | None:
+        """Return LAMA model info (algorithms used, blender weights if available)."""
+        if self._automl is None:
+            return None
+        info: dict = {"framework": "lama"}
+        try:
+            # Try to extract used models from reader/pipes
+            if hasattr(self._automl, "reader") and self._automl.reader is not None:
+                info["reader_class"] = type(self._automl.reader).__name__
+            if hasattr(self._automl, "blender") and self._automl.blender is not None:
+                blender = self._automl.blender
+                info["blender_class"] = type(blender).__name__
+                if hasattr(blender, "wts"):
+                    info["blender_weights"] = list(blender.wts) if blender.wts is not None else None
+            # Extract pipe names
+            if hasattr(self._automl, "levels") and self._automl.levels:
+                pipes = []
+                for level in self._automl.levels:
+                    for pipe in level:
+                        pipes.append(type(pipe).__name__)
+                info["pipes"] = pipes
+        except Exception:
+            info["extraction_error"] = "Could not extract full model info"
+        return info
 
     def predict(self, texts: list[str]) -> np.ndarray:
         if self.prediction_mode == "argmax":

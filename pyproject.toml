@@ -22,7 +22,7 @@ dependencies = [
 automl = [
     "autogluon.tabular>=1.1,<2",
     "h2o>=3.44,<3.47",
-    "lightautoml>=0.3.8,<0.4",
+    "lightautoml>=0.4",
 ]
 
 [build-system]

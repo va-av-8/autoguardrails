@@ -93,9 +93,22 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--prediction-mode",
-        choices=["threshold", "argmax"],
+        choices=["threshold", "argmax", "both"],
         default="threshold",
-        help="threshold: OOS via calibrated score; argmax: OOS as 151st class (default AutoML).",
+        help="threshold: OOS via calibrated score; argmax: OOS as 151st class; both: run both modes.",
+    )
+    parser.add_argument(
+        "--save-scores",
+        action="store_true",
+        default=True,
+        dest="save_scores",
+        help="Save prediction scores to results/scores/ (default: True).",
+    )
+    parser.add_argument(
+        "--no-save-scores",
+        action="store_false",
+        dest="save_scores",
+        help="Disable saving prediction scores.",
     )
     parser.add_argument(
         "--no-calibrate-threshold",
@@ -128,25 +141,42 @@ def main() -> None:
 
     _prepare_data_if_needed(args.sources, args.prepare_if_missing)
 
-    calibrate = not args.no_calibrate_threshold and args.prediction_mode != "argmax"
+    # Determine which prediction modes to run
+    if args.prediction_mode == "both":
+        prediction_modes = ["threshold", "argmax"]
+    else:
+        prediction_modes = [args.prediction_mode]
 
-    results, errors = run_framework_grid(
-        frameworks=args.frameworks,
-        sources=args.sources,
-        run_full=run_full,
-        run_fewshot=run_fewshot,
-        n_shots_list=args.n_shots,
-        seeds=args.seeds,
-        results_file=args.results_file,
-        continue_on_error=args.continue_on_error,
-        calibrate_threshold=calibrate,
-        prediction_mode=args.prediction_mode,
-    )
+    all_results = []
+    all_errors = []
 
-    LOGGER.info("Completed experiments: %d", len(results))
-    if errors:
-        LOGGER.warning("Failed experiments: %d", len(errors))
-        for err in errors:
+    for pred_mode in prediction_modes:
+        LOGGER.info("=" * 60)
+        LOGGER.info("Running prediction_mode=%s", pred_mode)
+        LOGGER.info("=" * 60)
+
+        calibrate = not args.no_calibrate_threshold and pred_mode != "argmax"
+
+        results, errors = run_framework_grid(
+            frameworks=args.frameworks,
+            sources=args.sources,
+            run_full=run_full,
+            run_fewshot=run_fewshot,
+            n_shots_list=args.n_shots,
+            seeds=args.seeds,
+            results_file=args.results_file,
+            continue_on_error=args.continue_on_error,
+            calibrate_threshold=calibrate,
+            prediction_mode=pred_mode,
+            save_scores=args.save_scores,
+        )
+        all_results.extend(results)
+        all_errors.extend(errors)
+
+    LOGGER.info("Completed experiments: %d", len(all_results))
+    if all_errors:
+        LOGGER.warning("Failed experiments: %d", len(all_errors))
+        for err in all_errors:
             LOGGER.warning(
                 "FAILED framework=%s source=%s mode=%s n_shots=%s seed=%s error=%s",
                 err["framework"],

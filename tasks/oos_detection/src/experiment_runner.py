@@ -5,6 +5,7 @@ import io
 import json
 import logging
 import os
+import time
 from pathlib import Path
 from typing import Any
 
@@ -66,6 +67,7 @@ def run_single_experiment(
     calibrate_threshold: bool = True,
     prediction_mode: str = "threshold",
     n_thresholds: int = 50,
+    save_scores: bool = True,
 ) -> EvaluationResult:
     """Run one experiment and save result through existing Evaluator."""
     train_data, val_data, test_data = load_experiment_data(
@@ -78,21 +80,29 @@ def run_single_experiment(
     kwargs = {"prediction_mode": prediction_mode, **(wrapper_kwargs or {})}
     wrapper = build_wrapper(framework_name, **kwargs)
     quiet_fit = os.environ.get("OOS_QUIET_FIT", "").lower() in ("1", "true", "yes")
+
+    # Measure training time
+    t0_train = time.perf_counter()
     if quiet_fit:
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             wrapper.fit(train_data["texts"], train_data["labels"])
     else:
         wrapper.fit(train_data["texts"], train_data["labels"])
+    train_sec = time.perf_counter() - t0_train
 
     if prediction_mode == "argmax":
         calibrate_threshold = False
 
+    # Measure calibration time (separate from training)
+    calibrate_sec = 0.0
     if calibrate_threshold:
+        t0_calib = time.perf_counter()
         threshold = wrapper.calibrate_threshold(
             val_data["texts"],
             val_data["labels"],
             n_thresholds=n_thresholds,
         )
+        calibrate_sec = time.perf_counter() - t0_calib
         LOGGER.info(
             "Calibrated threshold for %s (%s/%s): %.4f",
             framework_name,
@@ -113,6 +123,8 @@ def run_single_experiment(
                 mode=mode_str,
                 n_shots=n_shots,
                 seed=seed,
+                source=source,
+                save_scores_flag=save_scores,
             )
     else:
         result = evaluator.evaluate(
@@ -121,11 +133,15 @@ def run_single_experiment(
             mode=mode_str,
             n_shots=n_shots,
             seed=seed,
+            source=source,
+            save_scores_flag=save_scores,
         )
     result.extra = {
         "framework": framework_name,
         "source": source,
         "prediction_mode": prediction_mode,
+        "train_sec": round(train_sec, 2),
+        "calibrate_sec": round(calibrate_sec, 2),
         **result.extra,
     }
     if is_degenerate_result(result):
@@ -183,6 +199,7 @@ def run_framework_grid(
     wrapper_kwargs: dict[str, Any] | None = None,
     calibrate_threshold: bool = True,
     prediction_mode: str = "threshold",
+    save_scores: bool = True,
 ) -> tuple[list[EvaluationResult], list[dict[str, Any]]]:
     """
     Run framework/source/mode grid. On failure logs metadata and continues.
@@ -234,6 +251,7 @@ def run_framework_grid(
                 wrapper_kwargs=wrapper_kwargs,
                 calibrate_threshold=calibrate_threshold,
                 prediction_mode=prediction_mode,
+                save_scores=save_scores,
                 **job,
             )
             results.append(result)

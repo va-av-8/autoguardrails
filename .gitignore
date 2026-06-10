@@ -239,3 +239,10 @@ AutogluonModels/
 # Local clones / one-off exports (do not commit)
 /autoguardrails/
 metrics_clean_*.json
+
+# CatBoost training artifacts
+catboost_info/
+
+# Task-specific ignores
+tasks/jailbreak_detection/
+tasks/oos_detection/results/scores/

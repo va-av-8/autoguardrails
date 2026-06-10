@@ -50,7 +50,7 @@ class H2OWrapper(BaseFrameworkWrapper):
         default_threshold: float = 0.5,
         embedder_name: str = "intfloat/multilingual-e5-large-instruct",
         max_models: int = 5,
-        max_runtime_secs: int = 1500,
+        max_runtime_secs: int = 3600,
         seed: int = 42,
         prediction_mode: str = "threshold",
     ):
@@ -70,6 +70,9 @@ class H2OWrapper(BaseFrameworkWrapper):
         self._feature_names: list[str] = []
         self._h2o_initialized: bool = False
         self._oos_internal = H2O_OOS_INTERNAL
+        self._classes: list[int] = []
+        # Embedding cache: (tuple of texts) -> embeddings
+        self._embed_cache: tuple[tuple[str, ...], np.ndarray] | None = None
 
     def __del__(self):
         self.release()
@@ -88,14 +91,19 @@ class H2OWrapper(BaseFrameworkWrapper):
         return self._embedder
 
     def _embed(self, texts: list[str]) -> np.ndarray:
+        key = tuple(texts)
+        if self._embed_cache is not None and self._embed_cache[0] == key:
+            return self._embed_cache[1]
         model = self._get_embedder()
-        return np.asarray(
+        embeddings = np.asarray(
             model.encode(
                 texts,
                 normalize_embeddings=True,
                 show_progress_bar=False,
             )
         )
+        self._embed_cache = (key, embeddings)
+        return embeddings
 
     def _init_h2o(self) -> None:
         import h2o
@@ -122,6 +130,8 @@ class H2OWrapper(BaseFrameworkWrapper):
 
         x_texts, y_labels = self._train_texts_labels(train_texts, train_labels)
         y_internal = [self._encode_label(label) for label in y_labels]
+        # Store original class labels (before H2O encoding)
+        self._classes = sorted(set(y_labels))
 
         embeddings = self._embed(x_texts)
         self._feature_names = [f"f_{idx}" for idx in range(embeddings.shape[1])]
@@ -195,6 +205,26 @@ class H2OWrapper(BaseFrameworkWrapper):
             raise RuntimeError("H2O prediction does not contain class probabilities.")
         proba = pred_df[proba_cols].to_numpy(dtype=float)
         return 1.0 - proba.max(axis=1)
+
+    def predict_proba_full(self, texts: list[str]) -> np.ndarray:
+        """Return full probability matrix [n_samples, n_classes]."""
+        pred_df = self._predict_frame(texts)
+        # Extract probability columns (pN format), decode to original labels
+        proba_cols = [c for c in pred_df.columns if c.startswith("p") and c != "predict"]
+        if not proba_cols:
+            raise RuntimeError("H2O prediction does not contain class probabilities.")
+        return pred_df[proba_cols].to_numpy(dtype=float)
+
+    def get_classes(self) -> list[int]:
+        """Return list of class labels in column order of predict_proba_full."""
+        return list(self._classes)
+
+    def get_leaderboard(self) -> pd.DataFrame | None:
+        """Return H2O AutoML leaderboard DataFrame."""
+        if self._aml is None or self._aml.leaderboard is None:
+            return None
+        with _suppress_h2o_output():
+            return self._aml.leaderboard.as_data_frame(use_pandas=True)
 
     def predict(self, texts: list[str]) -> np.ndarray:
         if self.prediction_mode == "argmax":

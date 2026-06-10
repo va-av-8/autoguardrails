@@ -55,6 +55,14 @@ class BaseFrameworkWrapper(ABC):
         """Return OOS score for each text (higher = more OOS)."""
 
     @abstractmethod
+    def predict_proba_full(self, texts: list[str]) -> np.ndarray:
+        """Return full probability matrix [n_samples, n_classes]."""
+
+    @abstractmethod
+    def get_classes(self) -> list[int]:
+        """Return list of class labels in column order of predict_proba_full."""
+
+    @abstractmethod
     def _predict_in_domain(self, texts: list[str]) -> np.ndarray:
         """Predict in-domain labels only."""
 

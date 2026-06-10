@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass, field, asdict
+from datetime import datetime, timezone
 from pathlib import Path
 import json
 import time
@@ -26,6 +27,14 @@ class OOSModel(Protocol):
 
     def predict_proba(self, texts: list[str]) -> np.ndarray:
         """Return OOS probability scores (higher = more likely OOS)."""
+        ...
+
+    def predict_proba_full(self, texts: list[str]) -> np.ndarray:
+        """Return full probability matrix [n_samples, n_classes]."""
+        ...
+
+    def get_classes(self) -> list[int]:
+        """Return list of class labels in column order of predict_proba_full."""
         ...
 
 
@@ -56,6 +65,7 @@ class EvaluationResult:
     seed: int | None = None
     is_reference: bool = False     # True для guardrail reference (Chua 2024)
     extra: dict = field(default_factory=dict)
+    timestamp: str | None = None   # ISO 8601 UTC timestamp
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
@@ -85,7 +95,96 @@ class Evaluator:
         self.results_dir = Path(results_dir)
         self.results_dir.mkdir(parents=True, exist_ok=True)
         self.metrics_file = self.results_dir / "metrics.json"
+        self.scores_dir = self.results_dir / "scores"
+        self.scores_dir.mkdir(parents=True, exist_ok=True)
         self.oos_label = -1
+
+    def _build_filename_base(
+        self,
+        model_name: str,
+        mode: str,
+        seed: int | None,
+        source: str | None,
+    ) -> str:
+        """Build base filename for scores/logs: {model_name}_{mode}_{seed}_{source}."""
+        seed_str = str(seed) if seed is not None else "full"
+        source_str = source if source else "unknown"
+        return f"{model_name}_{mode}_{seed_str}_{source_str}"
+
+    def save_scores(
+        self,
+        model: OOSModel,
+        model_name: str,
+        mode: str,
+        seed: int | None,
+        source: str | None,
+        y_pred: np.ndarray,
+        y_scores: np.ndarray,
+    ) -> Path:
+        """
+        Save prediction scores to .npz file.
+
+        Returns path to saved file.
+        """
+        base = self._build_filename_base(model_name, mode, seed, source)
+        scores_file = self.scores_dir / f"{base}_scores.npz"
+
+        # Get full probability matrix and classes
+        try:
+            proba_matrix = model.predict_proba_full(self.texts)
+            classes = np.array(model.get_classes())
+        except (AttributeError, RuntimeError):
+            proba_matrix = np.array([])
+            classes = np.array([])
+
+        np.savez_compressed(
+            scores_file,
+            y_pred=y_pred,
+            y_scores=y_scores,
+            proba_matrix=proba_matrix,
+            classes=classes,
+            y_true=self.labels,
+            texts=np.array(self.texts, dtype=object),
+        )
+        return scores_file
+
+    def save_model_logs(
+        self,
+        model,
+        model_name: str,
+        mode: str,
+        seed: int | None,
+        source: str | None,
+    ) -> Path | None:
+        """
+        Save model-specific logs (leaderboard, selected models) to .json file.
+
+        Returns path to saved file or None if not available.
+        """
+        base = self._build_filename_base(model_name, mode, seed, source)
+        logs_file = self.scores_dir / f"{base}_models.json"
+
+        logs: dict = {"model_name": model_name, "mode": mode, "seed": seed, "source": source}
+
+        # Try to get leaderboard/model info depending on framework
+        try:
+            if hasattr(model, "get_leaderboard"):
+                lb = model.get_leaderboard()
+                if lb is not None:
+                    logs["leaderboard"] = lb.to_dict(orient="records")
+                else:
+                    logs["leaderboard"] = "not available"
+            elif hasattr(model, "get_model_info"):
+                info = model.get_model_info()
+                logs["model_info"] = info if info else "not available"
+            else:
+                logs["model_info"] = "not available"
+        except Exception as e:
+            logs["extraction_error"] = str(e)
+
+        with open(logs_file, "w", encoding="utf-8") as f:
+            json.dump(logs, f, ensure_ascii=False, indent=2, default=str)
+        return logs_file
 
     def evaluate(
         self,
@@ -94,9 +193,11 @@ class Evaluator:
         mode: str = "full",
         n_shots: int | None = None,
         seed: int | None = None,
+        source: str | None = None,
         is_reference: bool = False,
         measure_latency_flag: bool = True,
         extra: dict | None = None,
+        save_scores_flag: bool = True,
     ) -> EvaluationResult:
         """
         Прогоняет модель на тест-сплите, вычисляет все метрики,
@@ -108,8 +209,10 @@ class Evaluator:
             mode: "full" | "10shot" | "20shot" | "50shot"
             n_shots: число примеров на класс (для few-shot)
             seed: random seed (для few-shot)
+            source: dataset source (e.g., "deeppavlov", "standard")
             is_reference: True для guardrail reference model
             measure_latency_flag: измерять ли latency
+            save_scores_flag: сохранять ли скоры и логи моделей
 
         Returns:
             EvaluationResult с заполненными метриками
@@ -117,6 +220,11 @@ class Evaluator:
         # Get predictions
         y_pred = model.predict(self.texts)
         y_scores = model.predict_proba(self.texts)
+
+        # Save scores and model logs
+        if save_scores_flag:
+            self.save_scores(model, model_name, mode, seed, source, y_pred, y_scores)
+            self.save_model_logs(model, model_name, mode, seed, source)
 
         # Compute metrics
         metrics = compute_all_metrics(
@@ -131,6 +239,11 @@ class Evaluator:
         if measure_latency_flag:
             latency = measure_latency(model, self.texts[:100])
 
+        # Build extra dict with source if provided
+        result_extra = dict(extra) if extra else {}
+        if source is not None:
+            result_extra["source"] = source
+
         return EvaluationResult(
             model_name=model_name,
             mode=mode,
@@ -143,7 +256,8 @@ class Evaluator:
             n_shots=n_shots,
             seed=seed,
             is_reference=is_reference,
-            extra=extra or {},
+            extra=result_extra,
+            timestamp=datetime.now(timezone.utc).isoformat(),
         )
 
     def save(self, result: EvaluationResult) -> None:

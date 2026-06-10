@@ -24,7 +24,7 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
         self,
         default_threshold: float = 0.5,
         embedder_name: str = "intfloat/multilingual-e5-large-instruct",
-        time_limit: int | None = 600,
+        time_limit: int | None = 3600,
         num_cpus: int = 1,
         seed: int = 42,
         prediction_mode: str = "threshold",
@@ -44,6 +44,8 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
         self._predictor = None
         self._classes: np.ndarray | None = None
         self._feature_names: list[str] = []
+        # Embedding cache: (tuple of texts) -> embeddings
+        self._embed_cache: tuple[tuple[str, ...], np.ndarray] | None = None
 
     def _get_embedder(self) -> SentenceTransformer:
         if self._embedder is None:
@@ -51,14 +53,19 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
         return self._embedder
 
     def _embed(self, texts: list[str]) -> np.ndarray:
+        key = tuple(texts)
+        if self._embed_cache is not None and self._embed_cache[0] == key:
+            return self._embed_cache[1]
         model = self._get_embedder()
-        return np.asarray(
+        embeddings = np.asarray(
             model.encode(
                 texts,
                 normalize_embeddings=True,
                 show_progress_bar=False,
             )
         )
+        self._embed_cache = (key, embeddings)
+        return embeddings
 
     def fit(self, train_texts: list[str], train_labels: list[int]) -> "AutoGluonWrapper":
         try:
@@ -88,6 +95,7 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
         self._predictor.fit(
             train_data=train_df,
             time_limit=self.time_limit,
+            excluded_model_types=["FASTAI"],
             ag_args_fit={"num_cpus": self.num_cpus},
             verbosity=0,
         )
@@ -125,6 +133,27 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
                 oos_idx = classes.index(self.oos_label)
                 return proba[:, oos_idx]
         return 1.0 - proba.max(axis=1)
+
+    def predict_proba_full(self, texts: list[str]) -> np.ndarray:
+        """Return full probability matrix [n_samples, n_classes]."""
+        if self._predictor is None:
+            raise RuntimeError("Model is not fitted.")
+        embeddings = self._embed(texts)
+        test_df = pd.DataFrame(embeddings, columns=self._feature_names)
+        proba_df = self._predictor.predict_proba(test_df)
+        return proba_df.to_numpy()
+
+    def get_classes(self) -> list[int]:
+        """Return list of class labels in column order of predict_proba_full."""
+        if self._classes is None:
+            raise RuntimeError("Model is not fitted.")
+        return list(self._classes)
+
+    def get_leaderboard(self) -> pd.DataFrame | None:
+        """Return AutoGluon leaderboard DataFrame."""
+        if self._predictor is None:
+            return None
+        return self._predictor.leaderboard(extra_info=True, silent=True)
 
     def predict(self, texts: list[str]) -> np.ndarray:
         if self.prediction_mode == "argmax":
