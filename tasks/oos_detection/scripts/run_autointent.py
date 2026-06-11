@@ -15,9 +15,6 @@
     # Full train
     python scripts/run_autointent.py --source standard --mode full
 
-    # AutoML оптимизация embedder
-    python scripts/run_autointent.py --source standard --mode fewshot --n_shots 10 --seed 42 --no-fix-embedder
-
     # С кастомной OOS-метрикой для decision node (для сравнения с фреймворками)
     python scripts/run_autointent.py --source deeppavlov --mode fewshot --n_shots 10 --seed 42 --decision-metric oos_f1
 
@@ -39,7 +36,6 @@ task_dir = script_dir.parent
 
 def get_model_dir(
     pilot: bool,
-    no_fix_embedder: bool,
     source: str,
     mode: str,
     n_shots: int | None,
@@ -50,9 +46,7 @@ def get_model_dir(
     # Build model name with optional suffixes
     suffix = "_oosf1" if decision_metric == "oos_f1" else ""
 
-    if no_fix_embedder:
-        model_name = f"autointent_classic-light_autoembedder{suffix}"
-    elif pilot:
+    if pilot:
         model_name = f"autointent_classic-light_pilot{suffix}"
     else:
         model_name = f"autointent_classic-light{suffix}"
@@ -102,11 +96,6 @@ def main():
         help="Use small embedder for fast validation",
     )
     parser.add_argument(
-        "--no-fix-embedder",
-        action="store_true",
-        help="Let AutoML optimize embedder (slower, potentially better)",
-    )
-    parser.add_argument(
         "--train-only",
         action="store_true",
         help="Only train, skip evaluation",
@@ -125,7 +114,6 @@ def main():
     args = parser.parse_args()
 
     # Build command arguments
-    no_fix_embedder = getattr(args, 'no_fix_embedder', False)
     decision_metric = args.decision_metric
 
     train_args = [
@@ -139,11 +127,9 @@ def main():
     ]
     if args.pilot:
         train_args.append("--pilot")
-    if no_fix_embedder:
-        train_args.append("--no-fix-embedder")
 
     model_dir = get_model_dir(
-        args.pilot, no_fix_embedder, args.source, args.mode,
+        args.pilot, args.source, args.mode,
         args.n_shots if args.mode == "fewshot" else None,
         args.seed,  # always pass seed for consistent model_dir
         decision_metric,

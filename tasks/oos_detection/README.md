@@ -171,39 +171,24 @@ uv run python scripts/run_autointent.py --source <source> --mode fewshot --n_sho
 uv run python scripts/run_autointent.py --source <source> --mode full
 uv run python scripts/run_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed>
 
-# Без фиксации embedder (AutoML оптимизирует embedder)
-uv run python scripts/run_autointent.py --source <source> --mode full --no-fix-embedder
-uv run python scripts/run_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed> --no-fix-embedder
-
 # Раздельный запуск train/eval
 uv run python scripts/train_autointent.py --source <source> --mode fewshot --n_shots <n> --seed <seed>
 uv run python scripts/eval_autointent.py --model_dir runs/autointent_classic-light_<source>_<n>shot_seed<seed>
 ```
 
 **Структура директорий моделей:**
-- С фиксацией: `runs/autointent_classic-light_<source>_<mode>_seed<seed>`
-- Без фиксации: `runs/autointent_classic-light_autoembedder_<source>_<mode>_seed<seed>`
+- Final: `runs/autointent_classic-light_<source>_<mode>_seed<seed>`
 - Pilot: `runs/autointent_classic-light_pilot_<source>_<mode>_seed<seed>`
 
 **Batch-запуск всех экспериментов:**
 
 ```bash
-# С фиксацией embedder
+# Batch-запуск всех экспериментов
 for source in standard deeppavlov; do
   uv run python scripts/run_autointent.py --source $source --mode full
   for n in 10 20 50; do
     for seed in 42 123 456; do
       uv run python scripts/run_autointent.py --source $source --mode fewshot --n_shots $n --seed $seed
-    done
-  done
-done
-
-# Без фиксации embedder (AutoML)
-for source in standard deeppavlov; do
-  uv run python scripts/run_autointent.py --source $source --mode full --no-fix-embedder
-  for n in 10 20 50; do
-    for seed in 42 123 456; do
-      uv run python scripts/run_autointent.py --source $source --mode fewshot --n_shots $n --seed $seed --no-fix-embedder
     done
   done
 done
@@ -249,7 +234,7 @@ uv run python tasks/oos_detection/scripts/summarize_results.py
 | `--seed` | `42`, `123`, `456` | Random seed (few-shot) |
 | `--model` | `tfidf`, `cosine`, `all` | Бейзлайн (run_baseline.py) |
 | `--pilot` | flag | Быстрый embedder e5-small |
-| `--no-fix-embedder` | flag | AutoML оптимизирует embedder |
+| `--decision-metric` | `decision_accuracy`, `oos_f1` | Метрика для decision node |
 
 ### Датасеты
 
