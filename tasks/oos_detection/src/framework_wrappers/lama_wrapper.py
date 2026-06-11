@@ -29,7 +29,7 @@ class LAMAWrapper(BaseFrameworkWrapper):
         self,
         default_threshold: float = 0.5,
         embedder_name: str = "intfloat/multilingual-e5-large-instruct",
-        timeout: int = 3600,
+        timeout: int = 600,
         cpu_limit: int = 1,
         seed: int = 42,
         prediction_mode: str = "threshold",
@@ -101,6 +101,7 @@ class LAMAWrapper(BaseFrameworkWrapper):
             timeout=self.timeout,
             cpu_limit=self.cpu_limit,
             reader_params={"random_state": self.seed},
+            timing_params={"mode": 2},  # Hard timeout (Benchmarking mode)
         )
         automl.fit_predict(train_df, roles={"target": "label"}, verbose=0)
         self._automl = automl

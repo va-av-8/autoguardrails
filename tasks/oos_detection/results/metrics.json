@@ -4077,14 +4077,18 @@
     "f1_oos": 0.6658354114713217,
     "auroc": 0.9519397777777777,
     "au_ioc": 0.904354888888889,
-    "latency_ms": 499.0220482571749,
+    "latency_ms": 448.8346559321508,
     "n_shots": 10,
     "seed": 42,
     "is_reference": false,
     "extra": {
       "framework": "lama",
-      "source": "standard"
-    }
+      "source": "standard",
+      "prediction_mode": "threshold",
+      "train_sec": 1611.88,
+      "calibrate_sec": 12.57
+    },
+    "timestamp": "2026-06-11T15:49:56.694258+00:00"
   },
   {
     "model_name": "autogluon_threshold",

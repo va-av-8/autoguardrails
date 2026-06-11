@@ -24,7 +24,7 @@ class AutoGluonWrapper(BaseFrameworkWrapper):
         self,
         default_threshold: float = 0.5,
         embedder_name: str = "intfloat/multilingual-e5-large-instruct",
-        time_limit: int | None = 3600,
+        time_limit: int | None = 600,
         num_cpus: int = 1,
         seed: int = 42,
         prediction_mode: str = "threshold",
