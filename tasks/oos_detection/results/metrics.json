@@ -4088,36 +4088,44 @@
   {
     "model_name": "autogluon_threshold",
     "mode": "10shot",
-    "oos_recall": 0.629,
-    "in_domain_acc": 0.9091111111111111,
-    "f1_oos": 0.7188571428571429,
-    "auroc": 0.9475231111111112,
-    "au_ioc": 0.8809684444444446,
-    "latency_ms": 77.78695079730824,
+    "oos_recall": 0.819,
+    "in_domain_acc": 0.8775555555555555,
+    "f1_oos": 0.8013698630136986,
+    "auroc": 0.9637047777777776,
+    "au_ioc": 0.8610955555555555,
+    "latency_ms": 657.8269449993968,
     "n_shots": 10,
     "seed": 42,
     "is_reference": false,
     "extra": {
       "framework": "autogluon",
-      "source": "standard"
-    }
+      "source": "standard",
+      "prediction_mode": "threshold",
+      "train_sec": 3614.48,
+      "calibrate_sec": 13.51
+    },
+    "timestamp": "2026-06-11T12:40:21.338461+00:00"
   },
   {
     "model_name": "autogluon_threshold",
     "mode": "10shot",
-    "oos_recall": 0.494,
-    "in_domain_acc": 0.9204444444444444,
-    "f1_oos": 0.6345536287732819,
-    "auroc": 0.9523551111111112,
-    "au_ioc": 0.8927125555555557,
-    "latency_ms": 74.82204087777063,
+    "oos_recall": 0.729,
+    "in_domain_acc": 0.8877777777777778,
+    "f1_oos": 0.7809319764327799,
+    "auroc": 0.9631935555555555,
+    "au_ioc": 0.871396111111111,
+    "latency_ms": 636.9827792281285,
     "n_shots": 10,
     "seed": 123,
     "is_reference": false,
     "extra": {
       "framework": "autogluon",
-      "source": "standard"
-    }
+      "source": "standard",
+      "prediction_mode": "threshold",
+      "train_sec": 3615.14,
+      "calibrate_sec": 14.33
+    },
+    "timestamp": "2026-06-11T13:41:53.500438+00:00"
   },
   {
     "model_name": "autogluon_threshold",

@@ -14,6 +14,9 @@
     # AutoML оптимизация embedder (без фиксации)
     python scripts/train_autointent.py --mode fewshot --n_shots 10 --seed 42 --no-fix-embedder
 
+    # С кастомной OOS-метрикой для decision node (для сравнения с фреймворками)
+    python scripts/train_autointent.py --mode fewshot --n_shots 10 --seed 42 --decision-metric oos_f1
+
 После обучения модель сохраняется в runs/<model_name>/.
 Для оценки используйте eval_autointent.py.
 """
@@ -21,6 +24,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.resources as ires
 import sys
 from pathlib import Path
 
@@ -55,16 +59,75 @@ def get_runs_dir() -> Path:
     return runs_dir
 
 
-def get_model_name(pilot: bool) -> str:
+def get_configs_dir() -> Path:
+    configs_dir = task_dir / "configs"
+    configs_dir.mkdir(parents=True, exist_ok=True)
+    return configs_dir
+
+
+def get_model_name(pilot: bool, decision_metric: str) -> str:
+    suffix = "_oosf1" if decision_metric == "oos_f1" else ""
     if pilot:
-        return "autointent_classic-light_pilot"
-    return "autointent_classic-light"
+        return f"autointent_classic-light_pilot{suffix}"
+    return f"autointent_classic-light{suffix}"
 
 
 def get_embedder_name(pilot: bool) -> str:
     if pilot:
         return "intfloat/multilingual-e5-small"
     return "intfloat/multilingual-e5-large-instruct"
+
+
+def ensure_oosf1_config() -> Path:
+    """
+    Создаёт classic-light-oosf1.yaml программно из оригинального пресета.
+    Меняет ТОЛЬКО target_metric у decision-ноды: decision_accuracy → oos_f1.
+    Сохраняет точное форматирование оригинала (строковая замена).
+    Возвращает путь к созданному файлу.
+    """
+    configs_dir = get_configs_dir()
+    output_path = configs_dir / "classic-light-oosf1.yaml"
+
+    # Читаем оригинальный classic-light.yaml как текст (сохраняем форматирование)
+    preset_file = ires.files("autointent._presets").joinpath("classic-light.yaml")
+    original_text = preset_file.read_text()
+
+    # Заменяем ТОЛЬКО target_metric у decision-ноды (после строки node_type: decision)
+    lines = original_text.split("\n")
+    in_decision_node = False
+    modified_lines = []
+    for line in lines:
+        if "node_type: decision" in line:
+            in_decision_node = True
+        if in_decision_node and "target_metric: decision_accuracy" in line:
+            line = line.replace("decision_accuracy", "oos_f1")
+            in_decision_node = False
+        modified_lines.append(line)
+
+    # Сохраняем кастомный конфиг (сохраняем оригинальный newline в конце)
+    modified_text = "\n".join(modified_lines)
+    if original_text.endswith("\n") and not modified_text.endswith("\n"):
+        modified_text += "\n"
+    output_path.write_text(modified_text)
+
+    return output_path
+
+
+def register_oos_f1_metric() -> None:
+    """
+    Регистрирует кастомную метрику oos_f1 в DECISION_METRICS.
+    Идентична f1_oos из src/metrics.py, но работает с форматом AutoIntent (OOS=None).
+    """
+    from sklearn.metrics import f1_score
+    from autointent.metrics import DECISION_METRICS
+
+    def oos_f1(y_true, y_pred):
+        """Бинарный F1 по OOS-классу. OOS=None → positive class."""
+        y_true_bin = [1 if y is None else 0 for y in y_true]
+        y_pred_bin = [1 if y is None else 0 for y in y_pred]
+        return float(f1_score(y_true_bin, y_pred_bin, zero_division=0))
+
+    DECISION_METRICS["oos_f1"] = oos_f1
 
 
 def main():
@@ -105,6 +168,12 @@ def main():
         action="store_true",
         help="Let AutoML optimize embedder (slower, potentially better)",
     )
+    parser.add_argument(
+        "--decision-metric",
+        choices=["decision_accuracy", "oos_f1"],
+        default="decision_accuracy",
+        help="Target metric for decision node optimization (oos_f1 = binary F1 on OOS class)",
+    )
     args = parser.parse_args()
 
     data_dir = get_data_dir()
@@ -112,12 +181,15 @@ def main():
 
     # Model naming
     no_fix_embedder = getattr(args, 'no_fix_embedder', False)
+    decision_metric = args.decision_metric
 
     if no_fix_embedder:
         model_name = "autointent_classic-light_autoembedder"
+        if decision_metric == "oos_f1":
+            model_name += "_oosf1"
         embedder_name = "auto (optimized by AutoML)"
     else:
-        model_name = get_model_name(args.pilot)
+        model_name = get_model_name(args.pilot, decision_metric)
         embedder_name = get_embedder_name(args.pilot)
 
     if args.mode == "fewshot":
@@ -133,6 +205,7 @@ def main():
     print("=" * 60)
     print(f"Mode: {'PILOT' if args.pilot else ('AUTO-EMBEDDER' if no_fix_embedder else 'FINAL')}")
     print(f"Embedder: {embedder_name}")
+    print(f"Decision metric: {decision_metric}")
     print(f"Training: {mode_str}")
     print(f"Output: {model_dir}")
     print("=" * 60)
@@ -159,8 +232,17 @@ def main():
         "intents": intents,
     })
 
-    # Create pipeline
-    pipeline = Pipeline.from_preset("classic-light")
+    # Create pipeline (with custom metric if needed)
+    if decision_metric == "oos_f1":
+        # 1. Register custom metric BEFORE creating pipeline
+        register_oos_f1_metric()
+        # 2. Create/ensure custom config exists
+        config_path = ensure_oosf1_config()
+        print(f"Using custom config: {config_path}")
+        # 3. Create pipeline from custom config
+        pipeline = Pipeline.from_optimization_config(config_path)
+    else:
+        pipeline = Pipeline.from_preset("classic-light")
 
     # Set embedder (unless --no-fix-embedder)
     if not no_fix_embedder:
@@ -201,6 +283,7 @@ def main():
         "embedder_fixed": not no_fix_embedder,
         "pilot": args.pilot,
         "preset": "classic-light",
+        "decision_metric": decision_metric,
     }
 
     import json
