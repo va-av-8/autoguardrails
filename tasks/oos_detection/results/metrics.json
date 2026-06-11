@@ -2809,7 +2809,7 @@
     "f1_oos": 0.755079006772009,
     "auroc": 0.9595153333333334,
     "au_ioc": 0.8917623333333333,
-    "latency_ms": 0.20732165430672467,
+    "latency_ms": 0.18860837910324335,
     "n_shots": 10,
     "seed": 42,
     "is_reference": false,
@@ -2821,7 +2821,8 @@
       "pilot": false,
       "comparable_to_table3": true,
       "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_deeppavlov_10shot_seed42"
-    }
+    },
+    "timestamp": null
   },
   {
     "model_name": "autointent_classic-light",
@@ -5458,5 +5459,51 @@
       "prediction_mode": "argmax",
       "embedder": "intfloat/multilingual-e5-large-instruct"
     }
+  },
+  {
+    "model_name": "autointent_classic-light_oosf1",
+    "mode": "10shot",
+    "oos_recall": 0.904,
+    "in_domain_acc": 0.8524444444444444,
+    "f1_oos": 0.7517671517671518,
+    "auroc": 0.9595153333333334,
+    "au_ioc": 0.8410618888888889,
+    "latency_ms": 0.19737755879759789,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-large-instruct",
+      "embedder_fixed": true,
+      "pilot": false,
+      "comparable_to_table3": true,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_oosf1_deeppavlov_10shot_seed42"
+    },
+    "timestamp": null
+  },
+  {
+    "model_name": "autointent_classic-light_pilot_oosf1",
+    "mode": "10shot",
+    "oos_recall": 0.799,
+    "in_domain_acc": 0.8268888888888889,
+    "f1_oos": 0.7198198198198198,
+    "auroc": 0.9360511111111111,
+    "au_ioc": 0.8048492222222222,
+    "latency_ms": 0.12923584319651127,
+    "n_shots": 10,
+    "seed": 42,
+    "is_reference": false,
+    "extra": {
+      "source": "deeppavlov",
+      "preset": "classic-light",
+      "embedder": "intfloat/multilingual-e5-small",
+      "embedder_fixed": true,
+      "pilot": true,
+      "comparable_to_table3": false,
+      "model_dir": "/Users/anastasiagapeeva/Documents/Education/AITH/ProjectPractice2/autoguardrails/tasks/oos_detection/runs/autointent_classic-light_pilot_oosf1_deeppavlov_10shot_seed42"
+    },
+    "timestamp": null
   }
 ]

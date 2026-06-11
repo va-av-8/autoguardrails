@@ -332,10 +332,16 @@ class Evaluator:
             # Get source from extra
             source = r.get("extra", {}).get("source", "—")
 
+            # Format numeric values, handle None
+            def fmt(val, width=8, decimals=4):
+                if val is None:
+                    return f"{'—':>{width}}"
+                return f"{val:>{width}.{decimals}f}"
+
             print(
-                f"{name:<25} {source:<10} {r['mode']:<10} "
-                f"{r['oos_recall']:>8.4f} {r['in_domain_acc']:>8.4f} {r['f1_oos']:>8.4f} "
-                f"{r['auroc']:>8.4f} {r['au_ioc']:>8.4f} {r['latency_ms']:>8.2f}"
+                f"{name:<25} {source:<10} {r['mode'] or '—':<10} "
+                f"{fmt(r.get('oos_recall'))} {fmt(r.get('in_domain_acc'))} {fmt(r.get('f1_oos'))} "
+                f"{fmt(r.get('auroc'))} {fmt(r.get('au_ioc'))} {fmt(r.get('latency_ms'), decimals=2)}"
             )
 
         print("-" * 115)

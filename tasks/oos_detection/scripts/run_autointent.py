@@ -18,6 +18,9 @@
     # AutoML оптимизация embedder
     python scripts/run_autointent.py --source standard --mode fewshot --n_shots 10 --seed 42 --no-fix-embedder
 
+    # С кастомной OOS-метрикой для decision node (для сравнения с фреймворками)
+    python scripts/run_autointent.py --source deeppavlov --mode fewshot --n_shots 10 --seed 42 --decision-metric oos_f1
+
 Или запустите скрипты отдельно:
     python scripts/train_autointent.py --source standard --mode fewshot --n_shots 10 --seed 42
     python scripts/eval_autointent.py --model_dir runs/autointent_classic-light_standard_10shot_seed42
@@ -34,14 +37,25 @@ script_dir = Path(__file__).parent
 task_dir = script_dir.parent
 
 
-def get_model_dir(pilot: bool, no_fix_embedder: bool, source: str, mode: str, n_shots: int | None, seed: int | None) -> Path:
+def get_model_dir(
+    pilot: bool,
+    no_fix_embedder: bool,
+    source: str,
+    mode: str,
+    n_shots: int | None,
+    seed: int | None,
+    decision_metric: str = "decision_accuracy",
+) -> Path:
     """Construct model directory path."""
+    # Build model name with optional suffixes
+    suffix = "_oosf1" if decision_metric == "oos_f1" else ""
+
     if no_fix_embedder:
-        model_name = "autointent_classic-light_autoembedder"
+        model_name = f"autointent_classic-light_autoembedder{suffix}"
     elif pilot:
-        model_name = "autointent_classic-light_pilot"
+        model_name = f"autointent_classic-light_pilot{suffix}"
     else:
-        model_name = "autointent_classic-light"
+        model_name = f"autointent_classic-light{suffix}"
 
     if mode == "fewshot":
         mode_str = f"{n_shots}shot"
@@ -102,10 +116,17 @@ def main():
         action="store_true",
         help="Only evaluate (model must exist)",
     )
+    parser.add_argument(
+        "--decision-metric",
+        choices=["decision_accuracy", "oos_f1"],
+        default="decision_accuracy",
+        help="Target metric for decision node optimization (oos_f1 = binary F1 on OOS class)",
+    )
     args = parser.parse_args()
 
     # Build command arguments
     no_fix_embedder = getattr(args, 'no_fix_embedder', False)
+    decision_metric = args.decision_metric
 
     train_args = [
         sys.executable,
@@ -114,6 +135,7 @@ def main():
         "--mode", args.mode,
         "--n_shots", str(args.n_shots),
         "--seed", str(args.seed),
+        "--decision-metric", decision_metric,
     ]
     if args.pilot:
         train_args.append("--pilot")
@@ -124,6 +146,7 @@ def main():
         args.pilot, no_fix_embedder, args.source, args.mode,
         args.n_shots if args.mode == "fewshot" else None,
         args.seed,  # always pass seed for consistent model_dir
+        decision_metric,
     )
 
     eval_args = [
