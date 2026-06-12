@@ -242,3 +242,9 @@ tasks/*/results/diagnostics/
 # CatBoost training logs
 catboost_info/
 **/catboost_info/
+
+# OOS detection task (separate branch)
+tasks/oos_detection/
+
+# Backup files
+tasks/jailbreak_detection/results/metrics.json.bak_*

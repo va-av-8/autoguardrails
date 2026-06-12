@@ -5,9 +5,8 @@
 Детекция попыток jailbreak на input, до передачи промпта в LLM.
 OOS-переформулировка: safe = in-scope интент, jailbreak = OOS-класс.
 
-Задача структурно аналогична OOS-детекции, но данные adversarial
-по природе — jailbreak-промпты специально сконструированы, чтобы
-обходить защиты LLM.
+Задача структурно аналогична OOS-детекции, но данные adversarial по природе —
+jailbreak-промпты специально сконструированы, чтобы обходить защиты LLM.
 
 ## Датасет
 
@@ -15,8 +14,6 @@ OOS-переформулировка: safe = in-scope интент, jailbreak = 
 - HuggingFace: `allenai/wildjailbreak`
 - Train: 261 559 примеров
 - Eval: 2 210 примеров (используется как test)
-- Колонки: `vanilla` (str), `adversarial` (str), `completion` (str),
-  `data_type` (str)
 - Prompt-колонка: `adversarial` если непустой, иначе `vanilla`
 - Бинарная метка: `*_harmful` → jailbreak (1), `*_benign` → safe (0)
 
@@ -26,164 +23,157 @@ OOS-переформулировка: safe = in-scope интент, jailbreak = 
 | adversarial_harmful | 2000 | jailbreak |
 | adversarial_benign | 210 | safe |
 
-Vanilla-примеров в eval нет.
+Vanilla-примеров в eval нет. Дисбаланс ~10:1 (jailbreak:safe).
 
-**Распределение train (приблизительно):**
-| data_type | count |
-|-----------|-------|
-| vanilla_harmful | 50 050 |
-| vanilla_benign | 50 050 |
-| adversarial_harmful | 82 728 |
-| adversarial_benign | 78 706 |
-
-**Предупреждение:** датасет содержит примеры тяжёлого вреда,
-включая CSAM-категорию. При отображении примеров избегать
-воспроизведения контента из этих категорий.
+**Предупреждение:** датасет содержит примеры тяжёлого вреда, включая CSAM-категорию.
+При отображении примеров избегать воспроизведения контента из этих категорий.
 
 ## Подготовка данных
 
 ### Few-shot протокол
-
-- Balanced sampling: N примеров на класс (safe / jailbreak)
-- n_shots: [10, 20, 50], seeds: [42, 123, 456], итого 9 runs
-- Естественное распределение (~10:1 jailbreak/safe) сохранено
-  только в test-сплите
-- Соответствует практике WildGuard (NeurIPS 2024):
-  uniform mixture при обучении и оценке
-
-```bash
-python scripts/prepare_data.py  # few-shot по умолчанию
-```
+- Balanced sampling: N примеров на класс. n_shots [10, 20, 50], seeds [42, 123, 456].
+- Естественное распределение (~10:1) сохранено только в test.
+- `python scripts/prepare_data.py`
 
 ### Full-train подвыборки (100K)
-
-Для AutoML экспериментов (AutoGluon, H2O, LightAutoML) используются
-стратифицированные 100K подвыборки из train-сплита.
-
-**Обоснование размера:** Shi et al. 2021 (NeurIPS D&B) downsampled
-крупные текстовые датасеты (jigsaw toxicity, mercari) до 100K
-для computational tractability AutoML. Jigsaw toxicity — структурно
-ближайший родственник jailbreak detection.
-
-**Стратификация:**
-- 50/50 баланс safe vs jailbreak (по 50K)
-- Внутри каждого класса сохранена оригинальная пропорция vanilla/adversarial
-
-```bash
-python scripts/prepare_data.py --full_subset
-```
-
-**Выходные файлы:**
-- `data/processed/wildjailbreak_full100k_seed42.json`
-- `data/processed/wildjailbreak_full100k_seed123.json`
-- `data/processed/wildjailbreak_full100k_seed456.json`
-
-**Формат:** идентичен few-shot (AutoIntent-совместимый JSON).
+- Стратифицированные 100K из train: 50/50 safe vs jailbreak, внутри класса сохранена
+  пропорция vanilla/adversarial.
+- `python scripts/prepare_data.py --full_subset`
+- Выход: `wildjailbreak_full100k_seed{42,123,456}.json`
 
 ## Метрики
 
-Все функции в `src/metrics.py`, параметр `oos_label=1`.
-
-### Основные
-
-| Метрика | Описание | Функция |
-|---------|----------|---------|
-| **F1** | F1-score на jailbreak-классе | `f1_oos(y_true, y_pred, oos_label=1)` |
-| **Precision** | TP / (TP + FP) на jailbreak | `precision_oos(y_true, y_pred, oos_label=1)` |
-| **Recall** | TPR на jailbreak-классе | `oos_recall(y_true, y_pred, oos_label=1)` |
-| **Over-refusal Rate** | FPR на safe-промптах | `over_refusal_rate(y_true, y_pred, oos_label=1)` |
-
-### По подмножествам
+Все в `src/metrics.py`, `oos_label=1`. Агрегатор `evaluate_jailbreak(...)`.
 
 | Метрика | Описание |
 |---------|----------|
-| **recall_vanilla_harmful** | Recall на vanilla_harmful (недоступен в текущем eval) |
-| **recall_adversarial_harmful** | Recall на adversarial_harmful |
+| **F1** | F1 на jailbreak-классе |
+| **Recall** | TPR на jailbreak |
+| **Over-refusal Rate (ORR)** | FPR на safe (доля заблокированных безопасных) |
+| **ROC-AUC** | ранжирование (порого-независимо) |
+| **recall_adversarial_harmful** | recall на adversarial-подмножестве |
 
-Агрегатор: `evaluate_jailbreak(y_true, y_pred, data_types, oos_label=1)`.
+---
 
-## SOTA-модели
+## Ключевые находки
+
+Сводка расследования (детали — в `findings_jailbreak.md`, `autointent_jailbreak.md`,
+`wrappers_jailbreak.md`; диагностики — в ноутбуках 06–15).
+
+**Потолок разделимости.** На общих e5-эмбеддингах все модели упираются в близкий потолок
+ранжирования (ROC-AUC ~0.76–0.81). Вне эмбеддинга извлекаемого сигнала нет: символьная
+обфускация и структурные обёртки (role-play и пр.) распределены симметрично между safe и
+harmful, e5 их слабо разделяет (nb14). Это потолок представления, а не конкретной модели.
+
+**Бустинг закрывает разрыв с AutoML.** Отставание AutoIntent от AutoML-фреймворков на тех же
+e5 объясняется тем, что у фреймворков в поиске есть бустинги, а у classic-light — нет.
+Одиночный LightGBM на e5 даёт метрики на уровне фреймворков (даже чуть выше). Стекинг сверх
+бустинга прироста почти не даёт (+~0.006 ROC-AUC); по ROC-кривым видно, что сдвиг порога
+проблему не решает.
+
+**KNN vs Linear голова.** В classic-light HPO выбирает KNN-scorer, который на этой задаче
+слабее линейного: хуже ранжирует (ROC 0.76 vs 0.79) и даёт вдвое больший ORR (0.62 vs 0.36).
+Это вскрылось при отладке проброса query_prompt: префикс сломал KNN на eval, и HPO выбрал
+Linear (см. `autointent_jailbreak.md`, §6). Сам instruction-префикс до скоров не доходит —
+остаётся неиспробованным рычагом.
+
+**Препроцессинг текста бесполезен** на WildJailbreak: сомнительные паттерны и обёртки
+распределены одинаково по safe/harmful, bag-of-words и нормализация не дают сигнала.
+
+**ORR высок у всех.** Лучший достижимый ORR ~0.36 (Linear head, AutoML) — для guardrail это
+всё ещё много (каждый третий безопасный запрос блокируется). Это следствие потолка
+разделимости, а не конкретной модели. Баланс F1/ORR не достигается сдвигом порога.
+
+### Метрики (Full Train, 3 сида)
+
+| Модель | F1 | Recall | ORR | ROC-AUC |
+|--------|-----|--------|-----|---------|
+| AutoGluon (E5) | 0.8746±0.0221 | 0.8082±0.0379 | 0.3746±0.0310 | 0.8065±0.0141 |
+| LAMA (E5) | 0.8868±0.0015 | 0.8280±0.0023 | 0.3746±0.0073 | 0.8149±0.0020 |
+| AutoIntent classic-light — **KNN head** | 0.9083±0.0094 | 0.8863±0.0197 | 0.6206±0.0324 | 0.7569±0.0179 |
+| AutoIntent classic-light — **Linear head** (qp) | 0.8599±0.0020 | 0.7830±0.0035 | 0.3635±0.0099 | 0.7889±0.0038 |
+
+H2O невалиден на Apple Silicon (нет XGBoost) — перепрогон на x86/Windows.
+classic-medium / nn-medium / zero-shot — Kaggle-справочные (только few-shot), не сравнивать
+в лоб с локальными M1.
+
+### AutoIntent classic-light few-shot (KNN head)
+
+| n_shots | F1 | Recall | ORR |
+|---------|-----|--------|-----|
+| 10-shot | 0.651±0.133 | 0.519 | 0.467 |
+| 20-shot | 0.736±0.145 | 0.629 | 0.462 |
+| 50-shot | 0.682±0.119 | 0.550 | 0.417 |
+
+Few-shot нестабилен (высокий std); на 10-shot модели близки к случайному ранжированию.
+
+---
+
+## SOTA-модели (zero-shot, на test)
 
 | Модель | Параметры | Тип | Источник |
 |--------|-----------|-----|----------|
 | PromptGuard 2 | 86M | BERT-style classifier | LlamaFirewall, arxiv:2505.03574 |
 | Qwen3Guard-Gen | 4B / 8B | Generative LLM | arxiv:2510.14276 |
 
-**Примечания по выбору:**
-- WildGuard (NeurIPS 2024) исключён: обучен на WildGuardMix,
-  включающем данные из WildJailbreak — data leakage на нашем тесте.
-- Бейзлайны из OOS-спринта (TF-IDF, cosine) не запускаются:
-  adversarial промпты специально маскируют вредоносный intent,
-  bag-of-words методы предсказуемо деградируют.
-- SOTA запускается в zero-shot режиме только на тестовом сплите.
-- PromptGuard 2: SOTA-статус заявлен авторами (Meta),
-  независимых рецензируемых оценок нет.
-- Qwen3Guard: независимо оценён в arxiv:2511.22047,
-  показывает generalization gap −57 п.п. на novel prompts.
+- WildGuard исключён: обучен на данных, включающих WildJailbreak → data leakage.
+- Qwen3Guard независимо оценён (arxiv:2511.22047): generalization gap −57 п.п. на novel prompts.
 
-## Гипотезы
+---
 
-| # | Гипотеза | Статус |
-|---|----------|--------|
-| HYP-JB-001 | Обобщение OOS-пайплайна на adversarial данные | запланирована |
-| HYP-JB-002 | Vanilla vs adversarial generalization gap | запланирована (ограничение: eval содержит только adversarial) |
-| HYP-JB-003 | AutoIntent как бинарный классификатор на adversarial данных | выполнена |
-| HYP-JB-004 | Asymmetric cost function для снижения Over-refusal Rate | выполнена (опровергнута) |
+## Открытые направления
+
+1. **Починить query_prompt** симметрично (passage/classification prompt) — instruction-префикс
+   уникальное преимущество AutoIntent (Табл.1 статьи), пока не задействован.
+2. **Склейка с safety-классификатором** (напр. скрытое состояние / скор Qwen3Guard) как внешняя
+   фича — план Б, если префикс не поднимет разделимость.
+3. **Бустинг-scorer в classic-light.** Разрыв по ROC объясняется отсутствием бустинга в
+   classic-light. В AutoIntent бустинг-scorer есть (CatBoostScorer, входит в medium-пресеты) —
+   стоит прогнать classic-medium локально или добавить CatBoost-scorer в classic-light.
+4. **H2O — перепрогон на x86/Windows** (XGBoost; вернуть StackedEnsemble и дефолтную метрику).
+5. **Baseline AutoML — переделать строго «из коробки»** (родная текст-обработка каждого
+   фреймворка), CPU.
+6. **Стабилизация few-shot** — надежда на более сильные эмбеддинги или стекинг поверх них.
+
+---
 
 ## Ноутбуки
 
 | Ноутбук | Содержание |
 |---------|------------|
-| `01_eda.ipynb` | EDA датасета WildJailbreak |
-| `02_sota_eval.ipynb` | Запуск SOTA-моделей (Colab/Kaggle) |
-| `03_autointent_fewshot.ipynb` | AutoIntent few-shot (10/20/50-shot, 3 seeds) |
-| `04_jailbreak_assymetric_cost_hypothesis.ipynb` | Проверка HYP-JB-004: asymmetric cost на дискретных точках |
+| `01_eda.ipynb` | EDA WildJailbreak |
+| `04_jailbreak_assymetric_cost_hypothesis.ipynb` | Asymmetric cost (опровергнута) |
+| `06_scores_diagnostics.ipynb` | Диагностика скоров |
+| `07_fulltrain_diagnostics.ipynb` | Диагностика full-train |
+| `08_embedding_separability.ipynb` | Разделимость в эмбеддингах |
+| `09_adversarial_ceiling.ipynb` | Потолок на adversarial |
+| `10_knn_vs_linear_scorer.ipynb` | KNN vs Linear scorer |
+| `11_stacking_scorers.ipynb` | Стекинг scorer'ов |
+| `12_closing_gap_heads.ipynb` | Закрытие разрыва (головы) |
+| `13_orr_tradeoff.ipynb` | Trade-off ORR |
+| `14_attack_vectors.ipynb` | Векторы атак |
+| `15_roc_comparison.ipynb` | Сводное ROC-сравнение всех участников |
+
+## Документация
+
+| Файл | Содержание |
+|------|------------|
+| `autointent_jailbreak.md` | Обёртка AutoIntent: узлы, HPO, query_prompt, seed |
+| `wrappers_jailbreak.md` | AutoML-обёртки E5: архитектура «из коробки», decision rule, бюджеты |
+| `findings_jailbreak.md` | Карта валидности метрик, ties, техдолг |
 
 ## Ограничения
 
-- **Eval только adversarial:** vanilla_harmful и vanilla_benign
-  отсутствуют в eval-сплите, что ограничивает тестирование HYP-JB-002.
-- **Дисбаланс классов:** eval содержит ~10:1 jailbreak/safe,
-  что влияет на интерпретацию precision.
+- **Eval только adversarial:** vanilla_harmful/benign отсутствуют → не проверить vanilla vs
+  adversarial gap.
+- **Дисбаланс ~10:1** влияет на интерпретацию precision/ORR.
+- **train_sec/roc_auc** не пишутся в metrics.json (ROC восстанавливается из scores).
+- **Лидерборды AutoML** не сохраняются — состав обученных моделей из артефактов не установить.
 
 ## Ссылки
 
 - [WildJailbreak](https://arxiv.org/abs/2406.18510) — Jiang et al., NeurIPS 2024
 - [WildGuard](https://arxiv.org/abs/2406.18495) — Han et al., NeurIPS 2024
-- [XSTest](https://arxiv.org/abs/2308.01263) — Röttger et al., NAACL 2024
 - [AutoIntent](https://arxiv.org/abs/2509.21138) — Golubev et al., EMNLP 2025
-- [LlamaFirewall / PromptGuard 2](https://arxiv.org/abs/2505.03574) — Meta, 2025
+- [PromptGuard 2](https://arxiv.org/abs/2505.03574) — Meta, 2025
 - [Qwen3Guard](https://arxiv.org/abs/2510.14276) — Alibaba, 2025
-
-## Результаты AutoIntent few-shot
-
-**Модель:** AutoIntent classic-light
-**Embedder:** intfloat/multilingual-e5-large-instruct
-**Выбор эмбеддера:** AutoIntent прогонялся в двух режимах — с
-фиксированным эмбеддером и без (AutoML сам выбирает из пула моделей,
-`--pilot`). Во всех 12 прогонах без фиксации (10/20/50-shot
-и full × 3 сида) AutoML выбрал ту же `multilingual-e5-large-instruct`,
-поэтому отдельные full-прогоны с фиксацией не проводились —
-они эквивалентны прогонам без фиксации.
-
-| n_shots | F1 | Recall | CV(F1) |
-|---------|----|--------|--------|
-| 10-shot | 0.757 ± 0.026 | 0.642 ± 0.039 | 3.4% |
-| 20-shot | 0.796 ± 0.062 | 0.701 ± 0.108 | 7.8% |
-| 50-shot | 0.731 ± 0.148 | 0.623 ± 0.196 | 20.2% |
-
-Вердикт: **UNSTABLE** (overall CV = 10.3%). Оптимальная точка —
-20-shot. Высокий Over-refusal Rate (до 74%) — открытая проблема.
-
-### Артефакты: локальные модели vs metrics.json
-
-**Важно:** `results/metrics.json` содержит результаты Kaggle-прогонов
-с фиксированным эмбеддером (e5large), а не локальных прогонов из ноутбука 03.
-
-| Источник | model_name | embedder_fixed | Где хранится |
-|----------|------------|----------------|--------------|
-| Ноутбук 03 (локально) | `autointent_classic-light` | Yes | `runs/autointent_classic-light_*` |
-| Kaggle (metrics.json) | `autointent_classic-light_e5large` | Yes | только metrics.json |
-
-Числа совпадают — используется один и тот же эмбеддер (`e5-large-instruct`).
-Локальные модели few-shot (9 штук) сохранены в `runs/`, Kaggle-модели (e5large, full) — нет.
