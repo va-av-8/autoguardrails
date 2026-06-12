@@ -114,8 +114,8 @@ def main():
     n_shots = metadata.get("n_shots")
     seed = metadata.get("seed")
     embedder_name = metadata.get("embedder", "unknown")
-    embedder_fixed = metadata.get("embedder_fixed", True)  # Default True for backward compat
     pilot = args.pilot if args.pilot is not None else metadata.get("pilot", False)
+    decision_metric = metadata.get("decision_metric", "decision_accuracy")
 
     print()
     print("=" * 60)
@@ -125,7 +125,7 @@ def main():
     print(f"Source: {source}")
     print(f"Mode: {mode_str}")
     print(f"Embedder: {embedder_name}")
-    print(f"Embedder fixed: {embedder_fixed}")
+    print(f"Decision metric: {decision_metric}")
     print(f"Pilot: {pilot}")
     print("=" * 60)
     print()
@@ -185,9 +185,9 @@ def main():
             "source": source,
             "preset": metadata.get("preset", "classic-light"),
             "embedder": embedder_name,
-            "embedder_fixed": embedder_fixed,
+            "decision_metric": decision_metric,
             "pilot": pilot,
-            "comparable_to_table3": not pilot and embedder_fixed and source == "deeppavlov",
+            "comparable_to_table3": not pilot and source == "deeppavlov",
             "model_dir": str(model_dir),
         },
     )

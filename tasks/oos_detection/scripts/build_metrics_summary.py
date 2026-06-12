@@ -28,31 +28,85 @@ def get_task_root() -> Path:
     return Path(__file__).parent.parent
 
 
+# Column order: logical grouping
+COLUMN_ORDER = [
+    # Identification
+    "model_name",
+    "source",
+    "mode",
+    "n_shots",
+    "seed",
+    "prediction_mode",
+    "preset",
+    # Main metrics
+    "oos_recall",
+    "in_domain_acc",
+    "f1_oos",
+    "accuracy",
+    "macro_f1",
+    "oos_precision",
+    # Secondary metrics
+    "auroc",
+    "au_ioc",
+    # Timing
+    "latency_ms",
+    "train_sec",
+    "fit_sec",
+    "calibrate_sec",
+    "eval_sec",
+    # Meta
+    "framework",
+    "embedder",
+    "embedder_key",
+    "embedder_fixed",
+    "decision_metric",
+    "pilot",
+    "model_dir",
+    "hypothesis",
+    "kaggle_run",
+    "comparable_to_table3",
+    "is_reference",
+    "timestamp",
+]
+
+# Metrics to aggregate (mean ± std)
+METRICS_TO_AGGREGATE = [
+    "oos_recall",
+    "in_domain_acc",
+    "f1_oos",
+    "accuracy",
+    "macro_f1",
+    "oos_precision",
+    "auroc",
+    "au_ioc",
+    "latency_ms",
+    "train_sec",
+    "fit_sec",
+    "calibrate_sec",
+    "eval_sec",
+]
+
+
 def parse_entry(entry: dict) -> dict:
-    """Parse entry from metrics.json into flat row."""
+    """Parse entry from metrics.json into flat row with all fields."""
     extra = entry.get("extra", {})
 
-    return {
-        # Identification
-        "model_name": entry.get("model_name"),
-        "source": extra.get("source"),
-        "mode": entry.get("mode"),
-        "n_shots": entry.get("n_shots"),
-        "seed": entry.get("seed"),
-        # Main metrics
-        "oos_recall": entry.get("oos_recall"),
-        "in_domain_acc": entry.get("in_domain_acc"),
-        "f1_oos": entry.get("f1_oos"),
-        "auroc": entry.get("auroc"),
-        "au_ioc": entry.get("au_ioc"),
-        "latency_ms": entry.get("latency_ms"),
-        # Meta
-        "framework": extra.get("framework"),
-        "embedder": extra.get("embedder"),
-        "embedder_fixed": extra.get("embedder_fixed"),
-        "pilot": extra.get("pilot"),
-        "is_reference": entry.get("is_reference"),
-    }
+    row = {}
+
+    # Root-level fields
+    for key in ["model_name", "mode", "n_shots", "seed", "oos_recall", "in_domain_acc",
+                "f1_oos", "auroc", "au_ioc", "latency_ms", "is_reference", "timestamp"]:
+        row[key] = entry.get(key)
+
+    # Extra fields (flattened)
+    for key in ["source", "prediction_mode", "preset", "accuracy", "macro_f1",
+                "oos_precision", "train_sec", "fit_sec", "calibrate_sec", "eval_sec",
+                "framework", "embedder", "embedder_key", "embedder_fixed",
+                "decision_metric", "pilot", "model_dir", "hypothesis", "kaggle_run",
+                "comparable_to_table3"]:
+        row[key] = extra.get(key)
+
+    return row
 
 
 def build_summary(metrics_path: Path) -> pd.DataFrame:
@@ -68,6 +122,12 @@ def build_summary(metrics_path: Path) -> pd.DataFrame:
     rows = [parse_entry(entry) for entry in metrics_data]
     df = pd.DataFrame(rows)
 
+    # Reorder columns: COLUMN_ORDER first, then any extra columns alphabetically
+    existing_cols = set(df.columns)
+    ordered_cols = [c for c in COLUMN_ORDER if c in existing_cols]
+    extra_cols = sorted(existing_cols - set(ordered_cols))
+    df = df[ordered_cols + extra_cols]
+
     # Sort by model_name, source, mode, n_shots, seed
     mode_order = {"full": 0, "10shot": 1, "20shot": 2, "50shot": 3}
     df["_mode_order"] = df["mode"].map(lambda x: mode_order.get(x, 99))
@@ -80,8 +140,6 @@ def build_summary(metrics_path: Path) -> pd.DataFrame:
 
 def build_aggregated_summary(df: pd.DataFrame) -> pd.DataFrame:
     """Build aggregated summary with mean and std across seeds for each model+source+mode."""
-    metrics = ["oos_recall", "in_domain_acc", "f1_oos", "auroc", "au_ioc", "latency_ms"]
-
     grouped = df.groupby(["model_name", "source", "mode"], dropna=False)
 
     rows = []
@@ -94,7 +152,11 @@ def build_aggregated_summary(df: pd.DataFrame) -> pd.DataFrame:
             "seeds": sorted([int(s) for s in group["seed"].dropna().tolist()]) or None,
         }
 
-        for metric in metrics:
+        for metric in METRICS_TO_AGGREGATE:
+            if metric not in group.columns:
+                row[f"{metric}_mean"] = None
+                row[f"{metric}_std"] = None
+                continue
             values = group[metric].dropna()
             if len(values) > 0:
                 row[f"{metric}_mean"] = values.mean()

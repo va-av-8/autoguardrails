@@ -246,3 +246,4 @@ catboost_info/
 # Task-specific ignores
 tasks/jailbreak_detection/
 tasks/oos_detection/results/scores/
+tasks/oos_detection/results/*.bak*
